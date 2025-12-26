@@ -2,9 +2,15 @@ package net.minecraft.src;
 
 import java.io.File;
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
+
 import org.lwjgl.Sys;
 
 public class GuiTexturePacks extends GuiScreen {
+	static {
+		Client.class.getClass();
+	    //XXX Modifed
+	}
     protected GuiScreen guiScreen;
     private int field_6454_o = -1;
     private String fileLocation = "";
@@ -12,7 +18,6 @@ public class GuiTexturePacks extends GuiScreen {
     public GuiTexturePacks(GuiScreen var1) {
     	this(var1, true);
     }
-    //XXX Modifed
     public boolean fillBg = true;
     public GuiTexturePacks(GuiScreen var1, boolean fillBg) {
         this.guiScreen = var1;

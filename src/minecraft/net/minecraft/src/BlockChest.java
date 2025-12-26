@@ -186,15 +186,15 @@ public class BlockChest extends BlockContainer {
 
     public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
         Object var6 = (TileEntityChest)var1.getBlockTileEntity(var2, var3, var4);
-        if (var1.isBlockOpaqueCube(var2, var3 + 1, var4)) {
+        if (var1.func_28100_h(var2, var3 + 1, var4)) {
             return true;
-        } else if (var1.getBlockId(var2 - 1, var3, var4) == this.blockID && var1.isBlockOpaqueCube(var2 - 1, var3 + 1, var4)) {
+        } else if (var1.getBlockId(var2 - 1, var3, var4) == this.blockID && var1.func_28100_h(var2 - 1, var3 + 1, var4)) {
             return true;
-        } else if (var1.getBlockId(var2 + 1, var3, var4) == this.blockID && var1.isBlockOpaqueCube(var2 + 1, var3 + 1, var4)) {
+        } else if (var1.getBlockId(var2 + 1, var3, var4) == this.blockID && var1.func_28100_h(var2 + 1, var3 + 1, var4)) {
             return true;
-        } else if (var1.getBlockId(var2, var3, var4 - 1) == this.blockID && var1.isBlockOpaqueCube(var2, var3 + 1, var4 - 1)) {
+        } else if (var1.getBlockId(var2, var3, var4 - 1) == this.blockID && var1.func_28100_h(var2, var3 + 1, var4 - 1)) {
             return true;
-        } else if (var1.getBlockId(var2, var3, var4 + 1) == this.blockID && var1.isBlockOpaqueCube(var2, var3 + 1, var4 + 1)) {
+        } else if (var1.getBlockId(var2, var3, var4 + 1) == this.blockID && var1.func_28100_h(var2, var3 + 1, var4 + 1)) {
             return true;
         } else {
             if (var1.getBlockId(var2 - 1, var3, var4) == this.blockID) {

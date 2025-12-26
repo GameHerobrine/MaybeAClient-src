@@ -17,8 +17,19 @@ public class EntityGhast extends EntityFlying implements IMob {
         this.isImmuneToFire = true;
     }
 
+    protected void entityInit() {
+        super.entityInit();
+        this.dataWatcher.addObject(16, (byte)0);
+    }
+
+    public void onUpdate() {
+        super.onUpdate();
+        byte var1 = this.dataWatcher.getWatchableObjectByte(16);
+        this.texture = var1 == 1 ? "/mob/ghast_fire.png" : "/mob/ghast.png";
+    }
+
     protected void updatePlayerActionState() {
-        if (this.worldObj.difficultySetting == 0) {
+        if (!this.worldObj.multiplayerWorld && this.worldObj.difficultySetting == 0) {
             this.setEntityDead();
         }
 
@@ -36,7 +47,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 
         if (this.courseChangeCooldown-- <= 0) {
             this.courseChangeCooldown += this.rand.nextInt(5) + 2;
-            if (this.func_27023_a(this.waypointX, this.waypointY, this.waypointZ, var7)) {
+            if (this.isCourseTraversable(this.waypointX, this.waypointY, this.waypointZ, var7)) {
                 this.motionX += var1 / var7 * 0.1D;
                 this.motionY += var3 / var7 * 0.1D;
                 this.motionZ += var5 / var7 * 0.1D;
@@ -91,10 +102,17 @@ public class EntityGhast extends EntityFlying implements IMob {
             }
         }
 
-        this.texture = this.attackCounter > 10 ? "/mob/ghast_fire.png" : "/mob/ghast.png";
+        if (!this.worldObj.multiplayerWorld) {
+            byte var21 = this.dataWatcher.getWatchableObjectByte(16);
+            byte var12 = (byte)(this.attackCounter > 10 ? 1 : 0);
+            if (var21 != var12) {
+                this.dataWatcher.updateObject(16, var12);
+            }
+        }
+
     }
 
-    private boolean func_27023_a(double var1, double var3, double var5, double var7) {
+    private boolean isCourseTraversable(double var1, double var3, double var5, double var7) {
         double var9 = (this.waypointX - this.posX) / var7;
         double var11 = (this.waypointY - this.posY) / var7;
         double var13 = (this.waypointZ - this.posZ) / var7;

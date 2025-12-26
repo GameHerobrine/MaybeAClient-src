@@ -9,7 +9,7 @@ public interface ISaveFormat {
 
     List func_22176_b();
 
-    void func_22177_c();
+    void flushCache();
 
     WorldInfo func_22173_b(String var1);
 

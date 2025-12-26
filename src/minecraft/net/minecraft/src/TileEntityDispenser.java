@@ -41,9 +41,8 @@ public class TileEntityDispenser extends TileEntity implements IInventory {
         int var2 = 1;
 
         for(int var3 = 0; var3 < this.dispenserContents.length; ++var3) {
-            if (this.dispenserContents[var3] != null && this.dispenserRandom.nextInt(var2) == 0) {
+            if (this.dispenserContents[var3] != null && this.dispenserRandom.nextInt(var2++) == 0) {
                 var1 = var3;
-                ++var2;
             }
         }
 

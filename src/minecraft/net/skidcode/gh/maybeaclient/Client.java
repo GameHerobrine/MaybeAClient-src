@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.imageio.ImageIO;
@@ -22,12 +23,30 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.Block;
+import net.minecraft.src.BlockBed;
+import net.minecraft.src.BlockButton;
+import net.minecraft.src.BlockCake;
+import net.minecraft.src.BlockChest;
+import net.minecraft.src.BlockDispenser;
+import net.minecraft.src.BlockDoor;
+import net.minecraft.src.BlockFurnace;
+import net.minecraft.src.BlockJukeBox;
+import net.minecraft.src.BlockLever;
+import net.minecraft.src.BlockNote;
+import net.minecraft.src.BlockRedstoneOre;
+import net.minecraft.src.BlockRedstoneRepeater;
+import net.minecraft.src.BlockTrapDoor;
+import net.minecraft.src.BlockWorkbench;
+import net.minecraft.src.MapColor;
+import net.minecraft.src.Material;
 import net.minecraft.src.NBTBase;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagInt;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.NBTTagString;
 import net.minecraft.src.RenderManager;
+import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.console.*;
 import net.skidcode.gh.maybeaclient.gui.altman.AccountInfo;
 import net.skidcode.gh.maybeaclient.gui.altman.GuiAccManager;
@@ -39,6 +58,7 @@ import net.skidcode.gh.maybeaclient.gui.server.GuiServerSelector;
 import net.skidcode.gh.maybeaclient.gui.server.ServerInfo;
 import net.skidcode.gh.maybeaclient.hacks.*;
 import net.skidcode.gh.maybeaclient.hacks.settings.Setting;
+import net.skidcode.gh.maybeaclient.shaders.Framebuffer;
 import net.skidcode.gh.maybeaclient.shaders.Shaders;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 import net.skidcode.gh.maybeaclient.utils.TextureUtils;
@@ -53,14 +73,16 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "2.7";
+	public static final String clientVersion = "3.1.5";
 	
-	public static final int saveVersion = 3;
+	public static final int saveVersion = 4;
 	/*
 	 * Save format 2(1.3):
 	 *  * SettingColor saves the data as CompoundTag instead of ByteArray
 	 * Save format 3(1.5):
 	 *  * ClickGUI tabs save priority into the tag.
+	 * Save format 4(3.0):
+	 *  * Tabs save all settings
 	 */
 	
 	public static int convertingVersion = 0;
@@ -74,7 +96,7 @@ public class Client {
 	}
 	
 	public static void addMessage(String msg) {
-		addMessageRaw(String.format("%s[%s]:%s %s", ChatColor.CYAN, Client.clientName, ChatColor.WHITE, msg));
+		addMessageRaw(String.format("%s[%s]:%s %s", ChatColor.CYAN, ClientNameHack.instance.overrideInChat() ? ClientNameHack.instance.clientName() : Client.clientName, ChatColor.WHITE, msg));
 	}
 	
 	public static void addMessageRaw(String msg) {
@@ -280,17 +302,18 @@ public class Client {
 		DataInputStream dis = new DataInputStream(new FileInputStream(f));
 		NBTBase base = NBTBase.readTag(dis);
 		NBTTagCompound cc = (NBTTagCompound) base;
-		NBTTagCompound clickgui = cc.getCompoundTag("ClickGUI");
 		int version = cc.getInteger("FormatVersion");
 		if(version != Client.saveVersion) {
 			System.out.println(String.format("Gui settings save version does not match client(%d != %d). Converting...", version, Client.saveVersion));
 			Client.convertingVersion = version;
 		}
-		int lowest = Integer.MIN_VALUE;
+		
 		HashMap<Integer, Tab> priority = new HashMap<>();
+		NBTTagCompound clickgui = cc.getCompoundTag("ClickGUI");
+		int lowest = Integer.MIN_VALUE;
 		for(Tab tab : ClickGUI.tabs) {
-			NBTTagCompound tg = clickgui.getCompoundTag(tab.name.toLowerCase());
-			if(!clickgui.hasKey(tab.name.toLowerCase())) {
+			NBTTagCompound tg = clickgui.getCompoundTag(tab.getTabName().toLowerCase());
+			if(!clickgui.hasKey(tab.getTabName().toLowerCase())) {
 				System.out.println("Information about "+tab.name+" not found.");
 				priority.put(lowest++, tab);
 			}else {
@@ -304,7 +327,7 @@ public class Client {
 						priority.put(tabprio, tab);
 					}
 				}else {
-					priority.put(lowest++, tab);
+				priority.put(lowest++, tab);
 				}
 			}
 		}
@@ -322,7 +345,7 @@ public class Client {
 		
 		for(Tab tab : ClickGUI.tabs) {
 			NBTTagCompound tb = (NBTTagCompound) NBTBase.createTagOfType((byte) 10);
-			clickgui.setCompoundTag(tab.name.toLowerCase(), tb);
+			clickgui.setCompoundTag(tab.getTabName().toLowerCase(), tb);
 			tab.writeToNBT(tb);
 		}
 		
@@ -432,10 +455,65 @@ public class Client {
 		write2.writeTagContents(new DataOutputStream(new FileOutputStream(f)));
 	}
 	
+	public static int possibleColors[] = new int[MapColor.mapColorArray.length];
+	public static HashMap<Integer, Integer> containedColors = new HashMap<>();
+	public static HashMap<Integer, Integer> color2default = new HashMap<Integer, Integer>();
+	
+	public static HashMap<Integer, ArrayList<Block>> color2block = new HashMap<>();
+	
+	public static int color2blocks(MapColor mc, int col) {
+		color2default.put(col, mc.colorValue);
+		ArrayList<Block> blocks = color2block.getOrDefault(col, new ArrayList<>());
+		for(Block b : Block.blocksList) {
+			if(b != null && b.blockMaterial.materialMapColor == mc && b.blockMaterial != Material.fire) {
+				blocks.add(b);
+			}
+		}
+		
+		color2block.put(col, blocks);
+		return col;
+	}
+	
 	public static void postClientLoad() throws IOException {
 		System.out.println("Loaded "+Client.hacksByName.size()+" modules, "+Client.commands.size()+" commands.");
 		
 		ClickGUI.registerTabs();
+		int j = 0;
+		for(int i = 0; i < MapColor.mapColorArray.length; ++i) {
+			MapColor mc = MapColor.mapColorArray[i];
+			if(mc != null && mc != MapColor.field_28212_b) { //black not possible
+				int col = mc.colorValue;
+				if(!containedColors.containsKey(col)) {
+					possibleColors[j] = col;
+					containedColors.put(col, j);
+					++j;
+				}
+				
+				{ //1 & 3 - default
+					int r = (col >> 16 & 255) * 220 / 255;
+	                int g = (col >> 8 & 255) * 220 / 255;
+	                int b = (col & 255) * 220 / 255;
+	                color2blocks(mc, (r << 16) | (g << 8) | b);
+				}
+				
+				{ //2 - * 255/255 laddering up
+					color2blocks(mc, col);
+				}
+				
+				{ //0 laddering down
+					int r = (col >> 16 & 255) * 180 / 255;
+	                int g = (col >> 8 & 255) * 180 / 255;
+	                int b = (col & 255) * 180 / 255;
+	                
+	                color2blocks(mc, (r << 16) | (g << 8) | b);
+				}
+				
+			}
+		}
+		int[] realpossible = new int[j];
+		System.arraycopy(possibleColors, 0, realpossible, 0, j);
+		possibleColors = realpossible;
+		
 		
 		File f = new File(Minecraft.getMinecraftDir()+"/MaybeAClient/");
 		File fpr = new File(Minecraft.getMinecraftDir()+"/MaybeAClient_USER/");
@@ -588,7 +666,7 @@ public class Client {
 			return Client.path2bufImg.get(src);
 		}
 		
-		InputStream res = Client.mc.texturePackList.selectedTexturePack.func_6481_a(src);
+		InputStream res = Client.mc.texturePackList.selectedTexturePack.getResourceAsStream(src);
 		if(res == null) return null;
 		
 		
@@ -599,7 +677,7 @@ public class Client {
 		if(Client.path2bufImg.containsKey(src)) {
 			return Client.path2bufImg.get(src);
 		}
-		InputStream res = Client.mc.texturePackList.selectedTexturePack.func_6481_a(src);
+		InputStream res = Client.mc.texturePackList.selectedTexturePack.getResourceAsStream(src);
 		if(res == null) return null;
 		
 		
@@ -608,7 +686,7 @@ public class Client {
 	}
 	
 	public static boolean textureExists(String src) {
-		return Client.mc.texturePackList.selectedTexturePack.func_6481_a(src) != null;
+		return Client.mc.texturePackList.selectedTexturePack.getResourceAsStream(src) != null;
 	}
 	
 	public static byte[] itemsTextureSides;
@@ -619,7 +697,9 @@ public class Client {
 	public static final boolean BETTER_CHAT_CONTROLS = true;
 	
 	public static final int STENCIL_REF_ELDRAW = 123;
-	public static final int STENCIL_REF_TBDRAW = STENCIL_REF_ELDRAW+1;
+	public static final int STENCIL_REF_TBDRAW = STENCIL_REF_ELDRAW+1; //MUST BE +1 OR TEXTBOXES WILL BREAK
+	
+	public static final File mapartsDirectory = new File(Minecraft.getMinecraftDir(), "/maparts/");
 	
 	/**Future?
 	 * Better Schematica placement controls
@@ -628,23 +708,22 @@ public class Client {
 	 * Custom font support
 	 * BlockNotifier (notify if some block is close to the player)
 	 * Better AutoTunnel, Diagonal AutoTunnel?
-	 * Bred, Uware, CatHack, Iridium Themes
+	 * Bred, Uware, CatHack themes
 	 * AutoMiner
-	 * TabManager - hide/show tabs from clickgui, add new module tabs
+	 * Added tab manager(special tab in clickgui, .tab [...] in console) TODO console, heph & nodus theme, more options, rewrite saving
+	 * Added ability to create custom module categories and modify existent TODO
+	 * hai my digga can u add inventory clicker like when u hold shift and left button its moves in container with auto clicking every item to move item
+	 * - Steal button for invs?
 	*/
 	
 	/**
-	 * 2.7
-	 * Added AutoBoneMeal
-	 * Added ResetAllSettings button to every module 
-	 * Tweaked Step
-	 * Max Tunnel Width Left/Right slider value was increased from 2 to 5
-	 * Added ability to use mouse buttons as module keybindings
-	 * Small changes to Cliff theme
-	 * Improved schematica performance
+	 * 3.1.5
+	 * Fixed AutoBlockPlace attempting to place blocks on activeable blocks
+	 * Fixed Schematica Stats not using block metadata
 	 */
 	
 	static {
+		Client.mapartsDirectory.mkdirs();
 		//1.0
 		registerHack(new FlyHack());
 		registerHack(new JesusHack());
@@ -726,7 +805,7 @@ public class Client {
 		registerHack(new TunnelESPHack());
 		registerHack(new NoPortalSoundsHack());
 		registerHack(new TooltipsHack());
-		registerHack(new InventoryTweaksHack());
+		//useless registerHack(new InventoryTweaksHack());
 		//2.2.1
 		registerHack(new LowHopSpeedHack());
 		registerHack(new AFKDisconnectHack());
@@ -752,7 +831,11 @@ public class Client {
 		registerHack(new ZoomHack());
 		//2.6.2
 		registerHack(new AutoBoneMealHack());
-		
+		//3.0.0
+		registerHack(new NoFriendlyFireHack());
+		registerHack(new FireExtinguisherHack());
+		//3.1.2
+		registerHack(new WeatherLockHack());
 		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {
 			public Hack init() {
 				this.addSetting(new net.skidcode.gh.maybeaclient.hacks.settings.SettingChooser(this, "ColorSettingVithVeryVeryVeryVeryLongName", new String[] {"Ae", "Clef"}, new boolean[] {false, false}));
@@ -770,6 +853,10 @@ public class Client {
 		registerCommand(new CommandTab());
 		//2.1
 		registerCommand(new CommandTeleport());
+		//3.1
+		registerCommand(new CommandItemGui());
+		registerCommand(new CommandInstantBuild());
+		registerCommand(new CommandSetMapScale());
 		
 		try {
 			postClientLoad();
@@ -777,6 +864,34 @@ public class Client {
 			throw new RuntimeException(e);
 		}
 	}
+	public static boolean isActiveable[] = new boolean[Block.blocksList.length];
+	
+    static {
+    	for(int i = 0; i < Block.blocksList.length; ++i) {
+    		Block b = Block.blocksList[i];
+    		isActiveable[i] = 
+    			b instanceof BlockBed || 
+    			b instanceof BlockButton || 
+    			b instanceof BlockCake || 
+    			b instanceof BlockChest || 
+    			b instanceof BlockDispenser || 
+    			b instanceof BlockDoor ||
+    			b instanceof BlockFurnace ||
+    			b instanceof BlockJukeBox ||
+    			b instanceof BlockLever ||
+    			b instanceof BlockNote ||
+    			//b instanceof BlockPistonBase ||
+    			//b instanceof BlockPistonMoving ||
+    			b instanceof BlockRedstoneOre ||
+    			b instanceof BlockRedstoneRepeater ||
+    			//b instanceof BlockStairs ||
+    			//b instanceof BlockTNT ||
+    			b instanceof BlockTrapDoor ||
+    			b instanceof BlockWorkbench;
+    	}
+    }
+    
+	public static Framebuffer fb_entityTop;
 	
 	public static int outlinesDisplayLists = 0;
 	public static int blockDisplayLists = -1;
@@ -797,6 +912,9 @@ public class Client {
 	
 	public static void initTextures() {
 		Shaders.init();
+		if(fbEnabled) {
+			fb_entityTop = new Framebuffer();
+		}
 		
 		System.out.println("Intializing outlined textures");
 		long time = System.currentTimeMillis();
@@ -936,6 +1054,11 @@ public class Client {
 		}
     }
 	
+
+	public static Hack findHack(String name) {
+		return Client.hacksByName.get(name.toLowerCase());
+	}
+	
 	public static void onKeyPress(int keycode, boolean pressed) {
 		if(keycode == 0) return;
 		
@@ -972,4 +1095,27 @@ public class Client {
 		}
 	}
 
+	public static final boolean fbEnabled = false;
+	
+	public static void onScreenResize(ScaledResolution sr) {
+		if(fbEnabled) Client.fb_entityTop.setup(sr.getScaledWidth(), sr.getScaledHeight());
+	}
+	
+	public static void renderFramebuffers() {
+		if(Client.fbEnabled) Client.fb_entityTop.renderOnScreen();
+		
+	}
+
+	
+	public static ArrayList<File> maparts;
+	public static ArrayList<File> getMaparts(){
+		maparts = new ArrayList<File>();
+		File[] files = mapartsDirectory.listFiles();
+		for(File f : files) {
+			if(!f.getName().toLowerCase().endsWith(".png")) continue;
+			maparts.add(f);
+		}
+		if(files.length <= 0) maparts.add(null);
+		return maparts;
+	}
 }

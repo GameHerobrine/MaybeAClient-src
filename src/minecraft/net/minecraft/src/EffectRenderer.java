@@ -28,6 +28,10 @@ public class EffectRenderer {
 
     public void addEffect(EntityFX var1) {
         int var2 = var1.getFXLayer();
+        if (this.fxLayers[var2].size() >= 4000) {
+            this.fxLayers[var2].remove(0);
+        }
+
         this.fxLayers[var2].add(var1);
     }
 
@@ -106,19 +110,18 @@ public class EffectRenderer {
 
     }
 
-    public void addBlockDestroyEffects(int var1, int var2, int var3) {
-        int var4 = this.worldObj.getBlockId(var1, var2, var3);
+    public void addBlockDestroyEffects(int var1, int var2, int var3, int var4, int var5) {
         if (var4 != 0) {
-            Block var5 = Block.blocksList[var4];
-            byte var6 = 4;
+            Block var6 = Block.blocksList[var4];
+            byte var7 = 4;
 
-            for(int var7 = 0; var7 < var6; ++var7) {
-                for(int var8 = 0; var8 < var6; ++var8) {
-                    for(int var9 = 0; var9 < var6; ++var9) {
-                        double var10 = (double)var1 + ((double)var7 + 0.5D) / (double)var6;
-                        double var12 = (double)var2 + ((double)var8 + 0.5D) / (double)var6;
-                        double var14 = (double)var3 + ((double)var9 + 0.5D) / (double)var6;
-                        this.addEffect((new EntityDiggingFX(this.worldObj, var10, var12, var14, var10 - (double)var1 - 0.5D, var12 - (double)var2 - 0.5D, var14 - (double)var3 - 0.5D, var5)).func_4041_a(var1, var2, var3));
+            for(int var8 = 0; var8 < var7; ++var8) {
+                for(int var9 = 0; var9 < var7; ++var9) {
+                    for(int var10 = 0; var10 < var7; ++var10) {
+                        double var11 = (double)var1 + ((double)var8 + 0.5D) / (double)var7;
+                        double var13 = (double)var2 + ((double)var9 + 0.5D) / (double)var7;
+                        double var15 = (double)var3 + ((double)var10 + 0.5D) / (double)var7;
+                        this.addEffect((new EntityDiggingFX(this.worldObj, var11, var13, var15, var11 - (double)var1 - 0.5D, var13 - (double)var2 - 0.5D, var15 - (double)var3 - 0.5D, var6)).func_4041_a(var1, var2, var3));
                     }
                 }
             }

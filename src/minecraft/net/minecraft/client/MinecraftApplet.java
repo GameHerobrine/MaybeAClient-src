@@ -57,14 +57,14 @@ public class MinecraftApplet extends Applet {
 
     public void start() {
         if (this.mc != null) {
-            this.mc.isWorldLoaded = false;
+            this.mc.isGamePaused = false;
         }
 
     }
 
     public void stop() {
         if (this.mc != null) {
-            this.mc.isWorldLoaded = true;
+            this.mc.isGamePaused = true;
         }
 
     }

@@ -6,20 +6,13 @@ public class ChunkProviderLoadOrGenerate implements IChunkProvider {
     private Chunk blankChunk;
     private IChunkProvider chunkProvider;
     private IChunkLoader chunkLoader;
-    private Chunk[] chunks = new Chunk[1024];
+    private Chunk[] chunks;
     private World worldObj;
-    int lastQueriedChunkXPos = -999999999;
-    int lastQueriedChunkZPos = -999999999;
+    int lastQueriedChunkXPos;
+    int lastQueriedChunkZPos;
     private Chunk lastQueriedChunk;
     private int curChunkX;
     private int curChunkY;
-
-    public ChunkProviderLoadOrGenerate(World var1, IChunkLoader var2, IChunkProvider var3) {
-        this.blankChunk = new EmptyChunk(var1, new byte['\u8000'], 0, 0);
-        this.worldObj = var1;
-        this.chunkLoader = var2;
-        this.chunkProvider = var3;
-    }
 
     public void setCurrentChunkOver(int var1, int var2) {
         this.curChunkX = var1;
@@ -218,7 +211,7 @@ public class ChunkProviderLoadOrGenerate implements IChunkProvider {
         return true;
     }
 
-    public String toString() {
+    public String makeString() {
         return "ChunkCache: " + this.chunks.length;
     }
 }

@@ -9,12 +9,12 @@ public class EntityCreature extends EntityLiving {
         super(var1);
     }
 
-    protected boolean setCanWalk() {
+    protected boolean isMovementCeased() {
         return false;
     }
 
     protected void updatePlayerActionState() {
-        this.hasAttacked = this.setCanWalk();
+        this.hasAttacked = this.isMovementCeased();
         float var1 = 16.0F;
         if (this.playerToAttack == null) {
             this.playerToAttack = this.findPlayerToAttack();
@@ -27,6 +27,8 @@ public class EntityCreature extends EntityLiving {
             float var2 = this.playerToAttack.getDistanceToEntity(this);
             if (this.canEntityBeSeen(this.playerToAttack)) {
                 this.attackEntity(this.playerToAttack, var2);
+            } else {
+                this.attackBlockedEntity(this.playerToAttack, var2);
             }
         }
 
@@ -61,7 +63,7 @@ public class EntityCreature extends EntityLiving {
         }
 
         int var22 = MathHelper.floor_double(this.boundingBox.minY + 0.5D);
-        boolean var23 = this.func_27013_ag();
+        boolean var23 = this.isInWater();
         boolean var24 = this.handleLavaMovement();
         this.rotationPitch = 0.0F;
         if (this.pathToEntity != null && this.rand.nextInt(100) != 0) {
@@ -136,6 +138,9 @@ public class EntityCreature extends EntityLiving {
     }
 
     protected void attackEntity(Entity var1, float var2) {
+    }
+
+    protected void attackBlockedEntity(Entity var1, float var2) {
     }
 
     protected float getBlockPathWeight(int var1, int var2, int var3) {

@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 public class MaterialTransparent extends Material {
-    public MaterialTransparent() {
+    public MaterialTransparent(MapColor var1) {
+        super(var1);
         this.func_27284_f();
     }
 

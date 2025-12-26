@@ -53,8 +53,8 @@ public class MovePacketHook implements EventListener{
 				overrideYaw = overridePitch = false;
 				if(Client.mc.thePlayer instanceof EntityClientPlayerMP) {
 					EntityClientPlayerMP ep = (EntityClientPlayerMP) Client.mc.thePlayer;
-					ep.field_9385_bC = pk.yaw;
-					ep.field_9384_bD = pk.pitch;
+					ep.oldRotationYaw = pk.yaw;
+					ep.oldRotationPitch = pk.pitch;
 				}
 			}
 		}

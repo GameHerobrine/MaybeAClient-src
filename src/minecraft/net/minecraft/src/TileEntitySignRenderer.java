@@ -16,7 +16,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer {
             GL11.glTranslatef((float)var2 + 0.5F, (float)var4 + 0.75F * var10, (float)var6 + 0.5F);
             float var11 = (float)(var1.getBlockMetadata() * 360) / 16.0F;
             GL11.glRotatef(-var11, 0.0F, 1.0F, 0.0F);
-            this.signModel.field_1345_b.showModel = true;
+            this.signModel.signStick.showModel = true;
         } else {
             int var16 = var1.getBlockMetadata();
             var12 = 0.0F;
@@ -35,7 +35,7 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer {
             GL11.glTranslatef((float)var2 + 0.5F, (float)var4 + 0.75F * var10, (float)var6 + 0.5F);
             GL11.glRotatef(-var12, 0.0F, 1.0F, 0.0F);
             GL11.glTranslatef(0.0F, -0.3125F, -0.4375F);
-            this.signModel.field_1345_b.showModel = false;
+            this.signModel.signStick.showModel = false;
         }
 
         this.bindTextureByName("/item/sign.png");
@@ -62,7 +62,6 @@ public class TileEntitySignRenderer extends TileEntitySpecialRenderer {
 	            }
 	        }
         }
-
         GL11.glDepthMask(true);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();

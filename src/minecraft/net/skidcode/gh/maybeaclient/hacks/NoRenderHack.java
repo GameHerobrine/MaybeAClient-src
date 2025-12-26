@@ -27,6 +27,7 @@ public class NoRenderHack extends Hack{
 	);
 	public SettingBoolean weather = new SettingBoolean(this, "Weather", false);
 	public SettingBoolean vignette = new SettingBoolean(this, "Vignette", false);
+	public SettingBoolean players = new SettingBoolean(this, "Players", false);
 	
 	public NoRenderHack() {
 		super("NoRender", "Disables some rendering", Keyboard.KEY_NONE, Category.RENDER);
@@ -41,6 +42,7 @@ public class NoRenderHack extends Hack{
 		this.addSetting(this.particles);
 		this.addSetting(this.weather);
 		this.addSetting(this.vignette);
+		this.addSetting(this.players);
 	}
 	public static boolean shouldRender(EntityFX e) {
 		if(!instance.status) return true;

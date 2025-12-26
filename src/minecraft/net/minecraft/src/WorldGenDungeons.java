@@ -74,7 +74,7 @@ public class WorldGenDungeons extends WorldGenerator {
                         }
 
                         if (var15 == 1) {
-                            var1.setBlockWithNotify(var12, var4, var14, Block.crate.blockID);
+                            var1.setBlockWithNotify(var12, var4, var14, Block.chest.blockID);
                             TileEntityChest var16 = (TileEntityChest)var1.getBlockTileEntity(var12, var4, var14);
                             int var17 = 0;
 

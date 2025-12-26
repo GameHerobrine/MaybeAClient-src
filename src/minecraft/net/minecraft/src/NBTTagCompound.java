@@ -3,12 +3,13 @@ package net.minecraft.src;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class NBTTagCompound extends NBTBase {
-	public Map<String, NBTBase> tagMap = new HashMap<>();
+    public Map<String, NBTBase> tagMap = new HashMap<>();
 
     public void writeTagContents(DataOutput var1) throws IOException {
         Iterator var2 = this.tagMap.values().iterator();
@@ -21,7 +22,7 @@ public class NBTTagCompound extends NBTBase {
         var1.writeByte(0);
     }
 
-    public void readTagContents(DataInput var1) throws IOException {
+    void readTagContents(DataInput var1) throws IOException {
         this.tagMap.clear();
 
         NBTBase var2;
@@ -29,6 +30,10 @@ public class NBTTagCompound extends NBTBase {
             this.tagMap.put(var2.getKey(), var2);
         }
 
+    }
+
+    public Collection func_28110_c() {
+        return this.tagMap.values();
     }
 
     public byte getType() {

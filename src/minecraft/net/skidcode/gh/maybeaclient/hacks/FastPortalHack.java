@@ -23,7 +23,7 @@ public class FastPortalHack extends Hack implements EventListener{
 	@Override
 	public void handleEvent(Event event) {
 		if(event instanceof EventMPMovementUpdate) {
-			if (mc.thePlayer.timeInPortal > 0.0f && mc.thePlayer.field_9373_b == 0) {
+			if (mc.thePlayer.timeInPortal > 0.0f && mc.thePlayer.field_28024_y == 0) {
 				for(int i = 0; i < this.packets.getValue(); ++i) mc.getSendQueue().addToSendQueue(new Packet10Flying(true));
 			}
 		}

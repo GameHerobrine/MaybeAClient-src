@@ -15,12 +15,12 @@ public class ItemSword extends Item {
     }
 
     public boolean hitEntity(ItemStack var1, EntityLiving var2, EntityLiving var3) {
-        var1.func_25190_a(1, var3);
+        var1.damageItem(1, var3);
         return true;
     }
 
-    public boolean func_25008_a(ItemStack var1, int var2, int var3, int var4, int var5, EntityLiving var6) {
-        var1.func_25190_a(2, var6);
+    public boolean onBlockDestroyed(ItemStack var1, int var2, int var3, int var4, int var5, EntityLiving var6) {
+        var1.damageItem(2, var6);
         return true;
     }
 

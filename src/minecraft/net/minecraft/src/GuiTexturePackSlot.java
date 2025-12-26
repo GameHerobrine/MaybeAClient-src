@@ -19,6 +19,7 @@ class GuiTexturePackSlot extends GuiSlot {
         return var1.size();
     }
 
+
     protected void elementClicked(int var1, boolean var2) {
         List var3 = Client.mc.texturePackList.availableTexturePacks();
         Client.mc.texturePackList.setTexturePack((TexturePackBase)var3.get(var1));
@@ -33,12 +34,9 @@ class GuiTexturePackSlot extends GuiSlot {
     protected int getContentHeight() {
         return this.getSize() * 36;
     }
-    
-    @Override
+
     protected void drawBackground() {
-    	if(this.parentTexturePackGui.fillBg) {
-    		this.parentTexturePackGui.drawDefaultBackground();
-    	}
+        this.parentTexturePackGui.drawDefaultBackground();
     }
 
     protected void drawSlot(int var1, int var2, int var3, int var4, Tessellator var5) {

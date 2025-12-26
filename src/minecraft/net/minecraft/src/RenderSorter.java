@@ -3,13 +3,13 @@ package net.minecraft.src;
 import java.util.Comparator;
 
 public class RenderSorter implements Comparator {
-    private EntityLiving field_4274_a;
+    private EntityLiving baseEntity;
 
     public RenderSorter(EntityLiving var1) {
-        this.field_4274_a = var1;
+        this.baseEntity = var1;
     }
 
-    public int func_993_a(WorldRenderer var1, WorldRenderer var2) {
+    public int doCompare(WorldRenderer var1, WorldRenderer var2) {
         boolean var3 = var1.isInFrustum;
         boolean var4 = var2.isInFrustum;
         if (var3 && !var4) {
@@ -17,15 +17,14 @@ public class RenderSorter implements Comparator {
         } else if (var4 && !var3) {
             return -1;
         } else {
-            double var5 = (double)var1.distanceToEntitySquared(this.field_4274_a);
-            double var7 = (double)var2.distanceToEntitySquared(this.field_4274_a);
+            double var5 = (double)var1.distanceToEntitySquared(this.baseEntity);
+            double var7 = (double)var2.distanceToEntitySquared(this.baseEntity);
             if (var5 < var7) {
                 return 1;
             } else if (var5 > var7) {
                 return -1;
             } else {
-            	if(var1.field_1735_w < var2.field_1735_w) return 0;
-                return var1.field_1735_w < var2.field_1735_w ? 1 : -1;
+                return var1.chunkIndex < var2.chunkIndex ? 1 : -1;
             }
         }
     }
@@ -33,6 +32,6 @@ public class RenderSorter implements Comparator {
     // $FF: synthetic method
     // $FF: bridge method
     public int compare(Object var1, Object var2) {
-        return this.func_993_a((WorldRenderer)var1, (WorldRenderer)var2);
+        return this.doCompare((WorldRenderer)var1, (WorldRenderer)var2);
     }
 }

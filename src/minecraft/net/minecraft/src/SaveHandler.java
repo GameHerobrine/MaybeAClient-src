@@ -13,12 +13,15 @@ public class SaveHandler implements ISaveHandler {
     private static final Logger logger = Logger.getLogger("Minecraft");
     private final File saveDirectory;
     private final File playersDirectory;
+    private final File field_28114_d;
     private final long now = System.currentTimeMillis();
 
     public SaveHandler(File var1, String var2, boolean var3) {
         this.saveDirectory = new File(var1, var2);
         this.saveDirectory.mkdirs();
         this.playersDirectory = new File(this.saveDirectory, "players");
+        this.field_28114_d = new File(this.saveDirectory, "data");
+        this.field_28114_d.mkdirs();
         if (var3) {
             this.playersDirectory.mkdirs();
         }
@@ -159,5 +162,9 @@ public class SaveHandler implements ISaveHandler {
             var7.printStackTrace();
         }
 
+    }
+
+    public File func_28113_a(String var1) {
+        return new File(this.field_28114_d, var1 + ".dat");
     }
 }

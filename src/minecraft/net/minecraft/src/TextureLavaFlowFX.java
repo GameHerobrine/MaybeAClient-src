@@ -13,7 +13,8 @@ public class TextureLavaFlowFX extends TextureFX {
         super(Block.lavaMoving.blockIndexInTexture + 1);
         this.tileSize = 2;
     }
-    public boolean hasTexture = false;
+
+	public boolean hasTexture = false;
     public void onTick() {
         ++this.field_1139_k;
         if(this.hasTexture && NoRenderHack.instance.status && NoRenderHack.instance.lavaAnim.value) {
@@ -87,6 +88,5 @@ public class TextureLavaFlowFX extends TextureFX {
             this.imageData[var2 * 4 + 3] = -1;
         }
         this.hasTexture = true;
-
     }
 }

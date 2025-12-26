@@ -20,6 +20,8 @@ import net.skidcode.gh.maybeaclient.events.impl.EventWorldRenderPreFog;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.SettingsTab;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
+import net.skidcode.gh.maybeaclient.gui.click.element.VerticalContainer;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.Setting;
@@ -34,38 +36,16 @@ public class BlockESPHack extends Hack implements EventListener{
 	public static class SettingsTabWithParentProvider extends SettingsTab{
 		public static final Tab fakeMinimized = new Tab("") {};
 		static {
-			fakeMinimized.minimized = true;
+			fakeMinimized.minimized.setValue(true);
 			fakeMinimized.shown = false;
 		}
-		public SettingsTabWithParentProvider(SettingsProvider sp, int hackID) {
-			super(null, sp, hackID);
-		}
-		
-		@Override
-		public Tab getParent() {
-			if(ESPBlockChooser.instanz.hidden || ESPBlockChooser.instanz.minimized || !BlockESPHack.instance.expanded) {
-				return fakeMinimized;
-			}
-			
-			if(ClickGUIHack.theme().verticalSettings) {
-				return BlockESPHack.instance.category.tab;
-			}
-			
-			return BlockESPHack.instance.tab != null && BlockESPHack.instance.tab.shown ? BlockESPHack.instance.tab : fakeMinimized;
+		public SettingsTabWithParentProvider(Element parent, SettingsProvider sp) {
+			super(parent, sp);
 		}
 		
 		@Override
 		public int getInitialYPos() {
-			if(ClickGUIHack.theme().verticalSettings) {
-				Tab tab = this.getParent();
-				return tab.yPos + this.hackID + tab.getVScrollOffset();
-			}else {
-				int ae = this.hackID;
-				this.hackID = 1;
-				int result = super.getInitialYPos();
-				this.hackID = ae;
-				return result;
-			}
+			return this.parent.startY;
 		}
 	}
 	public static class ESPBlockChooser extends SettingBlockChooser{
@@ -128,6 +108,17 @@ public class BlockESPHack extends Hack implements EventListener{
 					public ArrayList<Setting> getSettings() {
 						return this.settings;
 					}
+
+					@Override
+					public void incrHiddens(int i) {
+						//XXX do nothing?
+					}
+
+					@Override
+					public VerticalContainer getSettingContainer() {
+						//TODO aaaaaa
+						return null;
+					}
 				};
 				final int uwu = i;
 				this.color[i] = new SettingColor(null, "Color", 255, 0, 0);
@@ -150,7 +141,7 @@ public class BlockESPHack extends Hack implements EventListener{
 					}
 					
 					@Override
-					public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+					public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 						int yn = yStart + (this.getSettingHeight(tab) - 16)/2;
 						GL11.glPushMatrix();
 						GL11.glDisable(GL11.GL_LIGHTING);
@@ -163,7 +154,7 @@ public class BlockESPHack extends Hack implements EventListener{
 					}
 					
 					@Override
-					public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+					public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 						int yy = this.getSettingHeight(tab) / 2 - 8 / 2; //XXX text height
 						String s = "ID: "+uwu;
 						Client.mc.fontRenderer.drawString(s, x + 16 + 4, y + yy, 0xffffff);
@@ -175,7 +166,7 @@ public class BlockESPHack extends Hack implements EventListener{
 					}
 					
 					@Override
-					public int getSettingHeight(Tab tab) {
+					public int getSettingHeight(Element tab) {
 						return super.getSettingHeight(tab)*2;
 					}
 					
@@ -197,15 +188,12 @@ public class BlockESPHack extends Hack implements EventListener{
 	        mc.theWorld.markBlocksDirty((int)mc.thePlayer.posX - 256, 0, (int)mc.thePlayer.posZ - 256, (int)mc.thePlayer.posX + 256, 127, (int)mc.thePlayer.posZ + 256);
 		}
 		@Override
-		public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
-			if(this.settingTab != null) {
-				((SettingsTab)this.settingTab).hackID = (2 + ClickGUIHack.theme().yspacing + yStart) - tab.yPos - tab.getVScrollOffset();
-			}
+		public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 			super.renderElement(tab, xStart, yStart, xEnd, yEnd);
 		}
 		
 		@Override
-		public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 			if(mouseClick != 1) {
 				super.onPressedInside(tab, xMin, yMin, xMax, yMax, mouseX, mouseY, mouseClick);
 				return;
@@ -247,9 +235,9 @@ public class BlockESPHack extends Hack implements EventListener{
 								if(m) {
 									ClickGUI.removeTab(this.settingTab);
 								}
-								int hid = yMin - tab.yPos - tab.getVScrollOffset();
-								
-								this.settingTab = new SettingsTabWithParentProvider(this.blockSettings[id], hid);
+								//int hid = yMin - tab.startY; //TODO vscrolloffset - tab.getVScrollOffset();
+								System.out.println(tab);
+								this.settingTab = new SettingsTabWithParentProvider(tab, this.blockSettings[id]);
 								ClickGUI.addTab(0, this.settingTab);
 							}
 							
@@ -287,15 +275,6 @@ public class BlockESPHack extends Hack implements EventListener{
 		EventRegistry.registerListener(EventWorldRenderPreFog.class, this);
 	}
 	
-	@Override
-	public void onExpandToggled() {
-		/*if(this.blocks.settingTab != null) {
-			this.blocks.settingTab.shown = this.expanded;
-			if(((SettingsTab)this.blocks.settingTab).getParent() != this.tab && this.tab != null){
-				((SettingsTab)this.blocks.settingTab).parent = this.tab;
-			}
-		}*/
-	}
 	@Override
 	public void handleEvent(Event event) {
 		if(event instanceof EventWorldRenderPreFog) {

@@ -19,8 +19,8 @@ class SorterStatsBlock implements Comparator {
         StatBase var5 = null;
         StatBase var6 = null;
         if (this.field_27298_b.field_27271_e == 2) {
-            var5 = StatList.field_25159_y[var3];
-            var6 = StatList.field_25159_y[var4];
+            var5 = StatList.mineBlockStatArray[var3];
+            var6 = StatList.mineBlockStatArray[var4];
         } else if (this.field_27298_b.field_27271_e == 0) {
             var5 = StatList.field_25158_z[var3];
             var6 = StatList.field_25158_z[var4];
@@ -37,9 +37,9 @@ class SorterStatsBlock implements Comparator {
             if (var6 == null) {
                 return -1;
             }
-            
-            int var7 = this.field_27298_b.field_27274_a.field_27156_o.func_27184_a(var5);
-            int var8 = this.field_27298_b.field_27274_a.field_27156_o.func_27184_a(var6);
+
+            int var7 = GuiStats.func_27142_c(this.field_27298_b.field_27274_a).func_27184_a(var5);
+            int var8 = GuiStats.func_27142_c(this.field_27298_b.field_27274_a).func_27184_a(var6);
             if (var7 != var8) {
                 return (var7 - var8) * this.field_27298_b.field_27270_f;
             }

@@ -1,18 +1,12 @@
 package net.skidcode.gh.maybeaclient.gui.click;
 
 import java.util.ArrayList;
-
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
-import net.skidcode.gh.maybeaclient.hacks.KeybindingsHack;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack.SorterAZ;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack.SorterZA;
-import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class ArrayListTab extends Tab{
@@ -21,44 +15,25 @@ public class ArrayListTab extends Tab{
 	
 	public ArrayListTab() {
 		super("Enabled Modules");
-		this.xDefPos = this.xPos = 10;
-		this.yDefPos = this.yPos = 100;
-		this.height = 12;
-		
+		this.xDefPos = this.startX = 10;
+		this.yDefPos = this.startY = 100;
+		this.endY = this.startX+12;
 		instance = this;
+		this.isHUD = true;
 	}
-	public int yOffset = 0;
 	
-	public int oldEnabledCnt = 0;
-	boolean first = true;
 	public void renderIngame() {
 		if(ArrayListHack.instance.status) super.renderIngame();
 	}
-	public void renderName(boolean alignRight) {
-		if(alignRight) {
-			int xStart = this.xPos;
-			int yStart = this.yPos;
-			this.renderNameBG();
-			this.renderNameAt(xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name) - ClickGUIHack.theme().headerXAdd, yStart); //XXX - 2 is needed
-		}else {
-			super.renderName();
-		}
-	}
 	
+	ArrayList<String> enabled;
 	@Override
-	public void renderMinimized() {
-		this.height = ClickGUIHack.theme().yspacing;
-		this.renderName(this.isAlignedRight(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue()));
-	}
-	
-	public void render() {
-		Client.debug = true;
-		ArrayList<String> enabled = new ArrayList<>();
-		int savdHeight = this.height;
-		int savdWidth = this.width;
+	public void preRender() {
+		enabled = new ArrayList<>();
 		int totalHeight = 0;
-		int titleSize = Client.mc.fontRenderer.getStringWidth(this.name);
+		int titleSize = Client.mc.fontRenderer.getStringWidth(this.getTabName());
 		int totalWidth = titleSize + ClickGUIHack.theme().titleXadd;
+		
 		for(Hack h : Client.hacksByName.values()) {
 			if(h.status) {
 				totalHeight += ClickGUIHack.theme().yspacing;
@@ -79,42 +54,25 @@ public class ArrayListTab extends Tab{
 				enabled.add(name);
 			}
 		}
-		this.width = totalWidth;
-		this.height = totalHeight + 14;
-		if(this.minimized) this.height = ClickGUIHack.theme().yspacing;
 		
-		boolean expandTop = this.setPosition(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue(), ArrayListHack.instance.expand.getValue());
-		boolean alignRight = this.isAlignedRight(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue());
+		this.setPosition(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue(), ArrayListHack.instance.expand.getValue());
+		this.isAlignedRight(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue());
 		
-		if(!this.minimized) {
-			if(first) {
-				first = false;
-			}else {
-				boolean sav = false;
-				if(expandTop && savdHeight != this.height) {
-					this.yPos -= (this.height - savdHeight);
-					sav = true;
-				}
-				
-				if(alignRight && savdWidth != this.width){
-					this.xPos -= (this.width - savdWidth);
-					sav = true;
-				}
-				
-				if(sav) Client.saveClickGUI();
-			}
-		}
-		
-		if(this.minimized) {
+		this.endX = this.startX + totalWidth;
+		this.endY = this.startY + totalHeight + this.getYOffset();
+		if(this.minimized.getValue()) this.endY = this.startY + ClickGUIHack.theme().yspacing;
+		super.preRender();
+	}
+	
+	@Override
+	public void render() {
+		if(this.minimized.getValue()) {
 			this.renderMinimized();
 			return;
 		}
 		
 		this.renderName(alignRight);
-		this.renderFrame(
-			this.xPos, this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff, 
-			this.xPos + totalWidth, this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff + totalHeight + this.yOffset
-		);
+		Tab.renderFrame(this, this.startX, this.startY + this.getYOffset(), this.endX, this.endY);
 		
 		if(ArrayListHack.instance.sortMode.currentMode.equalsIgnoreCase("Ascending")) enabled.sort(SorterAZ.inst);
 		else if(ArrayListHack.instance.sortMode.currentMode.equalsIgnoreCase("Descending"))  enabled.sort(SorterZA.inst);
@@ -122,16 +80,17 @@ public class ArrayListTab extends Tab{
 			String s = enabled.get(i);
 			int rendX, rendY;
 			if(alignRight) {
-				rendX = (this.xPos + this.width) - Client.mc.fontRenderer.getStringWidth(s);
+				rendX = (this.endX) - Client.mc.fontRenderer.getStringWidth(s);
 			}else {
-				rendX = this.xPos + 2;
+				rendX = this.startX + 2;
 			}
 			
-			rendY = this.yPos+i*ClickGUIHack.theme().yspacing + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff + 2;
+			rendY = this.startY+i*ClickGUIHack.theme().yspacing + this.getYOffset() + 2;
 			
 			Client.mc.fontRenderer.drawString(s, rendX, rendY, ClickGUIHack.normTextColor());
 		}
-		Client.debug = false;
+		Tab.renderFrameTop(this, this.startX, this.startY + this.getYOffset(), this.endX, this.endY);
+		
 	}
 	
 	@Override

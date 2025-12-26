@@ -9,8 +9,8 @@ public class StatBasic extends StatBase {
         super(var1, var2);
     }
 
-    public StatBase func_25068_c() {
-        super.func_25068_c();
+    public StatBase registerStat() {
+        super.registerStat();
         StatList.field_25187_b.add(this);
         return this;
     }

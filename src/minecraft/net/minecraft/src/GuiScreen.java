@@ -21,8 +21,8 @@ public class GuiScreen extends Gui {
     public boolean field_948_f = false;
     protected FontRenderer fontRenderer;
     public GuiParticle field_25091_h;
-    protected GuiButton selectedButton = null;
-    
+    public GuiButton selectedButton = null;
+
     //XXX very needed fix
     public GuiScreen() {
     	mc = Client.mc;
@@ -41,7 +41,6 @@ public class GuiScreen extends Gui {
             this.mc.displayGuiScreen((GuiScreen)null);
             this.mc.setIngameFocus();
         }
-
     }
 
     public static String getClipboardString() {
@@ -63,7 +62,7 @@ public class GuiScreen extends Gui {
                 GuiButton var5 = (GuiButton)this.controlList.get(var4);
                 if (var5.mousePressed(this.mc, var1, var2)) {
                     this.selectedButton = var5;
-                    this.mc.sndManager.func_337_a("random.click", 1.0F, 1.0F);
+                    this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
                     this.actionPerformed(var5);
                 }
             }
@@ -105,7 +104,9 @@ public class GuiScreen extends Gui {
         	AFKDisconnectHack.stopAFKing();
             this.handleKeyboardInput();
         }
+        
         AFKDisconnectHack.startAFKing();
+
     }
 
     public void handleMouseInput() {
@@ -125,7 +126,7 @@ public class GuiScreen extends Gui {
 
     public void handleKeyboardInput() {
         if (Keyboard.getEventKeyState()) {
-            if (Keyboard.getEventKey() == Keyboard.KEY_F11) {
+            if (Keyboard.getEventKey() == 87) {
                 this.mc.toggleFullscreen();
                 return;
             }
@@ -147,7 +148,7 @@ public class GuiScreen extends Gui {
 
     public void drawWorldBackground(int var1) {
         if (this.mc.theWorld != null) {
-            this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+            drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
             this.drawBackground(var1);
         }
@@ -177,6 +178,6 @@ public class GuiScreen extends Gui {
     public void deleteWorld(boolean var1, int var2) {
     }
 
-    public void func_27108_j() {
+    public void selectNextField() {
     }
 }

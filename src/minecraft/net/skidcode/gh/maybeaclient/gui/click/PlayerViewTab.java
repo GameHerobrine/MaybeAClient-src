@@ -18,38 +18,53 @@ public class PlayerViewTab extends Tab{
 	public static PlayerViewTab instance;
 	public PlayerViewTab() {
 		super("Player View");
-		this.xDefPos = this.xPos = 160;
-		this.yDefPos = this.yPos = 24 + 14 + 14 + 14 + 14;
-		this.minimized = true;
+		this.xDefPos = this.startX = 160;
+		this.yDefPos = this.startY = 24 + 14 + 14 + 14 + 14;
+		this.minimized.setValue(true);
 		instance = this;
+		this.isHUD = true;
 	}
 	
 	public void renderIngame() {
 		if(PlayerViewHack.instance.status && RenderManager.instance.livingPlayer != null) super.renderIngame();
 	}
 	
-	public void render() {
+	@Override
+	public void preRender() {
 		int ySpace = ClickGUIHack.theme().yspacing;
-		int prevSpace = ClickGUIHack.theme().titlebasediff;
-		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
-		if(this.minimized) {
-			this.height = ySpace;
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
+		int height, width;
+		if(this.minimized.getValue()) {
+			height = ySpace;
+			width = Client.mc.fontRenderer.getStringWidth(this.getTabName()) + ClickGUIHack.theme().titleXadd;
+		}else {
+			height = this.getYOffset() + 90; //cliff checked
+			width = Client.mc.fontRenderer.getStringWidth(this.getTabName()) + 2 + 16*2;
+		}
+		
+		this.endX = this.startX + width;
+		this.endY = this.startY + height;
+		super.preRender();
+	}
+	
+	@Override
+	public void render() {
+		int headOffset = this.getYOffset();
+		int ySpace = ClickGUIHack.theme().yspacing;
+		if(this.minimized.getValue()) {
 			super.render();
 			return;
 		}
 		EntityPlayer player = Client.mc.thePlayer;
-		this.height = ySpace + prevSpace + 90; //cliff checked
-		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2 + 16*2;
+		
 		super.render();
-		this.renderFrame((int)this.xPos, (int)this.yPos + ySpace + prevSpace, (int)this.xPos + this.width, (int)this.yPos + this.height);
+		Tab.renderFrame(this, (int)this.startX, (int)this.startY + headOffset, (int)this.endX, (int)this.endY);
 		
 		GL11.glEnable(EXTRescaleNormal.GL_RESCALE_NORMAL_EXT);
 		GL11.glEnable(GL11.GL_COLOR_MATERIAL);
 		GL11.glPushMatrix();
-		int centerX = (this.width - 16) / 2;
-		int centerY = this.height - ySpace;
-		GL11.glTranslatef((float)(centerX + this.xPos), (float)(centerY + this.yPos), 50.0F);
+		int centerX = (this.getCachedWidth() - 16) / 2;
+		int centerY = this.getCachedHeight() - ySpace;
+		GL11.glTranslatef((float)(centerX + this.startX), (float)(centerY + this.startY), 50.0F);
 		GL11.glScalef(-35, 35, 35);
 		GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
 		float lastRYaw = player.rotationYaw;
@@ -93,16 +108,17 @@ public class PlayerViewTab extends Tab{
 		for(;yOff < 4; ++yOff) {
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
-			GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
+			GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.endX-16, (int)this.startY + headOffset + 18*yOff);
+			GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.endX-16, (int)this.startY + headOffset + 18*yOff);
 		}
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
-		GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
+		GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.endX-16, (int)this.startY + headOffset + 18*yOff);
+		GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.endX-16, (int)this.startY + headOffset + 18*yOff);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		RenderHelper.disableStandardItemLighting();
 		GL11.glPopMatrix();
+		Tab.renderFrameTop(this, (int)this.startX, (int)this.startY + headOffset, (int)this.endX, (int)this.endY);
 	}
 }

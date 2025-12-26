@@ -50,10 +50,8 @@ public class MovementInputFromOptions extends MovementInput {
         }
 
     }
-    
-    
-    @Override
-    public void updatePlayerMoveState(EntityLiving var1) {
+
+    public void updatePlayerMoveState(EntityPlayer var1) {
         this.moveStrafe = 0.0F;
         this.moveForward = 0.0F;
         if (this.movementKeyStates[0]) {

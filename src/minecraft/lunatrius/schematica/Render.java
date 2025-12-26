@@ -146,6 +146,7 @@ public class Render {
 					toRemove.add(kp.getKey());
 					continue;
 				}
+				
 				kp.getValue().drawBlocks();
 			}
 			while(toRemove.size() > 0) this.renderBuffers.remove(toRemove.remove(toRemove.size()-1));
@@ -501,7 +502,7 @@ public class Render {
 			File newTextureFile = new File(Settings.textureDirectory, texturePackBase.texturePackFileName.replace(".zip", "") + textureName);
 			
 			if (!newTextureFile.exists()) {
-				BufferedImage bufferedImage = readTextureImage(texturePackBase.func_6481_a(texture));
+				BufferedImage bufferedImage = readTextureImage(texturePackBase.getResourceAsStream(texture));
 				if (bufferedImage == null) {
 					return texture;
 				}

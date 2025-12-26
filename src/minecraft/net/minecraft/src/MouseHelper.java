@@ -10,25 +10,24 @@ import net.skidcode.gh.maybeaclient.Client;
 
 public class MouseHelper {
     private Component field_1117_c;
-    //private Cursor cursor;
+    private Cursor cursor;
     public int deltaX;
     public int deltaY;
     private int field_1115_e = 10;
 
     public MouseHelper(Component var1) {
         this.field_1117_c = var1;
-        //IntBuffer var2 = GLAllocation.createDirectIntBuffer(1);
-        //var2.put(0);
-        //var2.flip();
-        //IntBuffer var3 = GLAllocation.createDirectIntBuffer(1024);
+        /*IntBuffer var2 = GLAllocation.createDirectIntBuffer(1);
+        var2.put(0);
+        var2.flip();
+        IntBuffer var3 = GLAllocation.createDirectIntBuffer(1024);
 
-        if(Client.debug) ;
-        /*try {
+        try {
             this.cursor = new Cursor(32, 32, 16, 16, 1, var3, var2);
         } catch (LWJGLException var5) {
             var5.printStackTrace();
         }*/
-
+        if(Client.debug) ;
     }
 
     public void grabMouseCursor() {

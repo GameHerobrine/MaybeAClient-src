@@ -56,10 +56,10 @@ public class ScreenShotHelper {
                 }
             }
 
-            BufferedImage img = new BufferedImage(var1, var2, 1);
-            img.setRGB(0, 0, var1, var2, imageData, 0, var1);
-            ImageIO.write(img, "png", var5);
-            if(AutoScreenshotCopyHack.instance.status) ClipboardCopier.INSTANCE.copy(img);
+            BufferedImage var15 = new BufferedImage(var1, var2, 1);
+            var15.setRGB(0, 0, var1, var2, imageData, 0, var1);
+            ImageIO.write(var15, "png", var5);
+            if(AutoScreenshotCopyHack.instance.status) ClipboardCopier.INSTANCE.copy(var15);
             return "Saved screenshot as " + var5.getName();
         } catch (Exception var14) {
             var14.printStackTrace();

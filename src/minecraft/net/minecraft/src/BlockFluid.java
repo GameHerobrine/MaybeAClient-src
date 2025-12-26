@@ -17,6 +17,10 @@ public abstract class BlockFluid extends Block {
         this.setTickOnLoad(true);
     }
 
+    public int colorMultiplier(IBlockAccess var1, int var2, int var3, int var4) {
+        return 16777215;
+    }
+
     public static float getPercentAir(int var0) {
         if (var0 >= 8) {
             var0 = 0;
@@ -56,17 +60,25 @@ public abstract class BlockFluid extends Block {
     }
 
     public boolean canCollideCheck(int var1, boolean var2) {
-    	
     	if(LiquidInteractHack.instance.status) {
     		return true;
     	}
-    	
         return var2 && var1 == 0;
+    }
+
+    public boolean getIsBlockSolid(IBlockAccess var1, int var2, int var3, int var4, int var5) {
+        Material var6 = var1.getBlockMaterial(var2, var3, var4);
+        if (var6 == this.blockMaterial) {
+            return false;
+        } else if (var6 == Material.ice) {
+            return false;
+        } else {
+            return var5 == 1 ? true : super.getIsBlockSolid(var1, var2, var3, var4, var5);
+        }
     }
 
     public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
         Material var6 = var1.getBlockMaterial(var2, var3, var4);
-        
         if(XRayHack.INSTANCE.status) {
         	int id = var1.getBlockId(var2, var3, var4);
         	if(XRayHack.INSTANCE.blockChooser.blocks[id] || (Block.blocksList[id] instanceof BlockFluid)) return false;
@@ -81,6 +93,7 @@ public abstract class BlockFluid extends Block {
             return var5 == 1 ? true : super.shouldSideBeRendered(var1, var2, var3, var4, var5);
         }
     }
+
     public static boolean forceNullBB = false;
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
     	if(forceNullBB || Client.mc.thePlayer == null) return null;
@@ -162,35 +175,35 @@ public abstract class BlockFluid extends Block {
 
         if (var1.getBlockMetadata(var2, var3, var4) >= 8) {
             boolean var13 = false;
-            if (var13 || this.shouldSideBeRendered(var1, var2, var3, var4 - 1, 2)) {
+            if (var13 || this.getIsBlockSolid(var1, var2, var3, var4 - 1, 2)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2, var3, var4 + 1, 3)) {
+            if (var13 || this.getIsBlockSolid(var1, var2, var3, var4 + 1, 3)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2 - 1, var3, var4, 4)) {
+            if (var13 || this.getIsBlockSolid(var1, var2 - 1, var3, var4, 4)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2 + 1, var3, var4, 5)) {
+            if (var13 || this.getIsBlockSolid(var1, var2 + 1, var3, var4, 5)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2, var3 + 1, var4 - 1, 2)) {
+            if (var13 || this.getIsBlockSolid(var1, var2, var3 + 1, var4 - 1, 2)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2, var3 + 1, var4 + 1, 3)) {
+            if (var13 || this.getIsBlockSolid(var1, var2, var3 + 1, var4 + 1, 3)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2 - 1, var3 + 1, var4, 4)) {
+            if (var13 || this.getIsBlockSolid(var1, var2 - 1, var3 + 1, var4, 4)) {
                 var13 = true;
             }
 
-            if (var13 || this.shouldSideBeRendered(var1, var2 + 1, var3 + 1, var4, 5)) {
+            if (var13 || this.getIsBlockSolid(var1, var2 + 1, var3 + 1, var4, 5)) {
                 var13 = true;
             }
 

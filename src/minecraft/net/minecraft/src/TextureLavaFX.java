@@ -11,6 +11,7 @@ public class TextureLavaFX extends TextureFX {
     public TextureLavaFX() {
         super(Block.lavaMoving.blockIndexInTexture);
     }
+
     public boolean hasTexture = false;
     public void onTick() {
     	if(this.hasTexture && NoRenderHack.instance.status && NoRenderHack.instance.lavaAnim.value) {

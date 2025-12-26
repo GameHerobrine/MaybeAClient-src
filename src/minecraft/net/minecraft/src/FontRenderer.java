@@ -21,7 +21,7 @@ public class FontRenderer {
 	public void reload(GameSettings var1, String var2, RenderEngine var3) {
 		BufferedImage var4;
 		try {
-			var4 = ImageIO.read(Client.mc.texturePackList.selectedTexturePack.func_6481_a(var2));
+			var4 = ImageIO.read(Client.mc.texturePackList.selectedTexturePack.getResourceAsStream(var2));
 		} catch (IOException var18) {
 			throw new RuntimeException(var18);
 		}

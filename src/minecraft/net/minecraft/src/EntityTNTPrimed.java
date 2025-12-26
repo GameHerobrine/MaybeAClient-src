@@ -51,8 +51,12 @@ public class EntityTNTPrimed extends Entity {
         }
 
         if (this.fuse-- <= 0) {
-            this.setEntityDead();
-            this.explode();
+            if (!this.worldObj.multiplayerWorld) {
+                this.setEntityDead();
+                this.explode();
+            } else {
+                this.setEntityDead();
+            }
         } else {
             this.worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
         }

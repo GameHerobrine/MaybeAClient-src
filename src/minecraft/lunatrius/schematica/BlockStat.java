@@ -2,13 +2,15 @@ package lunatrius.schematica;
 
 public class BlockStat {
 	public final int id;
+	public final int meta;
 	public int toPlace = 0;
 	public int donePlace = 0;
 	public int toRemove = 0;
 	public int metaInvalid = 0;
 	
-	public BlockStat(int id) {
+	public BlockStat(int id, int meta) {
 		this.id = id;
+		this.meta = meta;
 	}
 	
 	public void empty() {

@@ -28,19 +28,20 @@ public class GuiEditSign extends GuiScreen {
         if (this.mc.theWorld.multiplayerWorld) {
             this.mc.getSendQueue().addToSendQueue(new Packet130UpdateSign(this.entitySign.xCoord, this.entitySign.yCoord, this.entitySign.zCoord, this.entitySign.signText));
         }
+
     }
 
     public void updateScreen() {
         ++this.updateCounter;
     }
-
+    
     public void addChar(char var1) {
         StringBuilder var10000 = new StringBuilder();
         String[] var10002 = this.entitySign.signText;
         int var10004 = this.editLine;
         var10002[var10004] = var10000.append(var10002[var10004]).append(var1).toString();
     }
-    
+
     protected void actionPerformed(GuiButton var1) {
     	if(var1 instanceof GuiCharSelector) {
     		GuiCharSelector sel = (GuiCharSelector) var1;
@@ -54,13 +55,12 @@ public class GuiEditSign extends GuiScreen {
                 this.entitySign.y_();
                 this.displayScreen();
             }
+
         }
     }
-
     public void displayScreen() {
     	this.mc.displayGuiScreen((GuiScreen)null);
     }
-    
     protected void keyTyped(char var1, int var2) {
         if (var2 == 200) {
             this.editLine = this.editLine - 1 & 3;

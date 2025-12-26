@@ -11,7 +11,7 @@ public class BlockFlowing extends BlockFluid {
         super(var1, var2);
     }
 
-    private void func_27037_j(World var1, int var2, int var3, int var4) {
+    private void func_30003_j(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockMetadata(var2, var3, var4);
         var1.setBlockAndMetadata(var2, var3, var4, this.blockID + 1, var5);
         var1.markBlocksDirty(var2, var3, var4, var2, var3, var4);
@@ -49,7 +49,7 @@ public class BlockFlowing extends BlockFluid {
             }
 
             if (this.numAdjacentSources >= 2 && this.blockMaterial == Material.water) {
-                if (var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+                if (var1.getBlockMaterial(var2, var3 - 1, var4).isSolid()) {
                     var10 = 0;
                 } else if (var1.getBlockMaterial(var2, var3 - 1, var4) == this.blockMaterial && var1.getBlockMetadata(var2, var3, var4) == 0) {
                     var10 = 0;
@@ -71,10 +71,10 @@ public class BlockFlowing extends BlockFluid {
                     var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
                 }
             } else if (var8) {
-                this.func_27037_j(var1, var2, var3, var4);
+                this.func_30003_j(var1, var2, var3, var4);
             }
         } else {
-            this.func_27037_j(var1, var2, var3, var4);
+            this.func_30003_j(var1, var2, var3, var4);
         }
 
         if (this.liquidCanDisplaceBlock(var1, var2, var3 - 1, var4)) {
@@ -224,7 +224,7 @@ public class BlockFlowing extends BlockFluid {
                 return false;
             } else {
                 Material var6 = Block.blocksList[var5].blockMaterial;
-                return var6.isSolid();
+                return var6.getIsSolid();
             }
         } else {
             return true;

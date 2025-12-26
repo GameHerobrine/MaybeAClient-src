@@ -1,13 +1,10 @@
 package net.skidcode.gh.maybeaclient.gui.click;
 
 import java.util.ArrayList;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
 import net.minecraft.src.GuiScreen;
-import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.AFKDisconnectHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
@@ -73,8 +70,7 @@ public class ClickGUI extends GuiScreen{
 		}
 	}
 	
-	public boolean canSelectNewTab = false;
-	public boolean justInitialized = false;
+	public boolean canSelectNewTab = true;
 	@Override
 	public void mouseClicked(int x, int y, int click) {
 		if(inputHandler != null && hasInputHandler) {
@@ -82,12 +78,13 @@ public class ClickGUI extends GuiScreen{
 			return;
 		}
 		if(!canSelectNewTab) return;
+		
 		for(Tab tab : tabs) {
 			if(!tab.shown) continue;
 			if(tab.isPointInside(x, y)) {
 				this.selectedTab = tab;
 				canSelectNewTab = false;
-				tab.onSelect(click, x, y);
+				tab.onClick(x, y, click);
 				tabs.remove(this.selectedTab);
 				tabs.add(0, this.selectedTab);
 				break;
@@ -114,20 +111,16 @@ public class ClickGUI extends GuiScreen{
 			return;
 		}
 		
-		if(justInitialized) {
-			canSelectNewTab = true;
-			justInitialized = false;
-		}
-		
 		if(click != -1) {
 			canSelectNewTab = true;
 		}
 		
 		if(this.selectedTab != null) {
-			this.selectedTab.mouseMovedSelected(click, x, y);
+			this.selectedTab.mouseMovedSelected(x, y);
 			if(click != -1) {
-				this.selectedTab.onDeselect(click, x, y);
+				this.selectedTab.onDeselect(x, y);
 				this.selectedTab = null;
+				canSelectNewTab = true;
 			}
 		}else {
 			Tab tb = null;
@@ -147,29 +140,13 @@ public class ClickGUI extends GuiScreen{
 
 			if(tb != null){
 				this.hoveringOver = tb;
-				this.hoveringOver.mouseHovered(x, y, click);
+				this.hoveringOver.hoveringOver(x, y);
 			}
 		}
 	}
 	
 	public static void registerTabs() {
-		Tab t = new CategoryTab(Category.MOVEMENT, 160, 10, 90);
-		t.minimized = true;
-		tabs.add(t);
-		t = new CategoryTab(Category.RENDER, t.xPos, 24, 90);
-		t.minimized = true;
-		tabs.add(t);
-		t = new CategoryTab(Category.COMBAT, t.xPos, 24 + 14, 90);
-		t.minimized = true;
-		tabs.add(t);
-		t = new CategoryTab(Category.MISC, t.xPos, 24 + 14 + 14, 90);
-		t.minimized = true;
-		tabs.add(t);
-		t = new CategoryTab(Category.UI, t.xPos, 24 + 14 + 14 + 14, 90);
-		t.minimized = true;
-		tabs.add(t);
-		initialized = true;
-		
+		Tab t;
 		tabs.add(new ArrayListTab());
 		tabs.add(new ClientNameTab());
 		tabs.add(new ClientInfoTab());
@@ -181,25 +158,38 @@ public class ClickGUI extends GuiScreen{
 		tabs.add(new PlayerlistTab());
 		tabs.add(new LastSeenSpotsTab());
 		tabs.add(new SlimeRadarTab());
+		
+		//tabs.add(TabManagerTab.instance);
+		
+		Category.MOVEMENT.setTabOptions(160, 10, true);
+		Category.RENDER.setTabOptions(160, 24, true);
+		Category.COMBAT.setTabOptions(160, 24+14, true);
+		Category.MISC.setTabOptions(160, 24+14+14, true);
+		Category.UI.setTabOptions(160, 24+14+14+14, true);
+		for(Category c : Category.categories) tabs.add(c.tab);
+		TabManagerTab.instance.addAll(tabs);
+		
+		initialized = true;
 	}
 	
 	public static int descX, descY;
 	public static Hack descHack;
-	public static Tab descTab;
-	public static void showDescription(int x, int y, Hack h, Tab tab) {
+	public static void showDescription(int x, int y, Hack h) {
 		descX = x;
 		descY = y;
 		descHack = h;
-		descTab = tab;
 	}
 	
 	public static ArrayList<Tab> toAdd = new ArrayList<Tab>();
 	public static ArrayList<Tab> toRemove = new ArrayList<Tab>();
+	
 	public static void addTab(int i, Tab tab) {
 		toAdd.add(i, tab);
+		tab.shown = true;
 	}
 	public static void removeTab(Tab tab) {
 		toRemove.add(tab);
+		tab.shown = false;
 	}
 	public static int prevGUIScale = -1;
 	public static int newGUIScale = -1;
@@ -207,6 +197,7 @@ public class ClickGUI extends GuiScreen{
 	@Override
 	public void drawScreen(int var1, int var2, float var3) {
 		hasInputHandler = ClickGUI.inputHandler != null;
+		
 		descHack = null;
 		for(int i = toAdd.size(); --i >= 0;) {
 			Tab t = toAdd.remove(i);
@@ -231,20 +222,26 @@ public class ClickGUI extends GuiScreen{
 		
 		for(int i = tabs.size()-1; i >= 0; --i ) {
 			Tab t = tabs.get(i);
-			t.preRender();
+			t.recalculatePosition(null, 0, 0);
 		}
 		
 		for(int i = tabs.size()-1; i >= 0; --i ) { //inverse render them
 			Tab t = tabs.get(i);
 			if(!t.shown) continue;
+			
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			t.render();
+			t.renderBottom();
 		}
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		
 		int x = (int) ((Mouse.getEventX() * this.width) / this.mc.displayWidth);
 		int y = (int) (this.height - ((Mouse.getEventY() * this.height) / this.mc.displayHeight) - 1);
+		if(hasInputHandler && this.selectedTab != null) {
+			this.selectedTab.onDeselect(x, y);
+			this.selectedTab = null;
+			canSelectNewTab = true;
+		}
 		
 		int wheel = Mouse.getDWheel();
 		
@@ -273,7 +270,7 @@ public class ClickGUI extends GuiScreen{
 			Client.debug = false;
 			xMax = xMin + width_y[0] + 2;
 			int yMax = yMin + width_y[1];
-			descTab.renderFrame(xMin, yMin, xMax, yMax);
+			Tab.renderFrame(null, xMin, yMin, xMax, yMax);
 			Client.mc.fontRenderer.drawSplittedString_h(descHack.description, xMin + 2, yMin + 2, txtColor, xMax - xMin - 2, 12);
 			
 		}

@@ -12,6 +12,7 @@ public class TextureWaterFX extends TextureFX {
     public TextureWaterFX() {
         super(Block.waterMoving.blockIndexInTexture);
     }
+    
     public boolean hasTexture = false;
     public void onTick() {
         ++this.tickCounter;
@@ -87,6 +88,5 @@ public class TextureWaterFX extends TextureFX {
             this.imageData[var2 * 4 + 3] = (byte)var8;
         }
         hasTexture = true;
-
     }
 }

@@ -32,7 +32,7 @@ public class FurnaceRecipes {
         return (ItemStack)this.smeltingList.get(var1);
     }
 
-    public Map func_25194_b() {
+    public Map getSmeltingList() {
         return this.smeltingList;
     }
 }

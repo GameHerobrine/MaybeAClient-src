@@ -8,8 +8,8 @@ import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
-import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.InputHandler;
 
@@ -18,13 +18,13 @@ public class SettingTextBox extends Setting implements InputHandler{
 	public String initial, value;
 	public int maxTextboxWidth = -1;
 	public boolean isEditing = false;
-	public SettingTextBox(Hack hack, String name, String value) {
+	public SettingTextBox(SettingsProvider hack, String name, String value) {
 		super(hack, name);
 		this.initial = value;
 		this.setValue(value);
 	}
 	
-	public SettingTextBox(Hack hack, String name, String value, int maxTBWidth) {
+	public SettingTextBox(SettingsProvider hack, String name, String value, int maxTBWidth) {
 		super(hack, name);
 		this.initial = value;
 		this.setValue(value);
@@ -63,7 +63,7 @@ public class SettingTextBox extends Setting implements InputHandler{
 	public long time = 0;
 	public String add = "";
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		long time = System.currentTimeMillis();
 		if(time - this.time > 500) {
 			this.time = time;
@@ -83,6 +83,7 @@ public class SettingTextBox extends Setting implements InputHandler{
 		String s = this.name + ": ";
 		int maxy = (y + this.splittedHeight);
 		int miny = y;
+		
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS){
 			Client.mc.fontRenderer.drawStringWithShadow(s, x + Theme.HEPH_OPT_XADD, y + (maxy - miny) / 2 - 5, txtColor);
 			Client.mc.fontRenderer.drawSplittedStringWithShadow(this.value+add, xEnd - Theme.HEPH_OPT_XADD - this.maxSplitWidth + 2, y + ClickGUIHack.theme().yaddtocenterText, this.isEditing ? 0xafafaf : 0xffffff, this.maxSplitWidth, 12);
@@ -93,7 +94,7 @@ public class SettingTextBox extends Setting implements InputHandler{
 		
 	}
 	@Override
-	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		int tbxmin = xMin + Client.mc.fontRenderer.getStringWidth(this.name + ": ");
 		int tbymin = yMin;
 		int tbxmax = xMax;
@@ -105,12 +106,17 @@ public class SettingTextBox extends Setting implements InputHandler{
 	}
 	
 	@Override
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		int w = Client.mc.fontRenderer.getStringWidth(this.name + ": ");
 		int tbxs = xStart + w;
+		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+			Tab.renderFrameBackGround(tbxs, yStart, xEnd, yEnd, 0, 0, 0, 0.5f);
+			Tab.renderFrameOutlines(tbxs, yStart, xEnd, yEnd);
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			tbxs = xEnd - this.maxSplitWidth - Theme.HEPH_OPT_XADD + 1;
-			tab.renderFrameOutlines(tbxs, yStart, xEnd - Theme.HEPH_OPT_XADD + 3, yEnd);
+			Tab.renderFrameOutlines(tbxs, yStart, xEnd - Theme.HEPH_OPT_XADD + 3, yEnd);
 			
 			return;
 		}
@@ -129,9 +135,9 @@ public class SettingTextBox extends Setting implements InputHandler{
 		}
 		GL11.glStencilMask(0xFF);
 		if(ClickGUIHack.theme() == Theme.NODUS) {}
-		else tab.renderFrameOutlines(tbxs, yStart, xEnd, yEnd);
+		else Tab.renderFrameOutlines(tbxs, yStart, xEnd, yEnd);
 		GL11.glColorMask(false, false, false, false);
-		tab.renderFrameBackGround(tbxs, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+		Tab.renderFrameBackGround(tbxs, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		GL11.glColorMask(true, true, true, true);
 		if(stenciltesting) {
 			GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
@@ -142,17 +148,17 @@ public class SettingTextBox extends Setting implements InputHandler{
 		}
 		
 		if(ClickGUIHack.theme() == Theme.NODUS) {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
 		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS){
 			
 		}else{
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 		if(stenciltesting) {
 			GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_DECR); 
 			GL11.glStencilFunc(GL11.GL_EQUAL, Client.STENCIL_REF_TBDRAW, 0xFF);
 			GL11.glColorMask(false, false, false, false);
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 			GL11.glColorMask(true, true, true, true);
 		}
 		GL11.glDisable(GL11.GL_STENCIL_TEST);
@@ -161,7 +167,9 @@ public class SettingTextBox extends Setting implements InputHandler{
 	@Override
 	public int getSettingWidth() {
 		if(this.maxTextboxWidth >= 0) {
-			int w = Client.mc.fontRenderer.getStringWidth(this.name + ":" + "|") + this.maxTextboxWidth + (ClickGUIHack.theme() == Theme.HEPHAESTUS ? Theme.HEPH_OPT_XADD*3 + 2 : 0);
+			int hw = this.maxTextboxWidth;
+			int w = Client.mc.fontRenderer.getStringWidth(this.name + ":" + "|") + hw + (ClickGUIHack.theme() == Theme.HEPHAESTUS ? Theme.HEPH_OPT_XADD*3 + 2 : 0);
+			
 			return w;
 		}
 		return Client.mc.fontRenderer.getStringWidth(this.name + ":" + this.value + "|") + 10 + (ClickGUIHack.theme() == Theme.HEPHAESTUS ? Theme.HEPH_OPT_XADD*3 : 0);
@@ -194,10 +202,10 @@ public class SettingTextBox extends Setting implements InputHandler{
 	public int maxSplitWidth = this.maxTextboxWidth;
 	public int splittedHeight = 12;
 	@Override
-	public int getSettingHeight(Tab tab) {
+	public int getSettingHeight(Element tab) {
 		//return 24;
 		if(this.maxTextboxWidth < 0) return super.getSettingHeight(tab);
-		int a = tab.width - Client.mc.fontRenderer.getStringWidth(this.name + ":" + "|");
+		int a = tab.getCachedWidth() - Client.mc.fontRenderer.getStringWidth(this.name + ":" + "|");
 		int b = this.maxTextboxWidth;
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			a -= 3*Theme.HEPH_OPT_XADD;
@@ -206,7 +214,7 @@ public class SettingTextBox extends Setting implements InputHandler{
 		if(b > a) {
 			a = b;
 		}
-		this.maxSplitWidth = a-2-ClickGUIHack.theme().settingBorder;
+		this.maxSplitWidth = a-4-ClickGUIHack.theme().settingBorder;
 		
 		int[] sz = Client.mc.fontRenderer.getSplittedStringWidthAndHeight(this.value+"|", this.maxSplitWidth, 12);
 		this.splittedHeight = sz[1];

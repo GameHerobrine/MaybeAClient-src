@@ -7,11 +7,11 @@ public class ItemSlab extends ItemBlock {
         this.setHasSubtypes(true);
     }
 
-    public int func_27009_a(int var1) {
+    public int getIconFromDamage(int var1) {
         return Block.stairSingle.getBlockTextureFromSideAndMetadata(2, var1);
     }
 
-    public int func_21012_a(int var1) {
+    public int getPlacedBlockMetadata(int var1) {
         return var1;
     }
 

@@ -39,20 +39,13 @@ public class EntityFish extends Entity {
         this.field_4088_k = 0;
         this.field_4096_c = null;
         this.setSize(0.25F, 0.25F);
-    }
-
-    protected void entityInit() {
-    }
-
-    public boolean isInRangeToRenderDist(double var1) {
-        double var3 = this.boundingBox.getAverageEdgeLength() * 4.0D;
-        var3 *= 64.0D;
-        return var1 < var3 * var3;
+        this.ignoreFrustumCheck = true;
     }
 
     public EntityFish(World var1, double var2, double var4, double var6) {
         this(var1);
         this.setPosition(var2, var4, var6);
+        this.ignoreFrustumCheck = true;
     }
 
     public EntityFish(World var1, EntityPlayer var2) {
@@ -66,6 +59,7 @@ public class EntityFish extends Entity {
         this.field_4089_j = 0;
         this.field_4088_k = 0;
         this.field_4096_c = null;
+        this.ignoreFrustumCheck = true;
         this.angler = var2;
         this.angler.fishEntity = this;
         this.setSize(0.25F, 0.25F);
@@ -80,6 +74,15 @@ public class EntityFish extends Entity {
         this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
         this.motionY = (double)(-MathHelper.sin(this.rotationPitch / 180.0F * 3.1415927F) * var3);
         this.func_4042_a(this.motionX, this.motionY, this.motionZ, 1.5F, 1.0F);
+    }
+
+    protected void entityInit() {
+    }
+
+    public boolean isInRangeToRenderDist(double var1) {
+        double var3 = this.boundingBox.getAverageEdgeLength() * 4.0D;
+        var3 *= 64.0D;
+        return var1 < var3 * var3;
     }
 
     public void func_4042_a(double var1, double var3, double var5, float var7, float var8) {
@@ -119,6 +122,7 @@ public class EntityFish extends Entity {
         this.velocityY = this.motionY = var3;
         this.velocityZ = this.motionZ = var5;
     }
+
     public boolean hasLastRecordedY = false;
     public byte fishingTicksCheck = 0;
     public boolean fishing = false;
@@ -208,7 +212,7 @@ public class EntityFish extends Entity {
             	
         		return;
         	}
-            
+
             if (this.field_4091_h) {
                 int var19 = this.worldObj.getBlockId(this.tileX, this.tileY, this.tileZ);
                 if (var19 == this.field_4092_g) {
@@ -318,7 +322,7 @@ public class EntityFish extends Entity {
                         --this.field_4088_k;
                     } else {
                         short var29 = 500;
-                        if (this.worldObj.func_27167_r(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ))) {
+                        if (this.worldObj.canBlockBeRainedOn(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ))) {
                             var29 = 300;
                         }
 
@@ -413,7 +417,7 @@ public class EntityFish extends Entity {
             var13.motionY = var5 * var11 + (double)MathHelper.sqrt_double(var9) * 0.08D;
             var13.motionZ = var7 * var11;
             this.worldObj.entityJoinedWorld(var13);
-            this.angler.addStat(StatList.field_25160_x, 1);
+            this.angler.addStat(StatList.fishCaughtStat, 1);
             var1 = 1;
         }
 

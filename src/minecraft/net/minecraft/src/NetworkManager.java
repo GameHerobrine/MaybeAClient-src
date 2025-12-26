@@ -1,6 +1,5 @@
 package net.minecraft.src;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,6 +37,8 @@ public class NetworkManager {
     private Object[] field_20101_t;
     public int timeSinceLastRead = 0;
     private int sendQueueByteLength = 0;
+    public static int[] field_28145_d = new int[256];
+    public static int[] field_28144_e = new int[256];
     public int chunkDataSendCounter = 0;
     private int field_20100_w = 50;
 
@@ -53,8 +54,8 @@ public class NetworkManager {
             System.err.println(var5.getMessage());
         }
 
-        this.socketInputStream = new DataInputStream(new BufferedInputStream(var1.getInputStream()));
-        this.socketOutputStream = new DataOutputStream(new BufferedOutputStream(var1.getOutputStream()));
+        this.socketInputStream = new DataInputStream(var1.getInputStream());
+        this.socketOutputStream = new DataOutputStream(new BufferedOutputStream(var1.getOutputStream(), 5120));
         this.readThread = new NetworkReaderThread(this, var2 + " read thread");
         this.writeThread = new NetworkWriterThread(this, var2 + " write thread");
         this.readThread.start();
@@ -78,59 +79,78 @@ public class NetworkManager {
         }
     }
 
-    private void sendPacket() {
+    private boolean sendPacket() {
+        boolean var1 = false;
+
         try {
-            boolean var1 = true;
+            int[] var10000;
+            int var10001;
             Packet var2;
             if (!this.dataPackets.isEmpty() && (this.chunkDataSendCounter == 0 || System.currentTimeMillis() - ((Packet)this.dataPackets.get(0)).creationTimeMillis >= (long)this.chunkDataSendCounter)) {
-                var1 = false;
                 synchronized(this.sendQueueLock) {
                     var2 = (Packet)this.dataPackets.remove(0);
                     this.sendQueueByteLength -= var2.getPacketSize() + 1;
                 }
 
                 Packet.writePacket(var2, this.socketOutputStream);
+                var10000 = field_28144_e;
+                var10001 = var2.getPacketId();
+                var10000[var10001] += var2.getPacketSize() + 1;
+                var1 = true;
             }
 
-            if ((var1 || this.field_20100_w-- <= 0) && !this.chunkDataPackets.isEmpty() && (this.chunkDataSendCounter == 0 || System.currentTimeMillis() - ((Packet)this.chunkDataPackets.get(0)).creationTimeMillis >= (long)this.chunkDataSendCounter)) {
-                var1 = false;
+            if (this.field_20100_w-- <= 0 && !this.chunkDataPackets.isEmpty() && (this.chunkDataSendCounter == 0 || System.currentTimeMillis() - ((Packet)this.chunkDataPackets.get(0)).creationTimeMillis >= (long)this.chunkDataSendCounter)) {
                 synchronized(this.sendQueueLock) {
                     var2 = (Packet)this.chunkDataPackets.remove(0);
                     this.sendQueueByteLength -= var2.getPacketSize() + 1;
                 }
 
                 Packet.writePacket(var2, this.socketOutputStream);
-                this.field_20100_w = 50;
+                var10000 = field_28144_e;
+                var10001 = var2.getPacketId();
+                var10000[var10001] += var2.getPacketSize() + 1;
+                this.field_20100_w = 0;
+                var1 = true;
             }
 
-            if (var1) {
-                Thread.sleep(10L);
-            } else {
-                this.socketOutputStream.flush();
-            }
-        } catch (InterruptedException var8) {
-        } catch (Exception var9) {
+            return var1;
+        } catch (Exception var8) {
             if (!this.isTerminating) {
-                this.onNetworkError(var9);
+                this.onNetworkError(var8);
             }
-        }
 
+            return false;
+        }
     }
 
-    private void readPacket() {
+    public void wakeThreads() {
+        this.readThread.interrupt();
+        this.writeThread.interrupt();
+    }
+
+    private boolean readPacket() {
+        boolean var1 = false;
+
         try {
-            Packet var1 = Packet.readPacket(this.socketInputStream, this.netHandler.func_27247_c());
-            if (var1 != null) {
-                this.readPackets.add(var1);
+            Packet var2 = Packet.readPacket(this.socketInputStream, this.netHandler.isServerHandler());
+            if (var2 != null) {
+                int[] var10000 = field_28145_d;
+                int var10001 = var2.getPacketId();
+                var10000[var10001] += var2.getPacketSize() + 1;
+                this.readPackets.add(var2);
+                var1 = true;
             } else {
                 this.networkShutdown("disconnect.endOfStream");
             }
-        } catch (Exception var2) {
-            if (!this.isTerminating) {
-                this.onNetworkError(var2);
-            }
-        }
 
+            return var1;
+        } catch (Exception var3) {
+            if (!this.isTerminating) {
+                this.onNetworkError(var3);
+            }
+
+            return false;
+        }
     }
 
     private void onNetworkError(Exception var1) {
@@ -184,16 +204,23 @@ public class NetworkManager {
 
         while(!this.readPackets.isEmpty() && var1-- >= 0) {
             Packet var2 = (Packet)this.readPackets.remove(0);
-            
             EventPacketReceive ev = new EventPacketReceive(var2);
         	EventRegistry.handleEvent(ev);
         	if(!ev.cancelled) var2.processPacket(this.netHandler);
         }
 
+        this.wakeThreads();
         if (this.isTerminating && this.readPackets.isEmpty()) {
             this.netHandler.handleErrorMessage(this.terminationReason, this.field_20101_t);
         }
 
+    }
+
+    public void func_28142_c() {
+        this.wakeThreads();
+        this.isServerTerminating = true;
+        this.readThread.interrupt();
+        (new ThreadCloseConnection(this)).start();
     }
 
     // $FF: synthetic method
@@ -207,13 +234,28 @@ public class NetworkManager {
     }
 
     // $FF: synthetic method
-    static void readNetworkPacket(NetworkManager var0) {
-        var0.readPacket();
+    static boolean readNetworkPacket(NetworkManager var0) {
+        return var0.readPacket();
     }
 
     // $FF: synthetic method
-    static void sendNetworkPacket(NetworkManager var0) {
-        var0.sendPacket();
+    static boolean sendNetworkPacket(NetworkManager var0) {
+        return var0.sendPacket();
+    }
+
+    // $FF: synthetic method
+    static DataOutputStream func_28140_f(NetworkManager var0) {
+        return var0.socketOutputStream;
+    }
+
+    // $FF: synthetic method
+    static boolean func_28138_e(NetworkManager var0) {
+        return var0.isTerminating;
+    }
+
+    // $FF: synthetic method
+    static void func_30005_a(NetworkManager var0, Exception var1) {
+        var0.onNetworkError(var1);
     }
 
     // $FF: synthetic method

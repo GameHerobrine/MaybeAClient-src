@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.AutoMouseClickHack;
 import net.skidcode.gh.maybeaclient.hacks.ChestCheckerHack;
 import net.skidcode.gh.maybeaclient.hacks.InventoryWalkHack;
+import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.TooltipsHack;
 
 public abstract class GuiContainer extends GuiScreen {
@@ -23,7 +23,6 @@ public abstract class GuiContainer extends GuiScreen {
 
     public void initGui() {
         super.initGui();
-        this.controlList.clear();
         ChestCheckerHack.instance.locked=1;
         this.mc.thePlayer.craftingInventory = this.inventorySlots;
         this.controlList.add(new GuiButton(1337, 0, this.height - 20 - 1, 120, 20, "Disable AutoMouseClick") {
@@ -47,9 +46,11 @@ public abstract class GuiContainer extends GuiScreen {
     public void actionPerformed(GuiButton gb) {
     	if(gb.id == 1337) {
     		if(AutoMouseClickHack.instance.status) AutoMouseClickHack.instance.toggle();
+    	}else {
+    		super.actionPerformed(gb);
     	}
     }
-    
+
     @Override
     public void handleKeyboardInput()
     {
@@ -66,7 +67,7 @@ public abstract class GuiContainer extends GuiScreen {
         int var5 = (this.height - this.ySize) / 2;
         this.drawGuiContainerBackgroundLayer(var3);
         GL11.glPushMatrix();
-        GL11.glRotatef(180.0F, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef(120.0F, 1.0F, 0.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
         GL11.glPopMatrix();
         GL11.glPushMatrix();
@@ -86,7 +87,7 @@ public abstract class GuiContainer extends GuiScreen {
                 GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
                 txtX = var8.xDisplayPosition;
                 txtY = var8.yDisplayPosition;
-                this.drawGradientRect(txtX, txtY, txtX + 16, txtY + 16, -2130706433, -2130706433);
+                drawGradientRect(txtX, txtY, txtX + 16, txtY + 16, -2130706433, -2130706433);
                 GL11.glEnable(2896 /*GL_LIGHTING*/);
                 GL11.glEnable(2929 /*GL_DEPTH_TEST*/);
             }
@@ -105,12 +106,11 @@ public abstract class GuiContainer extends GuiScreen {
         GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
         this.drawGuiContainerForegroundLayer();
         if (var12.getItemStack() == null && var6 != null && var6.getHasStack()) {
-            String var13 = ("" + StringTranslate.getInstance().translateNamedKey(var6.getStack().func_20109_f())).trim();
+            String var13 = ("" + StringTranslate.getInstance().translateNamedKey(var6.getStack().getItemName())).trim();
             ArrayList<String[]> toolTip = var6.getStack().getTooltip();
             if (var13.length() > 0) {
                 txtX = var1 - var4 + 12;
                 txtY = var2 - var5 - 12;
-                
                 int height = 8;
                 if(TooltipsHack.instance.status) {
                 	height += (toolTip.size() > 0 ? toolTip.size()*8+8 : 0);
@@ -125,9 +125,9 @@ public abstract class GuiContainer extends GuiScreen {
                 		var13 += " ("+var6.getStack().itemID+":"+var6.getStack().getItemDamage()+")";
                 	}
                 }
-                int width = this.fontRenderer.getStringWidth(var13);
-                this.drawGradientRect(txtX - 3, txtY - 3, txtX + width + 3, txtY + height + 3, -1073741824, -1073741824);
-                this.fontRenderer.drawStringWithShadow(var13, txtX, txtY, 0xffffffff);
+                int var11 = this.fontRenderer.getStringWidth(var13);
+                drawGradientRect(txtX - 3, txtY - 3, txtX + var11 + 3, txtY + height + 3, -1073741824, -1073741824);
+                this.fontRenderer.drawStringWithShadow(var13, txtX, txtY, -1);
                 if(TooltipsHack.instance.status) {
                 	txtY += 8;
                 	for(int i = 0; i < toolTip.size(); ++i) {
@@ -236,5 +236,13 @@ public abstract class GuiContainer extends GuiScreen {
 
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    public void updateScreen() {
+        super.updateScreen();
+        if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead) {
+            this.mc.thePlayer.func_20059_m();
+        }
+
     }
 }

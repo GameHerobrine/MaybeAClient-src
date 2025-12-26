@@ -10,22 +10,27 @@ import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.RadarHack;
 import net.skidcode.gh.maybeaclient.hacks.SlimeChunkRadarHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
+import net.skidcode.gh.maybeaclient.utils.GUIUtils;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 import net.skidcode.gh.maybeaclient.utils.WorldUtils;
 
 public class SlimeRadarTab extends Tab {
 
 	public SlimeRadarTab() {
 		super("Slimechunks Radar", 0, 24);
-		this.minimized = false;
-		this.xDefPos = this.xPos = 160;
-		this.yDefPos = this.yPos = 24 + 14*7;
+		this.xDefPos = this.startX = 160;
+		this.yDefPos = this.startY = 24 + 14*7;
+		this.isHUD = true;
 	}
 	
 	public void preRender() {
 		Theme theme = ClickGUIHack.theme();
-		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + theme.titleXadd;
-		if(this.width < 64) this.width = 64;
-		this.height = this.width + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff;
+		int width = Client.mc.fontRenderer.getStringWidth(this.getTabName()) + theme.titleXadd;
+		if(width < 64) width = 64;
+		int height = width + this.getYOffset();
+		this.endX = this.startX + width;
+		this.endY = this.startY + height;
+		super.preRender();
 	}
 	
 	public void renderIngame() {
@@ -35,7 +40,7 @@ public class SlimeRadarTab extends Tab {
 	public void render() {
 		super.render();
 		
-		if(this.minimized) return;
+		if(this.minimized.getValue()) return;
 		
 		SlimeChunkRadarHack hck = SlimeChunkRadarHack.instance;
 		
@@ -43,37 +48,22 @@ public class SlimeRadarTab extends Tab {
 		final int scale = 8;
 		final int chunkScale = 16/scale;
 		
-		int xStart = (int)this.xPos;
-		int yStart = (int)this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff;
-		int xEnd = (int)this.xPos + this.width;
-		int yEnd = (int)this.yPos + this.height;
+		int xStart = (int)this.startX;
+		int yStart = (int)this.startY + this.getYOffset();
+		int xEnd = (int)this.endX;
+		int yEnd = (int)this.endY;
 		
+		
+		
+		
+		Tab.renderFrame(this, xStart, yStart, xEnd, yEnd);
 		
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glBlendFunc(770, 771);
 		
-		GL11.glEnable(GL11.GL_STENCIL_TEST);
-		GL11.glStencilOp(GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_REPLACE);  
-		GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
-		GL11.glStencilFunc(GL11.GL_ALWAYS, Client.STENCIL_REF_ELDRAW, 0xFF);
-		GL11.glStencilMask(0xFF);
-		
-		if(theme == Theme.CLIFF) {
-			this.renderFrameBackGround(xStart, yStart, xEnd, yEnd);
-		}else if(theme == Theme.NODUS) {
-			GL11.glStencilOp(GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_KEEP);
-			this.renderFrameBackGround(xStart-2, yStart-2, xEnd+2, yEnd+2, 1, 1, 1, 0x20/255f);
-			GL11.glStencilOp(GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_REPLACE);
-			this.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
-		}else if(theme == Theme.HEPHAESTUS) {
-			this.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 100/255f);
-			GL11.glStencilOp(GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_ZERO);
-			this.renderFrameOutlines(xStart, yStart, xEnd, yEnd);
-		}
-		
-		GL11.glStencilOp(GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_KEEP);
-		GL11.glStencilFunc(GL11.GL_EQUAL, Client.STENCIL_REF_ELDRAW, 0xFF);
+		GUIUtils.enableScissorTest();
+		GUIUtils.scissorStart(xStart, yStart, xEnd, yEnd);
 		
 		int yCenter = yStart + (yEnd - yStart) / 2;
 		int xCenter = xStart + (xEnd - xStart) / 2;
@@ -117,15 +107,8 @@ public class SlimeRadarTab extends Tab {
 				cx = plChunkX - MathHelper.floor_double(offMapY);
 				
 				if(WorldUtils.isSlimeChunk(cx, cz)) {
-					this.renderFrameBackGround(x, y, x+scale, y+scale, hck.slimeChunkColor.red/255f, hck.slimeChunkColor.green/255f, hck.slimeChunkColor.blue/255f, 0.5f);
+					Tab.renderFrameBackGround(x, y, x+scale, y+scale, hck.slimeChunkColor.red/255f, hck.slimeChunkColor.green/255f, hck.slimeChunkColor.blue/255f, 0.5f);
 				}
-				
-				/*GL11.glScaled(0.5, 0.5, 1);
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				Client.mc.fontRenderer.drawString(""+offMapX, (int)x*2, (int)y*2, 0xffffff);
-				Client.mc.fontRenderer.drawString(""+offMapY, (int)x*2, (int)y*2+8, 0xffffff);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-				GL11.glScaled(2, 2, 1);*/
 			}
 		}
 		
@@ -145,11 +128,6 @@ public class SlimeRadarTab extends Tab {
 			
 			Tessellator.instance.draw();
 		}
-
-		
-		//showChunkGrid
-		
-		//this.renderFrameBackGround(playerMapX, playerMapY, playerMapX+scale, playerMapY+scale, 1, 1, 0, 0.5f);
 		
 		//must be on top
 		GL11.glEnable(GL11.GL_POLYGON_SMOOTH);
@@ -165,17 +143,16 @@ public class SlimeRadarTab extends Tab {
 		Tessellator.instance.draw();
 		GL11.glPopMatrix();
 		
-		GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
-		GL11.glStencilFunc(GL11.GL_ALWAYS, Client.STENCIL_REF_ELDRAW, 0xFF);
-		
 		if(theme == Theme.CLIFF) {
-			this.renderFrameOutlines(xStart, yStart, xEnd, yEnd);
+			Tab.renderFrameOutlines(xStart, yStart, xEnd, yEnd);
 		}
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_POLYGON_SMOOTH);
-		GL11.glDisable(GL11.GL_STENCIL_TEST);
+		GUIUtils.scissorEnd();
+		GUIUtils.disableScissorTest();
+		Tab.renderFrameTop(this, xStart, yStart, xEnd, yEnd);
 		
 	}
 }

@@ -47,7 +47,6 @@ public class ItemSign extends Item {
                 --var1.stackSize;
                 TileEntitySign var8 = (TileEntitySign)var3.getBlockTileEntity(var4, var5, var6);
                 if (var8 != null) {
-                	
                 	if(AutoSignHack.instance.status) {
                 		var8.signText[0] = AutoSignHack.instance.text[0];
                 		var8.signText[1] = AutoSignHack.instance.text[1];

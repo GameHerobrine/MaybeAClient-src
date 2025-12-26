@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
 import net.skidcode.gh.maybeaclient.hacks.ThirdPersonTweaksHack;
 
@@ -45,8 +46,8 @@ public class RenderManager {
         this.entityRenderMap.put(Entity.class, new RenderEntity());
         this.entityRenderMap.put(EntityPainting.class, new RenderPainting());
         this.entityRenderMap.put(EntityArrow.class, new RenderArrow());
-        this.entityRenderMap.put(EntitySnowball.class, new RenderSnowball(Item.snowball.func_27009_a(0)));
-        this.entityRenderMap.put(EntityEgg.class, new RenderSnowball(Item.egg.func_27009_a(0)));
+        this.entityRenderMap.put(EntitySnowball.class, new RenderSnowball(Item.snowball.getIconFromDamage(0)));
+        this.entityRenderMap.put(EntityEgg.class, new RenderSnowball(Item.egg.getIconFromDamage(0)));
         this.entityRenderMap.put(EntityFireball.class, new RenderFireball());
         this.entityRenderMap.put(EntityItem.class, new RenderItem());
         this.entityRenderMap.put(EntityTNTPrimed.class, new RenderTNTPrimed());
@@ -84,13 +85,23 @@ public class RenderManager {
         this.options = var5;
         this.livingPlayer = var4;
         this.fontRenderer = var3;
-        this.playerViewY = var4.prevRotationYaw + (var4.rotationYaw - var4.prevRotationYaw) * var6;
-        this.playerViewX = var4.prevRotationPitch + (var4.rotationPitch - var4.prevRotationPitch) * var6;
+        if (var4.isPlayerSleeping()) {
+            int var7 = var1.getBlockId(MathHelper.floor_double(var4.posX), MathHelper.floor_double(var4.posY), MathHelper.floor_double(var4.posZ));
+            if (var7 == Block.blockBed.blockID) {
+                int var8 = var1.getBlockMetadata(MathHelper.floor_double(var4.posX), MathHelper.floor_double(var4.posY), MathHelper.floor_double(var4.posZ));
+                int var9 = var8 & 3;
+                this.playerViewY = (float)(var9 * 90 + 180);
+                this.playerViewX = 0.0F;
+            }
+        } else {
+            this.playerViewY = var4.prevRotationYaw + (var4.rotationYaw - var4.prevRotationYaw) * var6;
+            this.playerViewX = var4.prevRotationPitch + (var4.rotationPitch - var4.prevRotationPitch) * var6;
+        }
         
         if(ThirdPersonTweaksHack.instance.frontViewEnabled()) {
         	this.playerViewY += 180.0F;
         }
-        
+
         this.field_1222_l = var4.lastTickPosX + (var4.posX - var4.lastTickPosX) * (double)var6;
         this.field_1221_m = var4.lastTickPosY + (var4.posY - var4.lastTickPosY) * (double)var6;
         this.field_1220_n = var4.lastTickPosZ + (var4.posZ - var4.lastTickPosZ) * (double)var6;
@@ -107,10 +118,10 @@ public class RenderManager {
     }
 
     public void renderEntityWithPosYaw(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-    	
+    	Client.class.getClass(); //render engine null check
     	if(this.renderEngine == null) return;
     	if(var1 instanceof EntityItem && NoRenderHack.instance.status && NoRenderHack.instance.itemEntities.value) return;
-    	
+    	if(var1 instanceof EntityPlayer && var1 != Client.mc.thePlayer && NoRenderHack.instance.status && NoRenderHack.instance.players.value) return;
     	
     	Render var10 = this.getEntityRenderObject(var1);
         if (var10 != null) {

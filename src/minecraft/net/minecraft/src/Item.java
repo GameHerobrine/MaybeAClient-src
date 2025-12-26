@@ -107,6 +107,7 @@ public class Item {
     public static Item bed;
     public static Item redstoneRepeater;
     public static Item cookie;
+    public static ItemMap mapItem;
     public static Item record13;
     public static Item recordCat;
     public final int shiftedIndex;
@@ -142,12 +143,12 @@ public class Item {
         return this;
     }
 
-    public int func_27009_a(int var1) {
+    public int getIconFromDamage(int var1) {
         return this.iconIndex;
     }
 
     public final int getIconIndex(ItemStack var1) {
-        return this.func_27009_a(var1.getItemDamage());
+        return this.getIconFromDamage(var1.getItemDamage());
     }
 
     public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
@@ -166,7 +167,7 @@ public class Item {
         return this.maxStackSize;
     }
 
-    public int func_21012_a(int var1) {
+    public int getPlacedBlockMetadata(int var1) {
         return 0;
     }
 
@@ -188,7 +189,7 @@ public class Item {
         return this;
     }
 
-    public boolean func_25007_g() {
+    public boolean isDamagable() {
         return this.maxDamage > 0 && !this.hasSubtypes;
     }
 
@@ -196,7 +197,7 @@ public class Item {
         return false;
     }
 
-    public boolean func_25008_a(ItemStack var1, int var2, int var3, int var4, int var5, EntityLiving var6) {
+    public boolean onBlockDestroyed(ItemStack var1, int var2, int var3, int var4, int var5, EntityLiving var6) {
         return false;
     }
 
@@ -254,12 +255,18 @@ public class Item {
         return this.containerItem != null;
     }
 
-    public String func_25009_k() {
+    public String getStatName() {
         return StatCollector.translateToLocal(this.getItemName() + ".name");
     }
 
-    public int func_27010_f(int var1) {
+    public int getColorFromDamage(int var1) {
         return 16777215;
+    }
+
+    public void onUpdate(ItemStack var1, World var2, Entity var3, int var4, boolean var5) {
+    }
+
+    public void onCreated(ItemStack var1, World var2, EntityPlayer var3) {
     }
 
     static {
@@ -365,6 +372,7 @@ public class Item {
         bed = (new ItemBed(99)).setMaxStackSize(1).setIconCoord(13, 2).setItemName("bed");
         redstoneRepeater = (new ItemReed(100, Block.redstoneRepeaterIdle)).setIconCoord(6, 5).setItemName("diode");
         cookie = (new ItemCookie(101, 1, false, 8)).setIconCoord(12, 5).setItemName("cookie");
+        mapItem = (ItemMap)(new ItemMap(102)).setIconCoord(12, 3).setItemName("map");
         record13 = (new ItemRecord(2000, "13")).setIconCoord(0, 15).setItemName("record");
         recordCat = (new ItemRecord(2001, "cat")).setIconCoord(1, 15).setItemName("record");
         StatList.func_25151_b();

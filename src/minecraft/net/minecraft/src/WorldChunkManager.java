@@ -20,15 +20,15 @@ public class WorldChunkManager {
         this.field_4192_g = new NoiseGeneratorOctaves2(new Random(var1.getRandomSeed() * 543321L), 2);
     }
 
-    public BiomeGenBase func_4074_a(ChunkCoordIntPair var1) {
-        return this.func_4073_a(var1.chunkXPos << 4, var1.chunkZPos << 4);
+    public BiomeGenBase getBiomeGenAtChunkCoord(ChunkCoordIntPair var1) {
+        return this.getBiomeGenAt(var1.chunkXPos << 4, var1.chunkZPos << 4);
     }
 
-    public BiomeGenBase func_4073_a(int var1, int var2) {
+    public BiomeGenBase getBiomeGenAt(int var1, int var2) {
         return this.func_4069_a(var1, var2, 1, 1)[0];
     }
 
-    public double func_4072_b(int var1, int var2) {
+    public double getTemperature(int var1, int var2) {
         this.temperature = this.field_4194_e.func_4112_a(this.temperature, (double)var1, (double)var2, 1, 1, 0.02500000037252903D, 0.02500000037252903D, 0.5D);
         return this.temperature[0];
     }

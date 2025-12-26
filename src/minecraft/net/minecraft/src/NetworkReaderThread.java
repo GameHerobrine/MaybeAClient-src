@@ -19,23 +19,23 @@ class NetworkReaderThread extends Thread {
 
             try {
                 var12 = true;
-                if (NetworkManager.isRunning(this.netManager)) {
-                    if (!NetworkManager.isServerTerminating(this.netManager)) {
-                        NetworkManager.readNetworkPacket(this.netManager);
-
-                        try {
-                            sleep(0L);
-                        } catch (InterruptedException var15) {
-                        }
-                        continue;
-                    }
-
+                if (!NetworkManager.isRunning(this.netManager)) {
                     var12 = false;
                     break;
                 }
 
-                var12 = false;
-                break;
+                if (NetworkManager.isServerTerminating(this.netManager)) {
+                    var12 = false;
+                    break;
+                }
+
+                while(NetworkManager.readNetworkPacket(this.netManager)) {
+                }
+
+                try {
+                    sleep(100L);
+                } catch (InterruptedException var15) {
+                }
             } finally {
                 if (var12) {
                     synchronized(NetworkManager.threadSyncObject) {

@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
@@ -54,7 +55,7 @@ public strictfp class SettingFloat extends Setting{
 		}
 	}
 	@Override
-	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xMin += 5;
 			xMax -= 5;
@@ -75,8 +76,12 @@ public strictfp class SettingFloat extends Setting{
 		int v = (int) (value*100);
 		float f = (float)((double)v/100d);
 		this.setValue(value);
+		selected = true;
 	}
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	
+	public boolean selected = false;
+	
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xStart += 5;
 			xEnd -= 5;
@@ -92,16 +97,24 @@ public strictfp class SettingFloat extends Setting{
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			int sliderYbegin = yEnd - Theme.HEPH_SLIDER_HEIGHT;
 			int sliderYend = yEnd;
-			tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
-			tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1);
+			Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+			Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1);
 		}else if(ClickGUIHack.theme() == Theme.NODUS) {
-			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, 0, 0, 0, 0x80/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, 0, 0, 0, 0x80/255f);
 		}else {
-			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), ClickGUIHack.theme() == Theme.IRIDIUM ? 0xaa/255f : 1f);
 		}
 		
 	}
+	
+	@Override
+	public void onDeselect(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		selected = false;
+	}
+	
+	@Override
 	public void onMouseMoved(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(!selected) return;
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xMin += 5;
 			xMax -= 5;
@@ -124,7 +137,7 @@ public strictfp class SettingFloat extends Setting{
 	}
 	
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		int txtColor = 0xffffff;
 		if(ClickGUIHack.theme() == Theme.NODUS) {
 			txtColor = ClickGUIHack.instance.themeColor.rgb();

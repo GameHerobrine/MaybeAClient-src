@@ -32,9 +32,9 @@ public class CommandTab extends Command{
 					String tabname = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 					
 					for(Tab tab : ClickGUI.tabs) {
-						if(tab.name.equalsIgnoreCase(tabname)) {
-							tab.xPos = tab.xDefPos;
-							tab.yPos = tab.yDefPos;
+						if(tab.getTabName().equalsIgnoreCase(tabname)) {
+							tab.startX = tab.xDefPos;
+							tab.startY = tab.yDefPos;
 							Client.addMessage("Tab position was changed!");
 							return;
 						}
@@ -47,7 +47,7 @@ public class CommandTab extends Command{
 				String result = "Available tabs: ";
 				
 				for(Tab tab : ClickGUI.tabs) {
-					result += ChatColor.LIGHTCYAN+tab.name+ChatColor.WHITE+", ";
+					result += ChatColor.LIGHTCYAN+tab.getTabName()+ChatColor.WHITE+", ";
 				}
 				
 				result = result.substring(0, result.length() - 2);

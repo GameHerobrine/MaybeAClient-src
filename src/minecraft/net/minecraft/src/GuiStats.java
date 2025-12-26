@@ -10,7 +10,7 @@ public class GuiStats extends GuiScreen {
     private GuiSlotStatsGeneral field_27151_l;
     private GuiSlotStatsItem field_27150_m;
     private GuiSlotStatsBlock field_27157_n;
-    public StatFileWriter field_27156_o;
+    private StatFileWriter field_27156_o;
     private GuiSlot field_27155_p = null;
 
     public GuiStats(GuiScreen var1, StatFileWriter var2) {
@@ -71,14 +71,14 @@ public class GuiStats extends GuiScreen {
         super.drawScreen(var1, var2, var3);
     }
 
-    public void func_27138_c(int var1, int var2, int var3) {
+    private void func_27138_c(int var1, int var2, int var3) {
         this.func_27147_a(var1 + 1, var2 + 1);
         GL11.glEnable(32826 /*GL_RESCALE_NORMAL_EXT*/);
         GL11.glPushMatrix();
         GL11.glRotatef(180.0F, 1.0F, 0.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
         GL11.glPopMatrix();
-        field_27153_j.func_27003_a(this.fontRenderer, this.mc.renderEngine, var3, 0, Item.itemsList[var3].func_27009_a(0), var1 + 2, var2 + 2);
+        field_27153_j.drawItemIntoGui(this.fontRenderer, this.mc.renderEngine, var3, 0, Item.itemsList[var3].getIconFromDamage(0), var1 + 2, var2 + 2);
         RenderHelper.disableStandardItemLighting();
         GL11.glDisable(32826 /*GL_RESCALE_NORMAL_EXT*/);
     }
@@ -87,7 +87,7 @@ public class GuiStats extends GuiScreen {
         this.func_27136_c(var1, var2, 0, 0);
     }
 
-    public void func_27136_c(int var1, int var2, int var3, int var4) {
+    private void func_27136_c(int var1, int var2, int var3, int var4) {
         int var5 = this.mc.renderEngine.getTexture("/gui/slot.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.renderEngine.bindTexture(var5);
@@ -98,5 +98,100 @@ public class GuiStats extends GuiScreen {
         var10.addVertexWithUV((double)(var1 + 18), (double)(var2 + 0), (double)this.zLevel, (double)((float)(var3 + 18) * 0.0078125F), (double)((float)(var4 + 0) * 0.0078125F));
         var10.addVertexWithUV((double)(var1 + 0), (double)(var2 + 0), (double)this.zLevel, (double)((float)(var3 + 0) * 0.0078125F), (double)((float)(var4 + 0) * 0.0078125F));
         var10.draw();
+    }
+
+    // $FF: synthetic method
+    static Minecraft func_27141_a(GuiStats var0) {
+        return var0.mc;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27145_b(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static StatFileWriter func_27142_c(GuiStats var0) {
+        return var0.field_27156_o;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27140_d(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27146_e(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static Minecraft func_27143_f(GuiStats var0) {
+        return var0.mc;
+    }
+
+    // $FF: synthetic method
+    static void func_27128_a(GuiStats var0, int var1, int var2, int var3, int var4) {
+        var0.func_27136_c(var1, var2, var3, var4);
+    }
+
+    // $FF: synthetic method
+    static Minecraft func_27149_g(GuiStats var0) {
+        return var0.mc;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27133_h(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27137_i(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27132_j(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27134_k(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27139_l(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static void func_27129_a(GuiStats var0, int var1, int var2, int var3, int var4, int var5, int var6) {
+        drawGradientRect(var1, var2, var3, var4, var5, var6);
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27144_m(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27127_n(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static void func_27135_b(GuiStats var0, int var1, int var2, int var3, int var4, int var5, int var6) {
+        drawGradientRect(var1, var2, var3, var4, var5, var6);
+    }
+
+    // $FF: synthetic method
+    static FontRenderer func_27131_o(GuiStats var0) {
+        return var0.fontRenderer;
+    }
+
+    // $FF: synthetic method
+    static void func_27148_a(GuiStats var0, int var1, int var2, int var3) {
+        var0.func_27138_c(var1, var2, var3);
     }
 }

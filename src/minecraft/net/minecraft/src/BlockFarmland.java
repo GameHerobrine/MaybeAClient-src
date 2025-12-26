@@ -33,7 +33,7 @@ public class BlockFarmland extends Block {
 
     public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
         if (var5.nextInt(5) == 0) {
-            if (!this.isWaterNearby(var1, var2, var3, var4) && !var1.func_27167_r(var2, var3 + 1, var4)) {
+            if (!this.isWaterNearby(var1, var2, var3, var4) && !var1.canBlockBeRainedOn(var2, var3 + 1, var4)) {
                 int var6 = var1.getBlockMetadata(var2, var3, var4);
                 if (var6 > 0) {
                     var1.setBlockMetadataWithNotify(var2, var3, var4, var6 - 1);

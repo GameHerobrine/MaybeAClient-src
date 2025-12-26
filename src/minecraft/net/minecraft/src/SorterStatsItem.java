@@ -37,9 +37,9 @@ class SorterStatsItem implements Comparator {
             if (var6 == null) {
                 return -1;
             }
-            
-            int var7 = this.field_27372_b.field_27275_a.field_27156_o.func_27184_a(var5);
-            int var8 = this.field_27372_b.field_27275_a.field_27156_o.func_27184_a(var6);
+
+            int var7 = GuiStats.func_27142_c(this.field_27372_b.field_27275_a).func_27184_a(var5);
+            int var8 = GuiStats.func_27142_c(this.field_27372_b.field_27275_a).func_27184_a(var6);
             if (var7 != var8) {
                 return (var7 - var8) * this.field_27372_b.field_27270_f;
             }

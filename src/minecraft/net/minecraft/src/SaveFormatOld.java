@@ -35,7 +35,7 @@ public class SaveFormatOld implements ISaveFormat {
         return var1;
     }
 
-    public void func_22177_c() {
+    public void flushCache() {
     }
 
     public WorldInfo func_22173_b(String var1) {

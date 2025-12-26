@@ -27,7 +27,7 @@ public class GuiIngameMenu extends GuiScreen {
         }
 
         if (var1.id == 1) {
-            this.mc.field_25001_G.func_25100_a(StatList.field_25180_i, 1);
+            this.mc.statFileWriter.func_25100_a(StatList.leaveGameStat, 1);
             if (this.mc.isMultiplayerWorld()) {
                 this.mc.theWorld.sendQuittingDisconnectingPacket();
             }
@@ -43,11 +43,11 @@ public class GuiIngameMenu extends GuiScreen {
         }
 
         if (var1.id == 5) {
-            this.mc.displayGuiScreen(new GuiAchievements(this.mc.field_25001_G));
+            this.mc.displayGuiScreen(new GuiAchievements(this.mc.statFileWriter));
         }
 
         if (var1.id == 6) {
-            this.mc.displayGuiScreen(new GuiStats(this, this.mc.field_25001_G));
+            this.mc.displayGuiScreen(new GuiStats(this, this.mc.statFileWriter));
         }
 
     }

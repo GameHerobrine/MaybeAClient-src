@@ -23,8 +23,6 @@ public class SchematicWorld extends World {
 	public final Settings settings = Settings.instance();
 	public short[] blocks;
 	public byte[] metadata;
-	//public int[][][] blocks;
-	//public int[][][] metadata;
 	public List<TileEntity> tileEntities;
 	public short width;
 	public short length;
@@ -50,6 +48,8 @@ public class SchematicWorld extends World {
 	}
 
 	public void setBlocksAndMeta(int[][][] blocks, int[][][] meta) {
+		this.blocks = new short[this.width*this.height*this.length];
+		this.metadata = new byte[this.width*this.height*this.length];
 		 for (int x = 0; x < this.width; x++) {
 				for (int y = 0; y < this.height; y++) {
 					for (int z = 0; z < this.length; z++) {
@@ -112,24 +112,41 @@ public class SchematicWorld extends World {
 		refreshChests();
 	}
 
-	public void writeToNBT(NBTTagCompound tagCompound) {
-		tagCompound.setShort("Width", this.width);
-		tagCompound.setShort("Length", this.length);
-		tagCompound.setShort("Height", this.height);
 
-		byte localBlocks[] = new byte[this.width * this.length * this.height];
-		byte localMetadata[] = new byte[this.width * this.length * this.height];
-		byte extraBlocks[] = new byte[this.width * this.length * this.height];
+	public static void putToNBT(NBTTagCompound tagCompound, short width, short length, short height, int[][][] blocks, int[][][] metadata, List<TileEntity> tileEntities) {
+		short[] blockss = new short[width*length*height];
+		byte[] metadatab = new byte[width*length*height];
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				for (int z = 0; z < length; z++) {
+					int index = x + (y * length + z) * width;
+					
+					blockss[index] = (short) blocks[x][y][z];
+					metadatab[index] = (byte) metadata[x][y][z];
+				}
+			}
+		 }
+		 putToNBT(tagCompound, width, length, height, blockss, metadatab, tileEntities);
+	}
+	
+	public static void putToNBT(NBTTagCompound tagCompound, short width, short length, short height, short[] blocks, byte[] metadata, List<TileEntity> tileEntities) {
+		tagCompound.setShort("Width", width);
+		tagCompound.setShort("Length", length);
+		tagCompound.setShort("Height", height);
+
+		byte localBlocks[] = new byte[width * length * height];
+		byte localMetadata[] = new byte[width * length * height];
+		byte extraBlocks[] = new byte[width * length * height];
 		boolean extra = false;
 
-		for (int x = 0; x < this.width; x++) {
-			for (int y = 0; y < this.height; y++) {
-				for (int z = 0; z < this.length; z++) {
-					int index = x + (y * this.length + z) * this.width;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				for (int z = 0; z < length; z++) {
+					int index = x + (y * length + z) * width;
 					
-					localBlocks[x + (y * this.length + z) * this.width] = (byte) this.blocks[index];
-					localMetadata[x + (y * this.length + z) * this.width] = (byte) this.metadata[index];
-					if ((extraBlocks[x + (y * this.length + z) * this.width] = (byte) (this.blocks[index] >> 8)) > 0) {
+					localBlocks[x + (y * length + z) * width] = (byte) blocks[index];
+					localMetadata[x + (y * length + z) * width] = (byte) metadata[index];
+					if ((extraBlocks[x + (y * length + z) * width] = (byte) (blocks[index] >> 8)) > 0) {
 						extra = true;
 					}
 				}
@@ -145,13 +162,17 @@ public class SchematicWorld extends World {
 		tagCompound.setTag("Entities", new NBTTagList());
 
 		NBTTagList tileEntitiesList = new NBTTagList();
-		for (TileEntity tileEntity : this.tileEntities) {
+		for (TileEntity tileEntity : tileEntities) {
 			NBTTagCompound tileEntityTagCompound = new NBTTagCompound();
 			tileEntity.writeToNBT(tileEntityTagCompound);
 			tileEntitiesList.setTag(tileEntityTagCompound);
 		}
 
 		tagCompound.setTag("TileEntities", tileEntitiesList);
+	}
+	
+	public void writeToNBT(NBTTagCompound tagCompound) {
+		putToNBT(tagCompound, this.width, this.length, this.height, this.blocks, this.metadata, this.tileEntities);
 	}
 
 	@Override
@@ -178,10 +199,10 @@ public class SchematicWorld extends World {
 		return 15;
 	}*/
 
-	//@Override
-	//public float getBrightness(int var1, int var2, int var3, int var4) {
-	//	return 1.0f;
-	//}
+	@Override
+	public float getBrightness(int var1, int var2, int var3, int var4) {
+		return 1.0f;
+	}
 
 	@Override
 	public float getLightBrightness(int x, int y, int z) {
@@ -304,7 +325,7 @@ public class SchematicWorld extends World {
 			case 0x4:
 				return 0x3;
 			}
-		} else if (blockId == Block.minecartTrack.blockID) {
+		} else if (blockId == Block.rail.blockID) {
 			switch (blockMetadata) {
 			case 0x4:
 				return 0x5;
@@ -319,15 +340,14 @@ public class SchematicWorld extends World {
 			case 0x9:
 				return 0x6;
 			}
-		}
-		/*} else if (blockId == Block.railDetector.blockID || blockId == Block.railPowered.blockID) { XXX powered rails did not exist
+		} else if (blockId == Block.railDetector.blockID || blockId == Block.railPowered.blockID) {
 			switch (blockMetadata & 0x7) {
 			case 0x4:
 				return (byte) (0x5 | (blockMetadata & 0x8));
 			case 0x5:
 				return (byte) (0x4 | (blockMetadata & 0x8));
 			}
-		}*/ else if (blockId == Block.stairCompactCobblestone.blockID || blockId == Block.stairCompactPlanks.blockID) {
+		} else if (blockId == Block.stairCompactCobblestone.blockID || blockId == Block.stairCompactPlanks.blockID) {
 			switch (blockMetadata & 0x3) {
 			case 0x2:
 				return (byte) (0x3 | (blockMetadata & 0x4));
@@ -386,7 +406,7 @@ public class SchematicWorld extends World {
 			case 0xF:
 				return 0x9;
 			}
-		} else if (blockId == Block.ladder.blockID || blockId == Block.signWall.blockID || blockId == Block.stoneOvenActive.blockID || blockId == Block.stoneOvenIdle.blockID || blockId == Block.dispenser.blockID || blockId == Block.crate.blockID) {
+		} else if (blockId == Block.ladder.blockID || blockId == Block.signWall.blockID || blockId == Block.stoneOvenActive.blockID || blockId == Block.stoneOvenIdle.blockID || blockId == Block.dispenser.blockID || blockId == Block.chest.blockID) {
 			switch (blockMetadata) {
 			case 0x2:
 				return 0x3;
@@ -414,21 +434,22 @@ public class SchematicWorld extends World {
 			case 0x2:
 				return (byte) (0x0 | (blockMetadata & 0xC));
 			}
-		/*} else if (blockId == Block.trapdoor.blockID) { XXX b1.5, 1.6, 1.7
+		} else if (blockId == Block.trapdoor.blockID) { 
 			switch (blockMetadata) {
 			case 0x0:
 				return 0x1;
 			case 0x1:
 				return 0x0;
 			}
-		} else if (blockId == Block.pistonBase.blockID || blockId == Block.pistonStickyBase.blockID || blockId == Block.pistonExtension.blockID) {
+		} /*else if (blockId == Block.pistonBase.blockID || blockId == Block.pistonStickyBase.blockID || blockId == Block.pistonExtension.blockID) {
+		//XXX beta 1.7
 			switch (blockMetadata & 0x7) {
 			case 0x2:
 				return (byte) (0x3 | (blockMetadata & 0x8));
 			case 0x3:
 				return (byte) (0x2 | (blockMetadata & 0x8));
-			}*/
-		}
+			}
+		}*/
 
 		return blockMetadata;
 	}
@@ -487,7 +508,7 @@ public class SchematicWorld extends World {
 			case 0x4:
 				return 0x2;
 			}
-		} else if (blockId == Block.minecartTrack.blockID) {
+		} else if (blockId == Block.rail.blockID) {
 			switch (blockMetadata) {
 			case 0x0:
 				return 0x1;
@@ -510,7 +531,7 @@ public class SchematicWorld extends World {
 			case 0x9:
 				return 0x8;
 			}
-			/*} else if (blockId == Block.railDetector.blockID || blockId == Block.railPowered.blockID) { XXX b1.5
+		} else if (blockId == Block.railDetector.blockID || blockId == Block.railPowered.blockID) {
 			switch (blockMetadata & 0x7) {
 			case 0x0:
 				return (byte) (0x1 | (blockMetadata & 0x8));
@@ -524,7 +545,7 @@ public class SchematicWorld extends World {
 				return (byte) (0x3 | (blockMetadata & 0x8));
 			case 0x5:
 				return (byte) (0x2 | (blockMetadata & 0x8));
-			}*/
+			}
 		} else if (blockId == Block.stairCompactCobblestone.blockID || blockId == Block.stairCompactPlanks.blockID) {
 			switch (blockMetadata & 0x3) {
 			case 0x0:
@@ -577,7 +598,7 @@ public class SchematicWorld extends World {
 			 * case 0xC: return 0x8; case 0xD: return 0x9; case 0xE: return 0xA;
 			 * case 0xF: return 0xB; }
 			 */
-		} else if (blockId == Block.ladder.blockID || blockId == Block.signWall.blockID || blockId == Block.stoneOvenActive.blockID || blockId == Block.stoneOvenIdle.blockID || blockId == Block.dispenser.blockID || blockId == Block.crate.blockID) {
+		} else if (blockId == Block.ladder.blockID || blockId == Block.signWall.blockID || blockId == Block.stoneOvenActive.blockID || blockId == Block.stoneOvenIdle.blockID || blockId == Block.dispenser.blockID || blockId == Block.chest.blockID) {
 			switch (blockMetadata) {
 			case 0x2:
 				return 0x4;
@@ -621,7 +642,7 @@ public class SchematicWorld extends World {
 			case 0x3:
 				return (byte) (0x2 | (blockMetadata & 0xC));
 			}
-		/*} else if (blockId == Block.trapdoor.blockID) { XXX b1.5, 1.6, 1.7
+		} else if (blockId == Block.trapdoor.blockID) {
 			switch (blockMetadata) {
 			case 0x0:
 				return 0x2;
@@ -632,8 +653,8 @@ public class SchematicWorld extends World {
 			case 0x3:
 				return 0x0;
 			}
-		} else if (blockId == Block.pistonBase.blockID || blockId == Block.pistonStickyBase.blockID || blockId == Block.pistonExtension.blockID) {
-			switch (blockMetadata & 0x7) {
+		}/* else if (blockId == Block.pistonBase.blockID || blockId == Block.pistonStickyBase.blockID || blockId == Block.pistonExtension.blockID) {
+			switch (blockMetadata & 0x7) { // XXX b1.7
 			case 0x0:
 				return (byte) (0x0 | (blockMetadata & 0x8));
 			case 0x1:
@@ -646,8 +667,8 @@ public class SchematicWorld extends World {
 				return (byte) (0x3 | (blockMetadata & 0x8));
 			case 0x5:
 				return (byte) (0x2 | (blockMetadata & 0x8));
-			}*/
-		}
+			}
+		}*/
 		return blockMetadata;
 	}
 

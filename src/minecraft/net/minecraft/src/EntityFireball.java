@@ -9,7 +9,7 @@ public class EntityFireball extends Entity {
     private int field_9399_h = 0;
     private boolean field_9398_i = false;
     public int field_9406_a = 0;
-    private EntityLiving field_9397_j;
+    public EntityLiving field_9397_j;
     private int field_9396_k;
     private int field_9395_l = 0;
     public double field_9405_b;
@@ -28,6 +28,17 @@ public class EntityFireball extends Entity {
         double var3 = this.boundingBox.getAverageEdgeLength() * 4.0D;
         var3 *= 64.0D;
         return var1 < var3 * var3;
+    }
+
+    public EntityFireball(World var1, double var2, double var4, double var6, double var8, double var10, double var12) {
+        super(var1);
+        this.setSize(1.0F, 1.0F);
+        this.setLocationAndAngles(var2, var4, var6, this.rotationYaw, this.rotationPitch);
+        this.setPosition(var2, var4, var6);
+        double var14 = (double)MathHelper.sqrt_double(var8 * var8 + var10 * var10 + var12 * var12);
+        this.field_9405_b = var8 / var14 * 0.1D;
+        this.field_9404_c = var10 / var14 * 0.1D;
+        this.field_9403_d = var12 / var14 * 0.1D;
     }
 
     public EntityFireball(World var1, EntityLiving var2, double var3, double var5, double var7) {
@@ -109,10 +120,13 @@ public class EntityFireball extends Entity {
         }
 
         if (var3 != null) {
-            if (var3.entityHit != null && var3.entityHit.attackEntityFrom(this.field_9397_j, 0)) {
+            if (!this.worldObj.multiplayerWorld) {
+                if (var3.entityHit != null && var3.entityHit.attackEntityFrom(this.field_9397_j, 0)) {
+                }
+
+                this.worldObj.newExplosion((Entity)null, this.posX, this.posY, this.posZ, 1.0F, true);
             }
 
-            this.worldObj.newExplosion((Entity)null, this.posX, this.posY, this.posZ, 1.0F, true);
             this.setEntityDead();
         }
 
@@ -140,7 +154,7 @@ public class EntityFireball extends Entity {
         this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
         float var17 = 0.95F;
-        if (this.func_27013_ag()) {
+        if (this.isInWater()) {
             for(int var18 = 0; var18 < 4; ++var18) {
                 float var19 = 0.25F;
                 this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var19, this.posY - this.motionY * (double)var19, this.posZ - this.motionZ * (double)var19, this.motionX, this.motionY, this.motionZ);

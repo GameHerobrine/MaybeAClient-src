@@ -5,7 +5,7 @@ final class StepSoundSand extends StepSound {
         super(var1, var2, var3);
     }
 
-    public String func_1146_a() {
+    public String stepSoundDir() {
         return "step.gravel";
     }
 }

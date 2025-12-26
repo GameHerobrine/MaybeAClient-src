@@ -9,7 +9,7 @@ public enum EnumOptions {
     VIEW_BOBBING("options.viewBobbing", false, true),
     ANAGLYPH("options.anaglyph", false, true),
     ADVANCED_OPENGL("options.advancedOpengl", false, true),
-    LIMIT_FRAMERATE("options.limitFramerate", false, true),
+    LIMIT_FRAMERATE("options.framerateLimit", false, false),
     DIFFICULTY("options.difficulty", false, false),
     GRAPHICS("options.graphics", false, false),
     AMBIENT_OCCLUSION("options.ao", false, true),
@@ -19,7 +19,7 @@ public enum EnumOptions {
     private final boolean enumBoolean;
     private final String enumString;
 
-    public static EnumOptions func_20137_a(int var0) {
+    public static EnumOptions getEnumOptions(int var0) {
         EnumOptions[] var1 = values();
         int var2 = var1.length;
 

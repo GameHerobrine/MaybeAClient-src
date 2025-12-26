@@ -10,22 +10,16 @@ import net.minecraft.src.NBTTagList;
 import net.minecraft.src.NBTTagString;
 import net.skidcode.gh.maybeaclient.gui.GuiSetAutoSignText;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingButton;
 
 public class AutoSignHack extends Hack{
 	public static final int MAXSIGNTEXTLENGTH = 15;
 	public static AutoSignHack instance;
 	public String[] text = new String[] {"", "", "", ""};
-	public SettingBoolean openLoad = new SettingBoolean(this, "Edit Default Sign Text", false) {
-		@Override
-		public void setValue(boolean d) {}
-		
-		@Override
-		public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-			mc.displayGuiScreen(new GuiSetAutoSignText(mc.currentScreen));
-		}
-		
+	public SettingButton openLoad = new SettingButton(this, "Edit Default Sign Text") {
 		@Override
 		public void setValue_(String value) {
 			String[] as = value.split(" ");
@@ -77,6 +71,13 @@ public class AutoSignHack extends Hack{
 			}
 		}
 	};
+	
+	public void onPressed(SettingButton b) {
+		super.onPressed(b);
+		if(b == openLoad) {
+			mc.displayGuiScreen(new GuiSetAutoSignText(mc.currentScreen));
+		}
+	}
 	
 	public AutoSignHack() {
 		super("AutoSign", "Automatically fills signs", Keyboard.KEY_NONE, Category.MISC);

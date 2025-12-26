@@ -46,7 +46,7 @@ public class SaveConverterMcRegion extends SaveFormatOld {
         return var1;
     }
 
-    public void func_22177_c() {
+    public void flushCache() {
         RegionFileCache.func_22192_a();
     }
 

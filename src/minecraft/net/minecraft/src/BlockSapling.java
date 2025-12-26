@@ -10,16 +10,18 @@ public class BlockSapling extends BlockFlower {
     }
 
     public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-        super.updateTick(var1, var2, var3, var4, var5);
-        if (var1.getBlockLightValue(var2, var3 + 1, var4) >= 9 && var5.nextInt(30) == 0) {
-            int var6 = var1.getBlockMetadata(var2, var3, var4);
-            if ((var6 & 8) == 0) {
-                var1.setBlockMetadataWithNotify(var2, var3, var4, var6 | 8);
-            } else {
-                this.growTree(var1, var2, var3, var4, var5);
+        if (!var1.multiplayerWorld) {
+            super.updateTick(var1, var2, var3, var4, var5);
+            if (var1.getBlockLightValue(var2, var3 + 1, var4) >= 9 && var5.nextInt(30) == 0) {
+                int var6 = var1.getBlockMetadata(var2, var3, var4);
+                if ((var6 & 8) == 0) {
+                    var1.setBlockMetadataWithNotify(var2, var3, var4, var6 | 8);
+                } else {
+                    this.growTree(var1, var2, var3, var4, var5);
+                }
             }
-        }
 
+        }
     }
 
     public int getBlockTextureFromSideAndMetadata(int var1, int var2) {

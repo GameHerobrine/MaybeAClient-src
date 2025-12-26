@@ -97,6 +97,12 @@ public class ForceFieldHack extends Hack implements EventListener{
 			(chooser.getValue("Neutrals") && (e instanceof EntitySquid || e instanceof EntityWolf));
 	}
 	
+	public boolean isFriend(EntityPlayer e) {
+		if(!this.ignoreList.enabled) return false;
+		
+		return this.ignoreList.names.contains(e.username.toLowerCase());
+	}
+	
 	@Override
 	public void handleEvent(Event event) {
 		if(event instanceof EventPlayerUpdatePost) {
@@ -112,7 +118,7 @@ public class ForceFieldHack extends Hack implements EventListener{
 			for(Object o : entitiesNearby) {
 				Entity e = (Entity)o;
 				if(this.canBeAttacked(e)) {
-					if(e instanceof EntityPlayer && this.ignoreList.enabled && this.ignoreList.names.contains(((EntityPlayer)e).username.toLowerCase())) {
+					if(e instanceof EntityPlayer && this.isFriend((EntityPlayer)e)) {
 						continue;
 					}
 					if(e.ff_delay > 0) continue;

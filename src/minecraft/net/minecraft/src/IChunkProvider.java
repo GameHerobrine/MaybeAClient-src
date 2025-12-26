@@ -15,5 +15,5 @@ public interface IChunkProvider {
 
     boolean func_536_b();
 
-    String toString();
+    String makeString();
 }

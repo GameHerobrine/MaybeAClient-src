@@ -32,7 +32,7 @@ public class Settings {
 	private final static Settings instance = new Settings();
 	private final StringTranslate strTranslate = StringTranslate.getInstance();
 
-	public BlockStat stats_blocksToPlace[] = new BlockStat[Block.blocksList.length];
+	public BlockStat stats_blocksToPlace[] = new BlockStat[Block.blocksList.length*16];
 	public boolean stats_initialized = false;
 	
 	// loaded from config
@@ -72,7 +72,7 @@ public class Settings {
 
 	private Settings() {
 		for(int i = 0; i < stats_blocksToPlace.length; ++i) {
-			stats_blocksToPlace[i] = new BlockStat(i);
+			stats_blocksToPlace[i] = new BlockStat(i >> 4, i & 0xf);
 		}
 	}
 	public void tryUpdating(int x, int y, int z) {
@@ -101,7 +101,7 @@ public class Settings {
 		SchematicWorld world = this.schematic;
 
 		int x, y, z;
-		int blockId = 0, mcBlockId = 0;
+		int blockId = 0, blockMeta = 0, mcBlockId = 0, mcBlockMeta = 0;
 		int minX = 0, minY = 0, minZ = 0;
 		int maxX = this.schematic.width();
 		int maxY = this.schematic.height();
@@ -111,19 +111,22 @@ public class Settings {
 				for (z = minZ; z < maxZ; z++) {
 					try {
 						blockId = world.getBlockId(x, y, z);
+						blockMeta = world.getBlockMetadata(x, y, z);
+						
 						mcBlockId = mcWorld.getBlockId(x + this.offset.x, y + this.offset.y, z + this.offset.z);
-
+						mcBlockMeta = mcWorld.getBlockMetadata(x + this.offset.x, y + this.offset.y, z + this.offset.z);
+						
 						if (mcBlockId != 0) {
 							if (blockId != mcBlockId) {
-								this.incrementStat(mcBlockId, BlockStat.REMOVE);
-								this.incrementStat(blockId, BlockStat.PLACE);
+								this.incrementStat(mcBlockId, mcBlockMeta, BlockStat.REMOVE);
+								this.incrementStat(blockId, blockMeta, BlockStat.PLACE);
 							} else if (world.getBlockMetadata(x, y, z) != mcWorld.getBlockMetadata(x + this.offset.x, y + this.offset.y, z + this.offset.z)) {
-								this.incrementStat(blockId, BlockStat.METAINVALID);
+								this.incrementStat(blockId, blockMeta, BlockStat.METAINVALID);
 							}else if(mcBlockId == blockId){
-								this.incrementStat(blockId, BlockStat.DONEPLACE);
+								this.incrementStat(blockId, blockMeta, BlockStat.DONEPLACE);
 							}
 						} else if (mcBlockId == 0 && blockId > 0 && blockId < 0x1000) {
-							this.incrementStat(blockId, BlockStat.PLACE);
+							this.incrementStat(blockId, blockMeta, BlockStat.PLACE);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -134,13 +137,14 @@ public class Settings {
 		stats_initialized = true;
 	}
 	
-	public void incrementStat(int blockId, byte stat) {
-		if(blockId >= this.stats_blocksToPlace.length || blockId < 0) {
-			System.out.println("Trying to increment invalid block id stat! "+blockId+"  "+stat);
+	public void incrementStat(int blockId, int meta, byte stat) {
+		int ind = (blockId << 4) | (meta & 0xf);
+		if(ind >= this.stats_blocksToPlace.length || blockId < 0 || meta < 0 || meta > 15) {
+			System.out.println("Trying to increment invalid block id stat! "+blockId+":"+meta+"  "+stat);
 			return;
 		}
 		if(blockId == 0) return;
-		BlockStat st = this.stats_blocksToPlace[blockId];
+		BlockStat st = this.stats_blocksToPlace[(blockId << 4) | (meta & 0xf)];
 		
 		switch(stat) {
 			case BlockStat.PLACE:

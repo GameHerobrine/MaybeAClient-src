@@ -17,11 +17,11 @@ class GuiSlotStatsItem extends GuiSlotStats {
             StatCrafting var3 = (StatCrafting)var2.next();
             boolean var4 = false;
             int var5 = var3.func_25072_b();
-            if (var1.field_27156_o.func_27184_a(var3) > 0) {
+            if (GuiStats.func_27142_c(var1).func_27184_a(var3) > 0) {
                 var4 = true;
-            } else if (StatList.field_25170_B[var5] != null && var1.field_27156_o.func_27184_a(StatList.field_25170_B[var5]) > 0) {
+            } else if (StatList.field_25170_B[var5] != null && GuiStats.func_27142_c(var1).func_27184_a(StatList.field_25170_B[var5]) > 0) {
                 var4 = true;
-            } else if (StatList.field_25158_z[var5] != null && var1.field_27156_o.func_27184_a(StatList.field_25158_z[var5]) > 0) {
+            } else if (StatList.field_25158_z[var5] != null && GuiStats.func_27142_c(var1).func_27184_a(StatList.field_25158_z[var5]) > 0) {
                 var4 = true;
             }
 
@@ -36,21 +36,21 @@ class GuiSlotStatsItem extends GuiSlotStats {
     protected void func_27260_a(int var1, int var2, Tessellator var3) {
         super.func_27260_a(var1, var2, var3);
         if (this.field_27268_b == 0) {
-            this.field_27275_a.func_27136_c(var1 + 115 - 18 + 1, var2 + 1 + 1, 72, 18);
+            GuiStats.func_27128_a(this.field_27275_a, var1 + 115 - 18 + 1, var2 + 1 + 1, 72, 18);
         } else {
-            this.field_27275_a.func_27136_c(var1 + 115 - 18, var2 + 1, 72, 18);
+            GuiStats.func_27128_a(this.field_27275_a, var1 + 115 - 18, var2 + 1, 72, 18);
         }
 
         if (this.field_27268_b == 1) {
-            this.field_27275_a.func_27136_c(var1 + 165 - 18 + 1, var2 + 1 + 1, 18, 18);
+            GuiStats.func_27128_a(this.field_27275_a, var1 + 165 - 18 + 1, var2 + 1 + 1, 18, 18);
         } else {
-            this.field_27275_a.func_27136_c(var1 + 165 - 18, var2 + 1, 18, 18);
+            GuiStats.func_27128_a(this.field_27275_a, var1 + 165 - 18, var2 + 1, 18, 18);
         }
 
         if (this.field_27268_b == 2) {
-            this.field_27275_a.func_27136_c(var1 + 215 - 18 + 1, var2 + 1 + 1, 36, 18);
+            GuiStats.func_27128_a(this.field_27275_a, var1 + 215 - 18 + 1, var2 + 1 + 1, 36, 18);
         } else {
-            this.field_27275_a.func_27136_c(var1 + 215 - 18, var2 + 1, 36, 18);
+            GuiStats.func_27128_a(this.field_27275_a, var1 + 215 - 18, var2 + 1, 36, 18);
         }
 
     }
@@ -58,7 +58,7 @@ class GuiSlotStatsItem extends GuiSlotStats {
     protected void drawSlot(int var1, int var2, int var3, int var4, Tessellator var5) {
         StatCrafting var6 = this.func_27264_b(var1);
         int var7 = var6.func_25072_b();
-        field_27275_a.func_27138_c(var2 + 40, var3, var7);
+        GuiStats.func_27148_a(this.field_27275_a, var2 + 40, var3, var7);
         this.func_27265_a((StatCrafting)StatList.field_25170_B[var7], var2 + 115, var3, var1 % 2 == 0);
         this.func_27265_a((StatCrafting)StatList.field_25158_z[var7], var2 + 165, var3, var1 % 2 == 0);
         this.func_27265_a(var6, var2 + 215, var3, var1 % 2 == 0);

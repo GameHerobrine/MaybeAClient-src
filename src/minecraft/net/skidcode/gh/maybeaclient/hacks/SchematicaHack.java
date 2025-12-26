@@ -15,6 +15,7 @@ import lunatrius.schematica.Settings;
 import net.minecraft.src.Block;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
@@ -26,7 +27,6 @@ import net.skidcode.gh.maybeaclient.hacks.settings.SettingInteger;
 import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
 
 public class SchematicaHack extends Hack implements EventListener{
-	
 	public SettingBoolean enableAlpha;
 	public SettingInteger alpha;
 	public SettingBoolean highlight;
@@ -174,6 +174,9 @@ public class SchematicaHack extends Hack implements EventListener{
 									int meta = schem.getBlockMetadata(x, y, z); //schem.metadata[x][y][z];
 									Entry<ItemStack, Integer> ent = hm.get(id << 8 | meta);
 									if((id != 0 && (worldID == 0/*XXX modern versions: Replaceable || Block.blocksList[worldID].blockMaterial.getIsGroundCover()*/)) && id != worldID && ent != null) {
+										if(id == Block.gravel.blockID || id == Block.sand.blockID) {
+											if(mc.theWorld.getBlockId(rX, rY-1, rZ) == 0) continue;
+										}
 										ItemStack is = ent.getKey();
 										int slot = ent.getValue();
 										int saved = mc.thePlayer.inventory.currentItem;
@@ -217,6 +220,7 @@ public class SchematicaHack extends Hack implements EventListener{
 			if(placeon == 0) continue;
 			
 			Block b = Block.blocksList[placeon];
+			if(Client.isActiveable[placeon]) continue;
 			if(b.blockMaterial.getIsSolid()) {
 				return i;
 			}

@@ -17,6 +17,11 @@ public class AxisAlignedBB {
         return new AxisAlignedBB(var0, var2, var4, var6, var8, var10);
     }
 
+    public static void func_28196_a() {
+        boundingBoxes.clear();
+        numBoundingBoxesInUse = 0;
+    }
+
     public static void clearBoundingBoxPool() {
         numBoundingBoxesInUse = 0;
     }
@@ -216,6 +221,16 @@ public class AxisAlignedBB {
         double var3 = this.maxY - this.minY;
         double var5 = this.maxZ - this.minZ;
         return (var1 + var3 + var5) / 3.0D;
+    }
+
+    public AxisAlignedBB func_28195_e(double var1, double var3, double var5) {
+        double var7 = this.minX + var1;
+        double var9 = this.minY + var3;
+        double var11 = this.minZ + var5;
+        double var13 = this.maxX - var1;
+        double var15 = this.maxY - var3;
+        double var17 = this.maxZ - var5;
+        return getBoundingBoxFromPool(var7, var9, var11, var13, var15, var17);
     }
 
     public AxisAlignedBB copy() {

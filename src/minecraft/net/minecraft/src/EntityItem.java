@@ -50,7 +50,7 @@ public class EntityItem extends Entity {
             this.worldObj.playSoundAtEntity(this, "random.fizz", 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
         }
 
-        this.func_466_g(this.posX, this.posY, this.posZ);
+        this.func_28014_c(this.posX, (this.boundingBox.minY + this.boundingBox.maxY) / 2.0D, this.posZ);
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
         float var1 = 0.98F;
         if (this.onGround) {
@@ -78,81 +78,6 @@ public class EntityItem extends Entity {
 
     public boolean handleWaterMovement() {
         return this.worldObj.handleMaterialAcceleration(this.boundingBox, Material.water, this);
-    }
-
-    private boolean func_466_g(double var1, double var3, double var5) {
-        int var7 = MathHelper.floor_double(var1);
-        int var8 = MathHelper.floor_double(var3);
-        int var9 = MathHelper.floor_double(var5);
-        double var10 = var1 - (double)var7;
-        double var12 = var3 - (double)var8;
-        double var14 = var5 - (double)var9;
-        if (Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8, var9)]) {
-            boolean var16 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7 - 1, var8, var9)];
-            boolean var17 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7 + 1, var8, var9)];
-            boolean var18 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8 - 1, var9)];
-            boolean var19 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8 + 1, var9)];
-            boolean var20 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8, var9 - 1)];
-            boolean var21 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8, var9 + 1)];
-            byte var22 = -1;
-            double var23 = 9999.0D;
-            if (var16 && var10 < var23) {
-                var23 = var10;
-                var22 = 0;
-            }
-
-            if (var17 && 1.0D - var10 < var23) {
-                var23 = 1.0D - var10;
-                var22 = 1;
-            }
-
-            if (var18 && var12 < var23) {
-                var23 = var12;
-                var22 = 2;
-            }
-
-            if (var19 && 1.0D - var12 < var23) {
-                var23 = 1.0D - var12;
-                var22 = 3;
-            }
-
-            if (var20 && var14 < var23) {
-                var23 = var14;
-                var22 = 4;
-            }
-
-            if (var21 && 1.0D - var14 < var23) {
-                var23 = 1.0D - var14;
-                var22 = 5;
-            }
-
-            float var25 = this.rand.nextFloat() * 0.2F + 0.1F;
-            if (var22 == 0) {
-                this.motionX = (double)(-var25);
-            }
-
-            if (var22 == 1) {
-                this.motionX = (double)var25;
-            }
-
-            if (var22 == 2) {
-                this.motionY = (double)(-var25);
-            }
-
-            if (var22 == 3) {
-                this.motionY = (double)var25;
-            }
-
-            if (var22 == 4) {
-                this.motionZ = (double)(-var25);
-            }
-
-            if (var22 == 5) {
-                this.motionZ = (double)var25;
-            }
-        }
-
-        return false;
     }
 
     protected void dealFireDamage(int var1) {
@@ -187,16 +112,18 @@ public class EntityItem extends Entity {
             int var2 = this.item.stackSize;
             if (this.delayBeforeCanPickup == 0 && var1.inventory.addItemStackToInventory(this.item)) {
                 if (this.item.itemID == Block.wood.blockID) {
-                    var1.func_27026_a(AchievementList.field_25198_c);
+                    var1.triggerAchievement(AchievementList.mineWood);
                 }
 
                 if (this.item.itemID == Item.leather.shiftedIndex) {
-                    var1.func_27026_a(AchievementList.field_27376_t);
+                    var1.triggerAchievement(AchievementList.killCow);
                 }
 
                 this.worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 var1.onItemPickup(this, var2);
-                this.setEntityDead();
+                if (this.item.stackSize <= 0) {
+                    this.setEntityDead();
+                }
             }
 
         }

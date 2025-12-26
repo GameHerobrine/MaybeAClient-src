@@ -3,7 +3,7 @@ package net.minecraft.src;
 public class EntitySlimeFX extends EntityFX {
     public EntitySlimeFX(World var1, double var2, double var4, double var6, Item var8) {
         super(var1, var2, var4, var6, 0.0D, 0.0D, 0.0D);
-        this.particleTextureIndex = var8.func_27009_a(0);
+        this.particleTextureIndex = var8.getIconFromDamage(0);
         this.particleRed = this.particleGreen = this.particleBlue = 1.0F;
         this.particleGravity = Block.blockSnow.blockParticleGravity;
         this.particleScale /= 2.0F;

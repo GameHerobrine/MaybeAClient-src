@@ -12,12 +12,13 @@ public class BiomeGenBase {
     public static final BiomeGenBase forest = (new BiomeGenForest()).setColor(353825).setBiomeName("Forest").func_4124_a(5159473);
     public static final BiomeGenBase savanna = (new BiomeGenDesert()).setColor(14278691).setBiomeName("Savanna");
     public static final BiomeGenBase shrubland = (new BiomeGenBase()).setColor(10595616).setBiomeName("Shrubland");
-    public static final BiomeGenBase taiga = (new BiomeGenTaiga()).setColor(3060051).setBiomeName("Taiga").doesNothingForMobSpawnerBase().func_4124_a(8107825);
-    public static final BiomeGenBase desert = (new BiomeGenDesert()).setColor(16421912).setBiomeName("Desert").func_27076_e();
+    public static final BiomeGenBase taiga = (new BiomeGenTaiga()).setColor(3060051).setBiomeName("Taiga").setEnableSnow().func_4124_a(8107825);
+    public static final BiomeGenBase desert = (new BiomeGenDesert()).setColor(16421912).setBiomeName("Desert").setDisableRain();
     public static final BiomeGenBase plains = (new BiomeGenDesert()).setColor(16767248).setBiomeName("Plains");
-    public static final BiomeGenBase iceDesert = (new BiomeGenDesert()).setColor(16772499).setBiomeName("Ice Desert").doesNothingForMobSpawnerBase().func_27076_e().func_4124_a(12899129);
-    public static final BiomeGenBase tundra = (new BiomeGenBase()).setColor(5762041).setBiomeName("Tundra").doesNothingForMobSpawnerBase().func_4124_a(12899129);
-    public static final BiomeGenBase hell = (new BiomeGenHell()).setColor(16711680).setBiomeName("Hell").func_27076_e();
+    public static final BiomeGenBase iceDesert = (new BiomeGenDesert()).setColor(16772499).setBiomeName("Ice Desert").setEnableSnow().setDisableRain().func_4124_a(12899129);
+    public static final BiomeGenBase tundra = (new BiomeGenBase()).setColor(5762041).setBiomeName("Tundra").setEnableSnow().func_4124_a(12899129);
+    public static final BiomeGenBase hell = (new BiomeGenHell()).setColor(16711680).setBiomeName("Hell").setDisableRain();
+    public static final BiomeGenBase sky = (new BiomeGenSky()).setColor(8421631).setBiomeName("Sky").setDisableRain();
     public String biomeName;
     public int color;
     public byte topBlock;
@@ -26,8 +27,8 @@ public class BiomeGenBase {
     protected List spawnableMonsterList;
     protected List spawnableCreatureList;
     protected List spawnableWaterCreatureList;
-    private boolean field_27080_u;
-    private boolean field_27079_v;
+    private boolean enableSnow;
+    private boolean enableRain;
     private static BiomeGenBase[] biomeLookupTable = new BiomeGenBase[4096];
 
     protected BiomeGenBase() {
@@ -37,7 +38,7 @@ public class BiomeGenBase {
         this.spawnableMonsterList = new ArrayList();
         this.spawnableCreatureList = new ArrayList();
         this.spawnableWaterCreatureList = new ArrayList();
-        this.field_27079_v = true;
+        this.enableRain = true;
         this.spawnableMonsterList.add(new SpawnListEntry(EntitySpider.class, 10));
         this.spawnableMonsterList.add(new SpawnListEntry(EntityZombie.class, 10));
         this.spawnableMonsterList.add(new SpawnListEntry(EntitySkeleton.class, 10));
@@ -50,8 +51,8 @@ public class BiomeGenBase {
         this.spawnableWaterCreatureList.add(new SpawnListEntry(EntitySquid.class, 10));
     }
 
-    private BiomeGenBase func_27076_e() {
-        this.field_27079_v = false;
+    private BiomeGenBase setDisableRain() {
+        this.enableRain = false;
         return this;
     }
 
@@ -70,8 +71,8 @@ public class BiomeGenBase {
         return (WorldGenerator)(var1.nextInt(10) == 0 ? new WorldGenBigTree() : new WorldGenTrees());
     }
 
-    protected BiomeGenBase doesNothingForMobSpawnerBase() {
-        this.field_27080_u = true;
+    protected BiomeGenBase setEnableSnow() {
+        this.enableSnow = true;
         return this;
     }
 
@@ -142,12 +143,12 @@ public class BiomeGenBase {
         }
     }
 
-    public boolean func_27078_c() {
-        return this.field_27080_u;
+    public boolean getEnableSnow() {
+        return this.enableSnow;
     }
 
-    public boolean func_27077_d() {
-        return this.field_27080_u ? false : this.field_27079_v;
+    public boolean canSpawnLightningBolt() {
+        return this.enableSnow ? false : this.enableRain;
     }
 
     static {

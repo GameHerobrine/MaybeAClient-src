@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.IngameHook;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventRenderIngameNoDebug;
@@ -14,16 +15,17 @@ import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
 import org.lwjgl.opengl.GL11;
 
 public class GuiIngame extends Gui {
-	public static RenderItem itemRenderer = new RenderItem();
+    public static RenderItem itemRenderer = new RenderItem();
     private List chatMessageList = new ArrayList();
     private List<Boolean> chatMessagesBGs = new ArrayList<>();
     private Random rand = new Random();
     private Minecraft mc;
+    public String field_933_a = null;
     private int updateCounter = 0;
     private String recordPlaying = "";
     private int recordPlayingUpFor = 0;
     private boolean field_22065_l = false;
-    public float field_6446_b;
+    public float damageGuiPartialTime;
     float prevVignetteBrightness = 1.0F;
 
     public GuiIngame(Minecraft var1) {
@@ -36,7 +38,11 @@ public class GuiIngame extends Gui {
         int var7 = var5.getScaledHeight();
         FontRenderer var8 = this.mc.fontRenderer;
         this.mc.entityRenderer.setupScaledResolution();
+        
         GL11.glEnable(3042 /*GL_BLEND*/);
+        
+        Client.renderFramebuffers();
+        
         if (Minecraft.isFancyGraphicsEnabled()) {
             this.renderVignette(this.mc.thePlayer.getEntityBrightness(var1), var6, var7);
         }
@@ -141,7 +147,7 @@ public class GuiIngame extends Gui {
         GL11.glDisable(3042 /*GL_BLEND*/);
         GL11.glEnable(32826 /*GL_RESCALE_NORMAL_EXT*/);
         GL11.glPushMatrix();
-        GL11.glRotatef(180.0F, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef(120.0F, 1.0F, 0.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
         GL11.glPopMatrix();
 
@@ -170,7 +176,12 @@ public class GuiIngame extends Gui {
 
         String var23;
         if (this.mc.gameSettings.showDebugInfo) {
-            var8.drawStringWithShadow("Minecraft Beta 1.5_01 (" + this.mc.debug + ")", 2, 2, 16777215);
+            GL11.glPushMatrix();
+            if (Minecraft.hasPaidCheckTime > 0L) {
+                GL11.glTranslatef(0.0F, 32.0F, 0.0F);
+            }
+
+            var8.drawStringWithShadow("Minecraft Beta 1.6.6 (" + this.mc.debug + ")", 2, 2, 16777215);
             var8.drawStringWithShadow(this.mc.func_6241_m(), 2, 12, 16777215);
             var8.drawStringWithShadow(this.mc.func_6262_n(), 2, 22, 16777215);
             var8.drawStringWithShadow(this.mc.func_6245_o(), 2, 32, 16777215);
@@ -186,8 +197,8 @@ public class GuiIngame extends Gui {
             this.drawString(var8, "x: " + this.mc.thePlayer.posX, 2, 64, 14737632);
             this.drawString(var8, "y: " + this.mc.thePlayer.posY, 2, 72, 14737632);
             this.drawString(var8, "z: " + this.mc.thePlayer.posZ, 2, 80, 14737632);
-        } else {
-            //var8.drawStringWithShadow("Minecraft Beta 1.5_01", 2, 2, 16777215);
+            GL11.glPopMatrix();
+        }else {
         	EventRegistry.handleEvent(new EventRenderIngameNoDebug(var5));
             IngameHook.handleIngame(var5);
         }
@@ -226,8 +237,8 @@ public class GuiIngame extends Gui {
             var31 = true;
             if(HideChatHack.instance.mode.currentMode.equalsIgnoreCase("HideExceptChatGui")) renderChat = true;
         }
-        
-        if(renderChat) {
+
+        if(renderChat) { //XXX make sure to port depth_test
 	        GL11.glEnable(3042 /*GL_BLEND*/);
 	        GL11.glBlendFunc(770, 771);
 	        GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
@@ -263,7 +274,6 @@ public class GuiIngame extends Gui {
 	                    }else {
 	                    	this.drawRect(var33, var22 - 1, var33 + 320, var22 + 8, var20 / 2 << 24);
 	                    }
-	                    //this.drawRect(var33, var22 - 1, var33 + 320, var22 + 8, var20 / 2 << 24);
 	                    GL11.glEnable(3042 /*GL_BLEND*/);
 	                    var8.drawStringWithShadow(var23, var33, var22, 16777215 + (var20 << 24));
 	                }
@@ -298,7 +308,6 @@ public class GuiIngame extends Gui {
     }
 
     private void renderVignette(float var1, int var2, int var3) {
-    	
         var1 = 1.0F - var1;
         if (var1 < 0.0F) {
             var1 = 0.0F;
@@ -314,9 +323,7 @@ public class GuiIngame extends Gui {
         GL11.glBlendFunc(0, 769);
         GL11.glColor4f(this.prevVignetteBrightness, this.prevVignetteBrightness, this.prevVignetteBrightness, 1.0F);
         GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, this.mc.renderEngine.getTexture("%blur%/misc/vignette.png"));
-        
-       
-	    draw: {
+        draw: {
         	if(NoRenderHack.instance.status && NoRenderHack.instance.vignette.getValue()) break draw;
 	        Tessellator var4 = Tessellator.instance;
 	        var4.startDrawingQuads();
@@ -333,9 +340,12 @@ public class GuiIngame extends Gui {
     }
 
     private void renderPortalOverlay(float var1, int var2, int var3) {
-        var1 *= var1;
-        var1 *= var1;
-        var1 = var1 * 0.8F + 0.2F;
+        if (var1 < 1.0F) {
+            var1 *= var1;
+            var1 *= var1;
+            var1 = var1 * 0.8F + 0.2F;
+        }
+
         GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
         GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
         GL11.glDepthMask(false);
@@ -393,10 +403,13 @@ public class GuiIngame extends Gui {
 
     }
 
+    public void func_28097_b() {
+        this.chatMessageList.clear();
+    }
+
     public void addChatMessage(String var1) {
-    	while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
+        while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
             int var2;
-            
             String lastFormatting = "";
             for(var2 = 0; var2 < var1.length() && this.mc.fontRenderer.getStringWidth(var1.substring(0, var2 + 1)) <= 320; ++var2) {
             	if(var1.charAt(var2) == '§' && (var2+1) < var1.length()) {
@@ -404,6 +417,7 @@ public class GuiIngame extends Gui {
             	}
             
             }
+
             this.addChatMessage(var1.substring(0, var2));
             var1 = lastFormatting+var1.substring(var2);
         }
@@ -427,7 +441,7 @@ public class GuiIngame extends Gui {
         String var3 = var2.translateKey(var1);
         this.addChatMessage(var3);
     }
-
+    
 	public void addChatMessageWithMoreOpacityBG(String var1) {
 		while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
             int var2;

@@ -3,25 +3,25 @@ package net.minecraft.src;
 import java.util.Random;
 
 public class BlockRail extends Block {
-    private final boolean field_27045_a;
+    private final boolean isPowered;
 
-    public static final boolean func_27040_h(World var0, int var1, int var2, int var3) {
+    public static final boolean isRailBlockAt(World var0, int var1, int var2, int var3) {
         int var4 = var0.getBlockId(var1, var2, var3);
-        return var4 == Block.minecartTrack.blockID || var4 == Block.railPowered.blockID || var4 == Block.railDetector.blockID;
+        return var4 == Block.rail.blockID || var4 == Block.railPowered.blockID || var4 == Block.railDetector.blockID;
     }
 
-    public static final boolean func_27041_c(int var0) {
-        return var0 == Block.minecartTrack.blockID || var0 == Block.railPowered.blockID || var0 == Block.railDetector.blockID;
+    public static final boolean isRailBlock(int var0) {
+        return var0 == Block.rail.blockID || var0 == Block.railPowered.blockID || var0 == Block.railDetector.blockID;
     }
 
     protected BlockRail(int var1, int var2, boolean var3) {
         super(var1, var2, Material.circuits);
-        this.field_27045_a = var3;
+        this.isPowered = var3;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
     }
 
-    public boolean func_27042_h() {
-        return this.field_27045_a;
+    public boolean getIsPowered() {
+        return this.isPowered;
     }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
@@ -48,7 +48,7 @@ public class BlockRail extends Block {
     }
 
     public int getBlockTextureFromSideAndMetadata(int var1, int var2) {
-        if (this.field_27045_a) {
+        if (this.isPowered) {
             if (this.blockID == Block.railPowered.blockID && (var2 & 8) == 0) {
                 return this.blockIndexInTexture - 16;
             }
@@ -72,12 +72,12 @@ public class BlockRail extends Block {
     }
 
     public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-        return var1.isBlockOpaqueCube(var2, var3 - 1, var4);
+        return var1.func_28100_h(var2, var3 - 1, var4);
     }
 
     public void onBlockAdded(World var1, int var2, int var3, int var4) {
         if (!var1.multiplayerWorld) {
-            this.func_4031_h(var1, var2, var3, var4);
+            this.func_4031_h(var1, var2, var3, var4, true);
         }
 
     }
@@ -86,28 +86,28 @@ public class BlockRail extends Block {
         if (!var1.multiplayerWorld) {
             int var6 = var1.getBlockMetadata(var2, var3, var4);
             int var7 = var6;
-            if (this.field_27045_a) {
+            if (this.isPowered) {
                 var7 = var6 & 7;
             }
 
             boolean var8 = false;
-            if (!var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+            if (!var1.func_28100_h(var2, var3 - 1, var4)) {
                 var8 = true;
             }
 
-            if (var7 == 2 && !var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
+            if (var7 == 2 && !var1.func_28100_h(var2 + 1, var3, var4)) {
                 var8 = true;
             }
 
-            if (var7 == 3 && !var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
+            if (var7 == 3 && !var1.func_28100_h(var2 - 1, var3, var4)) {
                 var8 = true;
             }
 
-            if (var7 == 4 && !var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
+            if (var7 == 4 && !var1.func_28100_h(var2, var3, var4 - 1)) {
                 var8 = true;
             }
 
-            if (var7 == 5 && !var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
+            if (var7 == 5 && !var1.func_28100_h(var2, var3, var4 + 1)) {
                 var8 = true;
             }
 
@@ -132,16 +132,16 @@ public class BlockRail extends Block {
                         var1.notifyBlocksOfNeighborChange(var2, var3 + 1, var4, this.blockID);
                     }
                 }
-            } else if (var5 > 0 && Block.blocksList[var5].canProvidePower() && !this.field_27045_a && RailLogic.getNAdjacentTracks(new RailLogic(this, var1, var2, var3, var4)) == 3) {
-                this.func_4031_h(var1, var2, var3, var4);
+            } else if (var5 > 0 && Block.blocksList[var5].canProvidePower() && !this.isPowered && RailLogic.getNAdjacentTracks(new RailLogic(this, var1, var2, var3, var4)) == 3) {
+                this.func_4031_h(var1, var2, var3, var4, false);
             }
 
         }
     }
 
-    private void func_4031_h(World var1, int var2, int var3, int var4) {
+    private void func_4031_h(World var1, int var2, int var3, int var4, boolean var5) {
         if (!var1.multiplayerWorld) {
-            (new RailLogic(this, var1, var2, var3, var4)).func_792_a(var1.isBlockIndirectlyGettingPowered(var2, var3, var4));
+            (new RailLogic(this, var1, var2, var3, var4)).func_792_a(var1.isBlockIndirectlyGettingPowered(var2, var3, var4), var5);
         }
     }
 
@@ -245,7 +245,7 @@ public class BlockRail extends Block {
     }
 
     // $FF: synthetic method
-    static boolean func_27039_a(BlockRail var0) {
-        return var0.field_27045_a;
+    static boolean isPoweredBlockRail(BlockRail var0) {
+        return var0.isPowered;
     }
 }

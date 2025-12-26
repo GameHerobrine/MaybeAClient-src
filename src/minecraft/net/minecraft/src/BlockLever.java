@@ -21,17 +21,31 @@ public class BlockLever extends Block {
         return 12;
     }
 
-    public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-        if (var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
+    public boolean canPlaceBlockOnSide(World var1, int var2, int var3, int var4, int var5) {
+        if (var5 == 1 && var1.func_28100_h(var2, var3 - 1, var4)) {
             return true;
-        } else if (var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
+        } else if (var5 == 2 && var1.func_28100_h(var2, var3, var4 + 1)) {
             return true;
-        } else if (var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
+        } else if (var5 == 3 && var1.func_28100_h(var2, var3, var4 - 1)) {
             return true;
-        } else if (var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
+        } else if (var5 == 4 && var1.func_28100_h(var2 + 1, var3, var4)) {
             return true;
         } else {
-            return var1.isBlockOpaqueCube(var2, var3 - 1, var4);
+            return var5 == 5 && var1.func_28100_h(var2 - 1, var3, var4);
+        }
+    }
+
+    public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
+        if (var1.func_28100_h(var2 - 1, var3, var4)) {
+            return true;
+        } else if (var1.func_28100_h(var2 + 1, var3, var4)) {
+            return true;
+        } else if (var1.func_28100_h(var2, var3, var4 - 1)) {
+            return true;
+        } else if (var1.func_28100_h(var2, var3, var4 + 1)) {
+            return true;
+        } else {
+            return var1.func_28100_h(var2, var3 - 1, var4);
         }
     }
 
@@ -39,50 +53,60 @@ public class BlockLever extends Block {
         int var6 = var1.getBlockMetadata(var2, var3, var4);
         int var7 = var6 & 8;
         var6 &= 7;
-        if (var5 == 1 && var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+        var6 = -1;
+        if (var5 == 1 && var1.func_28100_h(var2, var3 - 1, var4)) {
             var6 = 5 + var1.rand.nextInt(2);
         }
 
-        if (var5 == 2 && var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
+        if (var5 == 2 && var1.func_28100_h(var2, var3, var4 + 1)) {
             var6 = 4;
         }
 
-        if (var5 == 3 && var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
+        if (var5 == 3 && var1.func_28100_h(var2, var3, var4 - 1)) {
             var6 = 3;
         }
 
-        if (var5 == 4 && var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
+        if (var5 == 4 && var1.func_28100_h(var2 + 1, var3, var4)) {
             var6 = 2;
         }
 
-        if (var5 == 5 && var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
+        if (var5 == 5 && var1.func_28100_h(var2 - 1, var3, var4)) {
             var6 = 1;
         }
 
-        var1.setBlockMetadataWithNotify(var2, var3, var4, var6 + var7);
+        if (var6 == -1) {
+            this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
+            var1.setBlockWithNotify(var2, var3, var4, 0);
+        } else {
+            var1.setBlockMetadataWithNotify(var2, var3, var4, var6 + var7);
+        }
     }
 
     public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
         if (this.checkIfAttachedToBlock(var1, var2, var3, var4)) {
             int var6 = var1.getBlockMetadata(var2, var3, var4) & 7;
             boolean var7 = false;
-            if (!var1.isBlockOpaqueCube(var2 - 1, var3, var4) && var6 == 1) {
+            if (!var1.func_28100_h(var2 - 1, var3, var4) && var6 == 1) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2 + 1, var3, var4) && var6 == 2) {
+            if (!var1.func_28100_h(var2 + 1, var3, var4) && var6 == 2) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3, var4 - 1) && var6 == 3) {
+            if (!var1.func_28100_h(var2, var3, var4 - 1) && var6 == 3) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3, var4 + 1) && var6 == 4) {
+            if (!var1.func_28100_h(var2, var3, var4 + 1) && var6 == 4) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3 - 1, var4) && var6 == 5) {
+            if (!var1.func_28100_h(var2, var3 - 1, var4) && var6 == 5) {
+                var7 = true;
+            }
+
+            if (!var1.func_28100_h(var2, var3 - 1, var4) && var6 == 6) {
                 var7 = true;
             }
 
@@ -184,7 +208,9 @@ public class BlockLever extends Block {
             return false;
         } else {
             int var7 = var6 & 7;
-            if (var7 == 5 && var5 == 1) {
+            if (var7 == 6 && var5 == 1) {
+                return true;
+            } else if (var7 == 5 && var5 == 1) {
                 return true;
             } else if (var7 == 4 && var5 == 2) {
                 return true;

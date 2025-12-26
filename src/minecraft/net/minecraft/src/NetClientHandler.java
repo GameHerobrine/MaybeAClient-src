@@ -9,10 +9,9 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
-
-import lunatrius.schematica.Settings;
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.LockTimeHack;
+import net.skidcode.gh.maybeaclient.hacks.WeatherLockHack;
 
 public class NetClientHandler extends NetHandler {
     private boolean disconnected = false;
@@ -21,9 +20,11 @@ public class NetClientHandler extends NetHandler {
     private Minecraft mc;
     public WorldClient worldClient;
     private boolean field_1210_g = false;
+    public MapStorage field_28118_b = new MapStorage((ISaveHandler)null);
     Random rand = new Random();
     public String ip;
     public int port;
+
     public NetClientHandler(Minecraft var1, String var2, int var3) throws UnknownHostException, IOException {
         this.mc = var1;
         Socket var4 = new Socket(InetAddress.getByName(var2), var3);
@@ -36,14 +37,17 @@ public class NetClientHandler extends NetHandler {
         if (!this.disconnected) {
             this.netManager.processReadPackets();
         }
+
+        this.netManager.wakeThreads();
     }
 
     public void handleLogin(Packet1Login var1) {
         this.mc.playerController = new PlayerControllerMP(this.mc, this);
-        this.mc.field_25001_G.func_25100_a(StatList.field_25181_h, 1);
+        this.mc.statFileWriter.func_25100_a(StatList.joinMultiplayerStat, 1);
         this.worldClient = new WorldClient(this, var1.mapSeed, var1.dimension);
         this.worldClient.multiplayerWorld = true;
         this.mc.changeWorld1(this.worldClient);
+        this.mc.thePlayer.dimension = var1.dimension;
         this.mc.displayGuiScreen(new GuiDownloadTerrain(this));
         this.mc.thePlayer.entityId = var1.protocolVersion;
     }
@@ -91,6 +95,11 @@ public class NetClientHandler extends NetHandler {
             var8 = new EntitySnowball(this.worldClient, var2, var4, var6);
         }
 
+        if (var1.type == 63) {
+            var8 = new EntityFireball(this.worldClient, var2, var4, var6, (double)var1.field_28047_e / 8000.0D, (double)var1.field_28046_f / 8000.0D, (double)var1.field_28045_g / 8000.0D);
+            var1.field_28044_i = 0;
+        }
+
         if (var1.type == 62) {
             var8 = new EntityEgg(this.worldClient, var2, var4, var6);
         }
@@ -119,11 +128,21 @@ public class NetClientHandler extends NetHandler {
             ((Entity)var8).rotationPitch = 0.0F;
             ((Entity)var8).entityId = var1.entityId;
             this.worldClient.func_712_a(var1.entityId, (Entity)var8);
+            if (var1.field_28044_i > 0) {
+                if (var1.type == 60) {
+                    Entity var9 = this.getEntityByID(var1.field_28044_i);
+                    if (var9 instanceof EntityLiving) {
+                        ((EntityArrow)var8).owner = (EntityLiving)var9;
+                    }
+                }
+
+                ((Entity)var8).setVelocity((double)var1.field_28047_e / 8000.0D, (double)var1.field_28046_f / 8000.0D, (double)var1.field_28045_g / 8000.0D);
+            }
         }
 
     }
 
-    public void func_27246_a(Packet71Weather var1) {
+    public void handleWeather(Packet71Weather var1) {
         double var2 = (double)var1.field_27053_b / 32.0D;
         double var4 = (double)var1.field_27057_c / 32.0D;
         double var6 = (double)var1.field_27056_d / 32.0D;
@@ -139,7 +158,7 @@ public class NetClientHandler extends NetHandler {
             var8.rotationYaw = 0.0F;
             var8.rotationPitch = 0.0F;
             var8.entityId = var1.field_27054_a;
-            this.worldClient.func_27159_a(var8);
+            this.worldClient.addWeatherEffect(var8);
         }
 
     }
@@ -171,9 +190,9 @@ public class NetClientHandler extends NetHandler {
         float var8 = (float)(var1.rotation * 360) / 256.0F;
         float var9 = (float)(var1.pitch * 360) / 256.0F;
         EntityOtherPlayerMP var10 = new EntityOtherPlayerMP(this.mc.theWorld, var1.name);
-        var10.serverPosX = var1.xPosition;
-        var10.serverPosY = var1.yPosition;
-        var10.serverPosZ = var1.zPosition;
+        var10.prevPosX = var10.lastTickPosX = (double)(var10.serverPosX = var1.xPosition);
+        var10.prevPosY = var10.lastTickPosY = (double)(var10.serverPosY = var1.yPosition);
+        var10.prevPosZ = var10.lastTickPosZ = (double)(var10.serverPosZ = var1.zPosition);
         int var11 = var1.currentItem;
         if (var11 == 0) {
             var10.inventory.mainInventory[var10.inventory.currentItem] = null;
@@ -207,7 +226,7 @@ public class NetClientHandler extends NetHandler {
             var2.serverPosY += var1.yPosition;
             var2.serverPosZ += var1.zPosition;
             double var3 = (double)var2.serverPosX / 32.0D;
-            double var5 = (double)var2.serverPosY / 32.0D + 0.015625D;
+            double var5 = (double)var2.serverPosY / 32.0D;
             double var7 = (double)var2.serverPosZ / 32.0D;
             float var9 = var1.rotating ? (float)(var1.yaw * 360) / 256.0F : var2.rotationYaw;
             float var10 = var1.rotating ? (float)(var1.pitch * 360) / 256.0F : var2.rotationPitch;
@@ -256,7 +275,7 @@ public class NetClientHandler extends NetHandler {
     }
 
     public void handlePreChunk(Packet50PreChunk var1) {
-        this.worldClient.func_713_a(var1.xPosition, var1.yPosition, var1.mode);
+        this.worldClient.doPreChunk(var1.xPosition, var1.yPosition, var1.mode);
     }
 
     public void handleMultiBlockChange(Packet52MultiBlockChange var1) {
@@ -271,7 +290,6 @@ public class NetClientHandler extends NetHandler {
             int var9 = var6 >> 12 & 15;
             int var10 = var6 >> 8 & 15;
             int var11 = var6 & 255;
-            Settings.instance().tryUpdating(var3 + var9, var11, var4 + var10);
             var2.setBlockIDWithMetadata(var9, var11, var10, var7, var8);
             this.worldClient.func_711_c(var9 + var3, var11, var10 + var4, var9 + var3, var11, var10 + var4);
             this.worldClient.markBlocksDirty(var9 + var3, var11, var10 + var4, var9 + var3, var11, var10 + var4);
@@ -285,9 +303,6 @@ public class NetClientHandler extends NetHandler {
     }
 
     public void handleBlockChange(Packet53BlockChange var1) {
-    	
-    	Settings.instance().tryUpdating(var1.xPosition, var1.yPosition, var1.zPosition);
-    	
         this.worldClient.func_714_c(var1.xPosition, var1.yPosition, var1.zPosition, var1.type, var1.metadata);
     }
 
@@ -303,6 +318,13 @@ public class NetClientHandler extends NetHandler {
             this.disconnected = true;
             this.mc.changeWorld1((World)null);
             this.mc.displayGuiScreen(new GuiConnectFailed("disconnect.lost", var1, var2));
+        }
+    }
+
+    public void func_28117_a(Packet var1) {
+        if (!this.disconnected) {
+            this.netManager.addToSendQueue(var1);
+            this.netManager.func_28142_c();
         }
     }
 
@@ -364,7 +386,7 @@ public class NetClientHandler extends NetHandler {
 
     public void handleHandshake(Packet2Handshake var1) {
         if (var1.username.equals("-")) {
-            this.addToSendQueue(new Packet1Login(this.mc.session.username, 11));
+            this.addToSendQueue(new Packet1Login(this.mc.session.username, 13));
         } else {
             try {
                 URL var2 = new URL("http://www.minecraft.net/game/joinserver.jsp?user=" + this.mc.session.username + "&sessionId=" + this.mc.session.sessionId + "&serverId=" + var1.username);
@@ -372,7 +394,7 @@ public class NetClientHandler extends NetHandler {
                 String var4 = var3.readLine();
                 var3.close();
                 if (var4.equalsIgnoreCase("ok")) {
-                    this.addToSendQueue(new Packet1Login(this.mc.session.username, 11));
+                    this.addToSendQueue(new Packet1Login(this.mc.session.username, 13));
                 } else {
                     this.netManager.networkShutdown("disconnect.loginFailedInfo", var4);
                 }
@@ -386,6 +408,7 @@ public class NetClientHandler extends NetHandler {
 
     public void disconnect() {
         this.disconnected = true;
+        this.netManager.wakeThreads();
         this.netManager.networkShutdown("disconnect.closed");
     }
 
@@ -401,7 +424,7 @@ public class NetClientHandler extends NetHandler {
         var10.serverPosZ = var1.zPosition;
         var10.entityId = var1.entityId;
         var10.setPositionAndRotation(var2, var4, var6, var8, var9);
-        var10.field_9343_G = true;
+        var10.isMultiplayerEntity = true;
         this.worldClient.func_712_a(var1.entityId, var10);
         List var11 = var1.getMetadata();
         if (var11 != null) {
@@ -417,6 +440,7 @@ public class NetClientHandler extends NetHandler {
 
     public void handleSpawnPosition(Packet6SpawnPosition var1) {
         this.mc.thePlayer.setPlayerSpawnCoordinate(new ChunkCoordinates(var1.xPosition, var1.yPosition, var1.zPosition));
+        this.mc.theWorld.getWorldInfo().setSpawn(var1.xPosition, var1.yPosition, var1.zPosition);
     }
 
     public void func_6497_a(Packet39AttachEntity var1) {
@@ -436,6 +460,7 @@ public class NetClientHandler extends NetHandler {
         if (var2 != null) {
             var2.handleHealthUpdate(var1.entityStatus);
         }
+
     }
 
     private Entity getEntityByID(int var1) {
@@ -447,7 +472,16 @@ public class NetClientHandler extends NetHandler {
     }
 
     public void func_9448_a(Packet9Respawn var1) {
-        this.mc.respawn(true);
+        if (var1.field_28048_a != this.mc.thePlayer.dimension) {
+            this.field_1210_g = false;
+            this.worldClient = new WorldClient(this, this.worldClient.getWorldInfo().getRandomSeed(), var1.field_28048_a);
+            this.worldClient.multiplayerWorld = true;
+            this.mc.changeWorld1(this.worldClient);
+            this.mc.thePlayer.dimension = var1.field_28048_a;
+            this.mc.displayGuiScreen(new GuiDownloadTerrain(this));
+        }
+
+        this.mc.respawn(true, var1.field_28048_a);
     }
 
     public void func_12245_a(Packet60Explosion var1) {
@@ -480,7 +514,12 @@ public class NetClientHandler extends NetHandler {
     public void func_20088_a(Packet103SetSlot var1) {
         if (var1.windowId == -1) {
             this.mc.thePlayer.inventory.setItemStack(var1.myItemStack);
-        } else if (var1.windowId == 0) {
+        } else if (var1.windowId == 0 && var1.itemSlot >= 36 && var1.itemSlot < 45) {
+            ItemStack var2 = this.mc.thePlayer.inventorySlots.getSlot(var1.itemSlot).getStack();
+            if (var1.myItemStack != null && (var2 == null || var2.stackSize < var1.myItemStack.stackSize)) {
+                var1.myItemStack.animationsToGo = 5;
+            }
+
             this.mc.thePlayer.inventorySlots.putStackInSlot(var1.itemSlot, var1.myItemStack);
         } else if (var1.windowId == this.mc.thePlayer.craftingInventory.windowId) {
             this.mc.thePlayer.craftingInventory.putStackInSlot(var1.itemSlot, var1.myItemStack);
@@ -563,20 +602,41 @@ public class NetClientHandler extends NetHandler {
         }
 
         if (var2 == 1) {
-            this.worldClient.func_22144_v().func_27394_b(true);
-            this.worldClient.func_27158_h(1.0F);
+        	if(WeatherLockHack.instance.status) {
+        		WeatherLockHack.raining = true;
+        	}else {
+        		this.worldClient.getWorldInfo().setRaining(true);
+                this.worldClient.func_27158_h(1.0F);
+        	}
         } else if (var2 == 2) {
-            this.worldClient.func_22144_v().func_27394_b(false);
-            this.worldClient.func_27158_h(0.0F);
+        	if(WeatherLockHack.instance.status) {
+        		WeatherLockHack.raining = false;
+        	}else {
+        		this.worldClient.getWorldInfo().setRaining(false);
+                this.worldClient.func_27158_h(0F);
+        	}
         }
 
+    }
+
+    public void func_28116_a(Packet131MapData var1) {
+        if (var1.field_28055_a == Item.mapItem.shiftedIndex) {
+            ItemMap.func_28013_a(var1.field_28054_b, this.mc.theWorld).func_28171_a(var1.field_28056_c);
+        } else {
+            System.out.println("Unknown itemid: " + var1.field_28054_b);
+        }
+
+    }
+
+    public void func_28115_a(Packet61DoorChange var1) {
+        this.mc.theWorld.func_28106_e(var1.field_28050_a, var1.field_28053_c, var1.field_28052_d, var1.field_28051_e, var1.field_28049_b);
     }
 
     public void func_27245_a(Packet200Statistic var1) {
         ((EntityClientPlayerMP)this.mc.thePlayer).func_27027_b(StatList.func_27361_a(var1.field_27052_a), var1.field_27051_b);
     }
 
-    public boolean func_27247_c() {
+    public boolean isServerHandler() {
         return false;
     }
 }

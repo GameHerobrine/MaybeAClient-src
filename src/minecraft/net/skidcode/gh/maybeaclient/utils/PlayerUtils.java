@@ -2,6 +2,7 @@ package net.skidcode.gh.maybeaclient.utils;
 
 import java.util.ArrayList;
 
+import lunatrius.schematica.Settings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
@@ -73,7 +74,7 @@ public class PlayerUtils {
 		if(mc.isMultiplayerWorld()) {
 			mc.getSendQueue().addToSendQueue(new Packet7UseEntity(0, e.entityId, 1));
 		}else {
-			mc.playerController.func_6472_b(mc.thePlayer, e);
+			mc.playerController.attackEntity(mc.thePlayer, e);
 		}
 	}
 	
@@ -92,8 +93,16 @@ public class PlayerUtils {
 	public static boolean placeBlock(int x, int y, int z, int side) {
 		
 		if(mc.isMultiplayerWorld()) {
-			((PlayerControllerMP)mc.playerController).func_730_e();
+			((PlayerControllerMP)mc.playerController).syncCurrentPlayItem();
 			mc.getSendQueue().addToSendQueue(new net.minecraft.src.Packet15Place(x, y, z, side, mc.thePlayer.getCurrentEquippedItem()));
+	        {
+				Client.class.getClass();
+	        	WorldUtils.toBlockPos(x, y, z, side);
+				int tx = WorldUtils.resX;
+				int ty = WorldUtils.resY;
+				int tz = WorldUtils.resZ;
+		        Settings.instance().tryUpdating(tx, ty, tz);
+	        }
 			return true;
 		}
 		
@@ -107,7 +116,7 @@ public class PlayerUtils {
 		
 		if(mc.isMultiplayerWorld()) {
 			PlayerControllerMP mp = (PlayerControllerMP) mc.playerController;
-			mp.func_730_e();
+			mp.syncCurrentPlayItem();
 			mc.getSendQueue().addToSendQueue(new Packet14BlockDig(0, x, y, z, side));
 			mc.getSendQueue().addToSendQueue(new Packet14BlockDig(2, x, y, z, side));
 		}else {
@@ -124,13 +133,6 @@ public class PlayerUtils {
 		}
 		
 		return Math.sqrt(diffX*diffX + diffZ*diffZ);
-	}
-
-	public static boolean isInNether() {
-		int x = MathHelper.floor_double(mc.thePlayer.posX);
-		int z = MathHelper.floor_double(mc.thePlayer.posZ);
-		
-		return mc.theWorld.getBlockId(x, 127, z) == Block.bedrock.blockID;
 	}
 
 	public static void useItem() {

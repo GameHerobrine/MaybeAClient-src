@@ -38,7 +38,7 @@ public class ItemFlintAndSteel extends Item {
             var3.setBlockWithNotify(var4, var5, var6, Block.fire.blockID);
         }
 
-        var1.func_25190_a(1, var2);
+        var1.damageItem(1, var2);
         return true;
     }
 }

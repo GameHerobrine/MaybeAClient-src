@@ -2,28 +2,33 @@ package net.minecraft.src;
 
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 public abstract class GuiSlot {
-    private final Minecraft mc;
+	static {
+		Client.class.getClass(); //all private was changed to public
+	}
+    public final Minecraft mc;
     public final int width;
     public final int height;
     protected final int top;
     protected final int bottom;
-    private final int right;
-    private final int left;
+    public final int right;
+    public final int left;
     protected final int posZ;
-    private int scrollUpButtonID;
-    private int scrollDownButtonID;
-    private float initialClickY = -2.0F;
-    private float scrollMultiplier;
-    private float amountScrolled;
-    private int selectedElement = -1;
-    private long lastClicked = 0L;
-    private boolean field_25123_p = true;
-    private boolean field_27262_q;
-    private int field_27261_r;
+    public int scrollUpButtonID;
+    public int scrollDownButtonID;
+    public float initialClickY = -2.0F;
+    public float scrollMultiplier;
+    public float amountScrolled;
+    public int selectedElement = -1;
+    public long lastClicked = 0L;
+    public boolean field_25123_p = true;
+    public boolean field_27262_q;
+    public int field_27261_r;
 
     public GuiSlot(Minecraft var1, int var2, int var3, int var4, int var5, int var6) {
         this.mc = var1;
@@ -85,7 +90,7 @@ public abstract class GuiSlot {
         this.scrollDownButtonID = var3;
     }
 
-    private void bindAmountScrolled() {
+    public void bindAmountScrolled() {
         int var1 = this.getContentHeight() - (this.bottom - this.top - 4);
         if (var1 < 0) {
             var1 /= 2;
@@ -185,22 +190,21 @@ public abstract class GuiSlot {
         GL11.glDisable(2896 /*GL_LIGHTING*/);
         GL11.glDisable(2912 /*GL_FOG*/);
         Tessellator var16 = Tessellator.instance;
+        Client.class.getClass();
         if(!(this instanceof GuiTexturePackSlot) || (((GuiTexturePackSlot)this).parentTexturePackGui.fillBg)) {
-            GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, this.mc.renderEngine.getTexture("/gui/background.png"));
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            float var17 = 32.0F;
-            var16.startDrawingQuads();
-            var16.setColorOpaque_I(2105376);
-            var16.addVertexWithUV((double)this.left, (double)this.bottom, 0.0D, (double)((float)this.left / var17), (double)((float)(this.bottom + (int)this.amountScrolled) / var17));
-            var16.addVertexWithUV((double)this.right, (double)this.bottom, 0.0D, (double)((float)this.right / var17), (double)((float)(this.bottom + (int)this.amountScrolled) / var17));
-            var16.addVertexWithUV((double)this.right, (double)this.top, 0.0D, (double)((float)this.right / var17), (double)((float)(this.top + (int)this.amountScrolled) / var17));
-            var16.addVertexWithUV((double)this.left, (double)this.top, 0.0D, (double)((float)this.left / var17), (double)((float)(this.top + (int)this.amountScrolled) / var17));
-            var16.draw();
+	        GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, this.mc.renderEngine.getTexture("/gui/background.png"));
+	        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+	        float var17 = 32.0F;
+	        var16.startDrawingQuads();
+	        var16.setColorOpaque_I(2105376);
+	        var16.addVertexWithUV((double)this.left, (double)this.bottom, 0.0D, (double)((float)this.left / var17), (double)((float)(this.bottom + (int)this.amountScrolled) / var17));
+	        var16.addVertexWithUV((double)this.right, (double)this.bottom, 0.0D, (double)((float)this.right / var17), (double)((float)(this.bottom + (int)this.amountScrolled) / var17));
+	        var16.addVertexWithUV((double)this.right, (double)this.top, 0.0D, (double)((float)this.right / var17), (double)((float)(this.top + (int)this.amountScrolled) / var17));
+	        var16.addVertexWithUV((double)this.left, (double)this.top, 0.0D, (double)((float)this.left / var17), (double)((float)(this.top + (int)this.amountScrolled) / var17));
+	        var16.draw();
         }else {
         	GuiScreen.drawGradientRect(this.left, this.top, this.right, this.bottom, -1072689136, -804253680);
         }
-        
-        
         var9 = this.width / 2 - 92 - 16;
         var10 = this.top + 4 - (int)this.amountScrolled;
         if (this.field_27262_q) {

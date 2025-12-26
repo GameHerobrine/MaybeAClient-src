@@ -1,7 +1,7 @@
 package net.minecraft.src;
 
 public abstract class NetHandler {
-    public abstract boolean func_27247_c();
+    public abstract boolean isServerHandler();
 
     public void handleMapChunk(Packet51MapChunk var1) {
     }
@@ -185,14 +185,26 @@ public abstract class NetHandler {
     }
 
     public void func_22186_a(Packet17Sleep var1) {
+        this.registerPacket(var1);
     }
 
     public void func_22185_a(Packet27Position var1) {
+        this.registerPacket(var1);
     }
 
     public void func_25118_a(Packet70Bed var1) {
+        this.registerPacket(var1);
     }
 
-    public void func_27246_a(Packet71Weather var1) {
+    public void handleWeather(Packet71Weather var1) {
+        this.registerPacket(var1);
+    }
+
+    public void func_28116_a(Packet131MapData var1) {
+        this.registerPacket(var1);
+    }
+
+    public void func_28115_a(Packet61DoorChange var1) {
+        this.registerPacket(var1);
     }
 }

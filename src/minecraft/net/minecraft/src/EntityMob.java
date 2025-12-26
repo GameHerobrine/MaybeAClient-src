@@ -11,7 +11,7 @@ public class EntityMob extends EntityCreature implements IMob {
     public void onLivingUpdate() {
         float var1 = this.getEntityBrightness(1.0F);
         if (var1 > 0.5F) {
-            this.field_9344_ag += 2;
+            this.entityAge += 2;
         }
 
         super.onLivingUpdate();
@@ -19,7 +19,7 @@ public class EntityMob extends EntityCreature implements IMob {
 
     public void onUpdate() {
         super.onUpdate();
-        if (this.worldObj.difficultySetting == 0) {
+        if (!this.worldObj.multiplayerWorld && this.worldObj.difficultySetting == 0) {
             this.setEntityDead();
         }
 

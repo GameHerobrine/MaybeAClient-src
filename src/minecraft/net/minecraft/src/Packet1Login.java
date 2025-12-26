@@ -20,14 +20,14 @@ public class Packet1Login extends Packet {
 
     public void readPacketData(DataInputStream var1) throws IOException {
         this.protocolVersion = var1.readInt();
-        this.username = func_27048_a(var1, 16);
+        this.username = readString(var1, 16);
         this.mapSeed = var1.readLong();
         this.dimension = var1.readByte();
     }
 
     public void writePacketData(DataOutputStream var1) throws IOException {
         var1.writeInt(this.protocolVersion);
-        func_27049_a(this.username, var1);
+        writeString(this.username, var1);
         var1.writeLong(this.mapSeed);
         var1.writeByte(this.dimension);
     }

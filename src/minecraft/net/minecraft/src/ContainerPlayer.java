@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import net.skidcode.gh.maybeaclient.hacks.InventoryTweaksHack;
-
 public class ContainerPlayer extends Container {
     public InventoryCrafting craftMatrix;
     public IInventory craftResult;
@@ -46,49 +44,7 @@ public class ContainerPlayer extends Container {
     public void onCraftMatrixChanged(IInventory var1) {
         this.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix));
     }
-    
-    @Override
-    public ItemStack func_27279_a(int slt) {
-    	if(!InventoryTweaksHack.instance.status) return super.func_27279_a(slt);
-    	ItemStack itemstack = null;
-        Slot slot = (Slot)slots.get(slt);
-        if(slot != null && slot.getHasStack())
-        {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-            if(slt == 0)
-            {
-                invtweaks_func28125a(itemstack1, 9, 45, true);
-            } else
-            if(slt >= 9 && slt < 36)
-            {
-                invtweaks_func28125a(itemstack1, 36, 45, false);
-            } else
-            if(slt >= 36 && slt < 45)
-            {
-                invtweaks_func28125a(itemstack1, 9, 36, false);
-            } else
-            {
-                invtweaks_func28125a(itemstack1, 9, 45, false);
-            }
-            if(itemstack1.stackSize == 0)
-            {
-                slot.putStack(null);
-            } else
-            {
-                slot.onSlotChanged();
-            }
-            if(itemstack1.stackSize != itemstack.stackSize)
-            {
-                slot.onPickupFromSlot(itemstack1);
-            } else
-            {
-                return null;
-            }
-        }
-        return itemstack;
-    }
-    
+
     public void onCraftGuiClosed(EntityPlayer var1) {
         super.onCraftGuiClosed(var1);
 
@@ -104,5 +60,37 @@ public class ContainerPlayer extends Container {
 
     public boolean isUsableByPlayer(EntityPlayer var1) {
         return true;
+    }
+
+    public ItemStack getStackInSlot(int var1) {
+        ItemStack var2 = null;
+        Slot var3 = (Slot)this.slots.get(var1);
+        if (var3 != null && var3.getHasStack()) {
+            ItemStack var4 = var3.getStack();
+            var2 = var4.copy();
+            if (var1 == 0) {
+                this.func_28125_a(var4, 9, 45, true);
+            } else if (var1 >= 9 && var1 < 36) {
+                this.func_28125_a(var4, 36, 45, false);
+            } else if (var1 >= 36 && var1 < 45) {
+                this.func_28125_a(var4, 9, 36, false);
+            } else {
+                this.func_28125_a(var4, 9, 45, false);
+            }
+
+            if (var4.stackSize == 0) {
+                var3.putStack((ItemStack)null);
+            } else {
+                var3.onSlotChanged();
+            }
+
+            if (var4.stackSize == var2.stackSize) {
+                return null;
+            }
+
+            var3.onPickupFromSlot(var4);
+        }
+
+        return var2;
     }
 }

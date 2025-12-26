@@ -31,7 +31,11 @@ public class ItemBoat extends Item {
                 int var26 = var24.blockY;
                 int var27 = var24.blockZ;
                 if (!var2.multiplayerWorld) {
-                    var2.entityJoinedWorld(new EntityBoat(var2, (double)((float)var25 + 0.5F), (double)((float)var26 + 1.5F), (double)((float)var27 + 0.5F)));
+                    if (var2.getBlockId(var25, var26, var27) == Block.snow.blockID) {
+                        --var26;
+                    }
+
+                    var2.entityJoinedWorld(new EntityBoat(var2, (double)((float)var25 + 0.5F), (double)((float)var26 + 1.0F), (double)((float)var27 + 0.5F)));
                 }
 
                 --var1.stackSize;

@@ -3,8 +3,8 @@ package net.minecraft.src;
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.EntityESPHack;
-import net.skidcode.gh.maybeaclient.hacks.NameTagsHack;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingColor;
+import net.skidcode.gh.maybeaclient.shaders.Shaders;
 import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 import org.lwjgl.opengl.GL11;
@@ -26,6 +26,10 @@ public class RenderLiving extends Render {
         GL11.glPushMatrix();
         GL11.glDisable(2884 /*GL_CULL_FACE*/);
         this.mainModel.onGround = this.func_167_c(entity, var9);
+        if (this.renderPassModel != null) {
+            this.renderPassModel.onGround = this.mainModel.onGround;
+        }
+
         this.mainModel.isRiding = entity.isRiding();
         if (this.renderPassModel != null) {
             this.renderPassModel.isRiding = this.mainModel.isRiding;
@@ -37,7 +41,7 @@ public class RenderLiving extends Render {
             float var12 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * var9;
             this.func_22012_b(entity, var2, var4, var6);
             float var13 = this.func_170_d(entity, var9);
-            this.func_21004_a(entity, var13, var10, var9);
+            this.rotateCorpse(entity, var13, var10, var9);
             float var14 = 0.0625F;
             GL11.glEnable(32826 /*GL_RESCALE_NORMAL_EXT*/);
             GL11.glScalef(-1.0F, -1.0F, 1.0F);
@@ -51,7 +55,7 @@ public class RenderLiving extends Render {
 
             this.loadDownloadableImageTexture(entity.skinUrl, entity.getEntityTexture());
             GL11.glEnable(3008 /*GL_ALPHA_TEST*/);
-            this.mainModel.func_25103_a(entity, var16, var15, var9);
+            this.mainModel.setLivingAnimations(entity, var16, var15, var9);
             this.mainModel.render(var16, var15, var13, var11 - var10, var12, var14);
 
             for(int var17 = 0; var17 < 4; ++var17) {
@@ -61,9 +65,9 @@ public class RenderLiving extends Render {
                     GL11.glEnable(3008 /*GL_ALPHA_TEST*/);
                 }
             }
-
             if (EntityESPHack.instance.status && EntityESPHack.instance.shouldRender(entity)) {
 				float r, g, b;
+				EntityESPHack.currentlyRendering = true;
 				SettingColor color = EntityESPHack.instance.getRenderColor(entity);
 				if(color == null) {
 					System.out.println("Tried rendering esp for "+entity+" that has no color!");
@@ -86,8 +90,23 @@ public class RenderLiving extends Render {
 					GL11.glEnable(GL11.GL_BLEND);
 					GL11.glDisable(GL11.GL_FOG);
 					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+					
+					//int i = Client.mc.renderEngine.getTexture("/misc/enchantile_texture.png");
+					//Client.mc.renderEngine.bindTexture(i);
+					//GL11.glColor4f(0.7F, 0.3F, 0.8F, 0.6F);
+					//GL11.glEnable(GL11.GL_TEXTURE_2D);
+					
 					GL11.glColor3f((float)r/255, (float)g/255, (float)b/255);
 					this.mainModel.render(var16, var15, var13, var11 - var10, var12, var14);
+					if(this instanceof RenderSheep) {
+			            for(int var17 = 0; var17 < 4; ++var17) {
+			                if (this.shouldRenderPass(entity, var17, var9)) {
+			                    this.renderPassModel.render(var16, var15, var13, var11 - var10, var12, var14);
+			                }
+			            }
+					}
+					
+					//GL11.glDisable(GL11.GL_TEXTURE_2D);
 					GL11.glPopAttrib();
 					GL11.glPopMatrix();
 				}else if(EntityESPHack.instance.getRenderingMode(entity).equalsIgnoreCase("Outline") || EntityESPHack.instance.getRenderingMode(entity).equalsIgnoreCase("Glow")){
@@ -127,12 +146,24 @@ public class RenderLiving extends Render {
 					GL11.glStencilOp(GL11.GL_REPLACE, GL11.GL_REPLACE, GL11.GL_REPLACE);
 					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 					mainModel.render(var16, var15, var13, var11 - var10, var12, var14);
-					
+					if(this instanceof RenderSheep) {
+			            for(int var17 = 0; var17 < 4; ++var17) {
+			                if (this.shouldRenderPass(entity, var17, var9)) {
+			                    this.renderPassModel.render(var16, var15, var13, var11 - var10, var12, var14);
+			                }
+			            }
+					}
 					GL11.glStencilFunc(GL11.GL_NEVER, 0, 0xF);
 					GL11.glStencilOp(GL11.GL_REPLACE, GL11.GL_REPLACE, GL11.GL_REPLACE);
 					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 					mainModel.render(var16, var15, var13, var11 - var10, var12, var14);
-					
+					if(this instanceof RenderSheep) {
+			            for(int var17 = 0; var17 < 4; ++var17) {
+			                if (this.shouldRenderPass(entity, var17, var9)) {
+			                    this.renderPassModel.render(var16, var15, var13, var11 - var10, var12, var14);
+			                }
+			            }
+					}
 					GL11.glStencilFunc(GL11.GL_EQUAL, 1, 0xF);
 					GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
 					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
@@ -141,18 +172,33 @@ public class RenderLiving extends Render {
 					GL11.glDepthMask(false);
 					GL11.glDisable(GL11.GL_DEPTH_TEST);
 					//GL13.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240.0F, 240.0F);
+
 					if(glow) {
 						float c = 1;
 						for(float i = lineWidthMin; i <= lineWidthMax; i+=(lineWidthMax-lineWidthMin)/4) {
 							GL11.glLineWidth(i);
 							GL11.glColor4f(r/255, g/255, b/255, c);
 							mainModel.render(var16, var15, var13, var11 - var10, var12, var14);
+							if(this instanceof RenderSheep) {
+					            for(int var17 = 0; var17 < 4; ++var17) {
+					                if (this.shouldRenderPass(entity, var17, var9)) {
+					                    this.renderPassModel.render(var16, var15, var13, var11 - var10, var12, var14);
+					                }
+					            }
+							}
 							c /= 2;
 						}
 					}else{
 						mainModel.render(var16, var15, var13, var11 - var10, var12, var14);
+						if(this instanceof RenderSheep) {
+				            for(int var17 = 0; var17 < 4; ++var17) {
+				                if (this.shouldRenderPass(entity, var17, var9)) {
+				                    this.renderPassModel.render(var16, var15, var13, var11 - var10, var12, var14);
+				                }
+				            }
+						}
 					}
-					
+
 					GL11.glEnable(GL11.GL_DEPTH_TEST);
 					GL11.glDepthMask(true);
 					GL11.glDisable(GL11.GL_STENCIL_TEST);
@@ -167,9 +213,8 @@ public class RenderLiving extends Render {
 						((ModelBiped)this.mainModel).bipedHeadwear.showModel = true;
 					}
 				}
+				EntityESPHack.currentlyRendering = false;
 			}
-            
-            
             this.renderEquippedItems(entity, var9);
             float var25 = entity.getEntityBrightness(var9);
             int var18 = this.getColorMultiplier(entity, var25, var9);
@@ -227,7 +272,7 @@ public class RenderLiving extends Render {
         GL11.glTranslatef((float)var2, (float)var4, (float)var6);
     }
 
-    protected void func_21004_a(EntityLiving var1, float var2, float var3, float var4) {
+    protected void rotateCorpse(EntityLiving var1, float var2, float var3, float var4) {
         GL11.glRotatef(180.0F - var3, 0.0F, 1.0F, 0.0F);
         if (var1.deathTime > 0) {
             float var5 = ((float)var1.deathTime + var4 - 1.0F) / 20.0F * 1.6F;
@@ -236,7 +281,7 @@ public class RenderLiving extends Render {
                 var5 = 1.0F;
             }
 
-            GL11.glRotatef(var5 * this.func_172_a(var1), 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(var5 * this.getDeathMaxRotation(var1), 0.0F, 0.0F, 1.0F);
         }
 
     }
@@ -260,7 +305,7 @@ public class RenderLiving extends Render {
         return false;
     }
 
-    protected float func_172_a(EntityLiving var1) {
+    protected float getDeathMaxRotation(EntityLiving var1) {
         return 90.0F;
     }
 

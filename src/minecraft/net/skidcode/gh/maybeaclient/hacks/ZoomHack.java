@@ -28,6 +28,7 @@ public class ZoomHack extends Hack{
 	}
 
 	public static boolean holdingStarted = false;
+	
 	@Override
 	public void toggleByKeybind() {
 		if(this.status && this.mustHoldKeybind.getValue()) {
@@ -39,6 +40,7 @@ public class ZoomHack extends Hack{
 			}
 		}
 	}
+	
 	public static void onStopHolding() {
 		if(holdingStarted) {
 			holdingStarted = false;

@@ -28,10 +28,23 @@ public class EntityCreeper extends EntityMob {
         this.dataWatcher.updateObject(17, (byte)(var1.getBoolean("powered") ? 1 : 0));
     }
 
+    protected void attackBlockedEntity(Entity var1, float var2) {
+        if (!this.worldObj.multiplayerWorld) {
+            if (this.timeSinceIgnited > 0) {
+                this.setCreeperState(-1);
+                --this.timeSinceIgnited;
+                if (this.timeSinceIgnited < 0) {
+                    this.timeSinceIgnited = 0;
+                }
+            }
+
+        }
+    }
+
     public void onUpdate() {
         this.lastActiveTime = this.timeSinceIgnited;
         if (this.worldObj.multiplayerWorld) {
-            int var1 = this.func_21091_q();
+            int var1 = this.getCreeperState();
             if (var1 > 0 && this.timeSinceIgnited == 0) {
                 this.worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
             }
@@ -47,6 +60,14 @@ public class EntityCreeper extends EntityMob {
         }
 
         super.onUpdate();
+        if (this.playerToAttack == null && this.timeSinceIgnited > 0) {
+            this.setCreeperState(-1);
+            --this.timeSinceIgnited;
+            if (this.timeSinceIgnited < 0) {
+                this.timeSinceIgnited = 0;
+            }
+        }
+
     }
 
     protected String getHurtSound() {
@@ -66,36 +87,38 @@ public class EntityCreeper extends EntityMob {
     }
 
     protected void attackEntity(Entity var1, float var2) {
-        int var3 = this.func_21091_q();
-        if (var3 <= 0 && var2 < 3.0F || var3 > 0 && var2 < 7.0F) {
-            if (this.timeSinceIgnited == 0) {
-                this.worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
-            }
-
-            this.func_21090_e(1);
-            ++this.timeSinceIgnited;
-            if (this.timeSinceIgnited >= 30) {
-                if (this.func_27022_s()) {
-                    this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 6.0F);
-                } else {
-                    this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 3.0F);
+        if (!this.worldObj.multiplayerWorld) {
+            int var3 = this.getCreeperState();
+            if (var3 <= 0 && var2 < 3.0F || var3 > 0 && var2 < 7.0F) {
+                if (this.timeSinceIgnited == 0) {
+                    this.worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
                 }
 
-                this.setEntityDead();
+                this.setCreeperState(1);
+                ++this.timeSinceIgnited;
+                if (this.timeSinceIgnited >= 30) {
+                    if (this.getPowered()) {
+                        this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 6.0F);
+                    } else {
+                        this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 3.0F);
+                    }
+
+                    this.setEntityDead();
+                }
+
+                this.hasAttacked = true;
+            } else {
+                this.setCreeperState(-1);
+                --this.timeSinceIgnited;
+                if (this.timeSinceIgnited < 0) {
+                    this.timeSinceIgnited = 0;
+                }
             }
 
-            this.hasAttacked = true;
-        } else {
-            this.func_21090_e(-1);
-            --this.timeSinceIgnited;
-            if (this.timeSinceIgnited < 0) {
-                this.timeSinceIgnited = 0;
-            }
         }
-
     }
 
-    public boolean func_27022_s() {
+    public boolean getPowered() {
         return this.dataWatcher.getWatchableObjectByte(17) == 1;
     }
 
@@ -107,16 +130,16 @@ public class EntityCreeper extends EntityMob {
         return Item.gunpowder.shiftedIndex;
     }
 
-    private int func_21091_q() {
+    private int getCreeperState() {
         return this.dataWatcher.getWatchableObjectByte(16);
     }
 
-    private void func_21090_e(int var1) {
+    private void setCreeperState(int var1) {
         this.dataWatcher.updateObject(16, (byte)var1);
     }
 
-    public void func_27014_a(EntityLightningBolt var1) {
-        super.func_27014_a(var1);
+    public void onStruckByLightning(EntityLightningBolt var1) {
+        super.onStruckByLightning(var1);
         this.dataWatcher.updateObject(17, (byte)1);
     }
 }

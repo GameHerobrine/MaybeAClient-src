@@ -2,6 +2,8 @@ package net.minecraft.src;
 
 import java.util.List;
 
+import net.skidcode.gh.maybeaclient.hacks.WeatherLockHack;
+
 public class WorldInfo {
     private long randomSeed;
     private int spawnX;
@@ -14,10 +16,10 @@ public class WorldInfo {
     private int dimension;
     private String levelName;
     private int saveVersion;
-    private boolean field_27404_l;
-    private int field_27403_m;
-    private boolean field_27402_n;
-    private int field_27401_o;
+    private boolean raining;
+    private int rainTime;
+    private boolean thundering;
+    private int thunderTime;
 
     public WorldInfo(NBTTagCompound var1) {
         this.randomSeed = var1.getLong("RandomSeed");
@@ -29,10 +31,10 @@ public class WorldInfo {
         this.sizeOnDisk = var1.getLong("SizeOnDisk");
         this.levelName = var1.getString("LevelName");
         this.saveVersion = var1.getInteger("version");
-        this.field_27403_m = var1.getInteger("rainTime");
-        this.field_27404_l = var1.getBoolean("raining");
-        this.field_27401_o = var1.getInteger("thunderTime");
-        this.field_27402_n = var1.getBoolean("thundering");
+        this.rainTime = var1.getInteger("rainTime");
+        this.raining = var1.getBoolean("raining");
+        this.thunderTime = var1.getInteger("thunderTime");
+        this.thundering = var1.getBoolean("thundering");
         if (var1.hasKey("Player")) {
             this.playerTag = var1.getCompoundTag("Player");
             this.dimension = this.playerTag.getInteger("Dimension");
@@ -57,10 +59,10 @@ public class WorldInfo {
         this.dimension = var1.dimension;
         this.levelName = var1.levelName;
         this.saveVersion = var1.saveVersion;
-        this.field_27403_m = var1.field_27403_m;
-        this.field_27404_l = var1.field_27404_l;
-        this.field_27401_o = var1.field_27401_o;
-        this.field_27402_n = var1.field_27402_n;
+        this.rainTime = var1.rainTime;
+        this.raining = var1.raining;
+        this.thunderTime = var1.thunderTime;
+        this.thundering = var1.thundering;
     }
 
     public NBTTagCompound getNBTTagCompound() {
@@ -96,10 +98,10 @@ public class WorldInfo {
         var1.setLong("LastPlayed", System.currentTimeMillis());
         var1.setString("LevelName", this.levelName);
         var1.setInteger("version", this.saveVersion);
-        var1.setInteger("rainTime", this.field_27403_m);
-        var1.setBoolean("raining", this.field_27404_l);
-        var1.setInteger("thunderTime", this.field_27401_o);
-        var1.setBoolean("thundering", this.field_27402_n);
+        var1.setInteger("rainTime", this.rainTime);
+        var1.setBoolean("raining", this.raining);
+        var1.setInteger("thunderTime", this.thunderTime);
+        var1.setBoolean("thundering", this.thundering);
         if (var2 != null) {
             var1.setCompoundTag("Player", var2);
         }
@@ -188,35 +190,35 @@ public class WorldInfo {
         return this.lastTimePlayed;
     }
 
-    public boolean func_27396_m() {
-        return this.field_27402_n;
+    public boolean getThundering() {
+        return this.thundering;
     }
 
-    public void func_27398_a(boolean var1) {
-        this.field_27402_n = var1;
+    public void setThundering(boolean var1) {
+        this.thundering = var1;
     }
 
-    public int func_27400_n() {
-        return this.field_27401_o;
+    public int getThunderTime() {
+        return this.thunderTime;
     }
 
-    public void func_27399_e(int var1) {
-        this.field_27401_o = var1;
+    public void setThunderTime(int var1) {
+        this.thunderTime = var1;
     }
 
-    public boolean func_27397_o() {
-        return this.field_27404_l;
+    public boolean getRaining() {
+        return this.raining;
     }
 
-    public void func_27394_b(boolean var1) {
-        this.field_27404_l = var1;
+    public void setRaining(boolean var1) {
+        this.raining = var1;
     }
 
-    public int func_27393_p() {
-        return this.field_27403_m;
+    public int getRainTime() {
+        return this.rainTime;
     }
 
-    public void func_27395_f(int var1) {
-        this.field_27403_m = var1;
+    public void setRainTime(int var1) {
+        this.rainTime = var1;
     }
 }

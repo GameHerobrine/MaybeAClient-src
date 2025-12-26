@@ -267,7 +267,7 @@ public class AutoTunnelHack extends Hack implements EventListener{
 			prev = mc.thePlayer.inventory.currentItem;
 			mc.thePlayer.inventory.currentItem = it;
 			if(mc.isMultiplayerWorld()) {
-				((PlayerControllerMP)mc.playerController).func_730_e();
+				((PlayerControllerMP)mc.playerController).syncCurrentPlayItem();
 			}
 		}
 		
@@ -292,7 +292,7 @@ public class AutoTunnelHack extends Hack implements EventListener{
 		if(it != -1) {
 			mc.thePlayer.inventory.currentItem = prev;
 			if(mc.isMultiplayerWorld()) {
-				((PlayerControllerMP)mc.playerController).func_730_e();
+				((PlayerControllerMP)mc.playerController).syncCurrentPlayItem();
 			}
 		}
 		return true;

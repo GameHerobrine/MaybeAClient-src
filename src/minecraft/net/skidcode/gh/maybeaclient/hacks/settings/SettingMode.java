@@ -6,6 +6,7 @@ import java.util.HashSet;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.AutoTunnelHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
@@ -21,7 +22,7 @@ public class SettingMode extends Setting{
 	public String defaultMode;
 	public String currentMode = "";
 	
-	public SettingMode(Hack hack, String name, String... modes) {
+	public SettingMode(SettingsProvider hack, String name, String... modes) {
 		super(hack, name);
 		this.init();
 		for(int i = 0; i < modes.length; ++i) {
@@ -63,8 +64,13 @@ public class SettingMode extends Setting{
 		output.setString(this.name, this.currentMode == null ? this.defaultMode : this.currentMode);
 	}
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		int txtColor = 0xffffff;
+		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+			this.mouseHovering = false;
+			Client.mc.fontRenderer.drawStringWithShadow(this.name + " - " + this.currentMode, x + 2, y + ClickGUIHack.theme().yaddtocenterText, Theme.IRIDIUM_ENABLED_COLOR);
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			this.mouseHovering = false;
 			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
@@ -87,7 +93,7 @@ public class SettingMode extends Setting{
 	}
 	
 	@Override
-	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		boolean set = false;
 		int i = 0;
 		if(this.mode2pos.get(this.currentMode.toLowerCase()) != null) {
@@ -100,12 +106,14 @@ public class SettingMode extends Setting{
 		this.setValue(this.modes.get(this.pos2mode.get(i)));
 	}
 	
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	
+	
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) return;
 		if(ClickGUIHack.theme() == Theme.NODUS) {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
 		}else {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 	}
 	

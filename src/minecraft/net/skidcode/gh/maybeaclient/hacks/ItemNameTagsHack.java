@@ -16,7 +16,7 @@ public class ItemNameTagsHack extends Hack{
 		this.addSetting(enableCountDisplay = new SettingBoolean(this, "Display count", true));
 	}
 	public static String getName(EntityItem entity) {
-		String s = StringTranslate.getInstance().translateNamedKey(entity.item.func_20109_f()).trim();
+		String s = StringTranslate.getInstance().translateNamedKey(entity.item.getItemName()).trim();
 		if(enableCountDisplay.value) return entity.item.stackSize+" "+s;
 		return s;
 	}

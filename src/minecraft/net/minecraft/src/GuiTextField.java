@@ -11,10 +11,10 @@ public class GuiTextField extends Gui {
     private int cursorCounter;
     public boolean isFocused = false;
     public boolean isEnabled = true;
-    private GuiScreen field_27107_l;
+    private GuiScreen parentGuiScreen;
 
     public GuiTextField(GuiScreen var1, FontRenderer var2, int var3, int var4, int var5, int var6, String var7) {
-        this.field_27107_l = var1;
+        this.parentGuiScreen = var1;
         this.fontRenderer = var2;
         this.xPos = var3;
         this.yPos = var4;
@@ -38,7 +38,7 @@ public class GuiTextField extends Gui {
     public void textboxKeyTyped(char var1, int var2) {
         if (this.isEnabled && this.isFocused) {
             if (var1 == '\t') {
-                this.field_27107_l.func_27108_j();
+                this.parentGuiScreen.selectNextField();
             }
 
             if (var1 == 22) {
@@ -70,10 +70,10 @@ public class GuiTextField extends Gui {
 
     public void mouseClicked(int var1, int var2, int var3) {
         boolean var4 = this.isEnabled && var1 >= this.xPos && var1 < this.xPos + this.width && var2 >= this.yPos && var2 < this.yPos + this.height;
-        this.func_27106_a(var4);
+        this.setFocused(var4);
     }
 
-    public void func_27106_a(boolean var1) {
+    public void setFocused(boolean var1) {
         if (var1 && !this.isFocused) {
             this.cursorCounter = 0;
         }

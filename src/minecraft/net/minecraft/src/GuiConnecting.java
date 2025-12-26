@@ -1,20 +1,22 @@
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
-import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.LastSeenSpotsHack;
 import net.skidcode.gh.maybeaclient.hacks.PlayerlistHack;
+import net.skidcode.gh.maybeaclient.hacks.WeatherLockHack;
 
 public class GuiConnecting extends GuiScreen {
     private NetClientHandler clientHandler;
     private boolean cancelled = false;
 
     public GuiConnecting(Minecraft var1, String var2, int var3) {
+        System.out.println("Connecting to " + var2 + ", " + var3);
         var1.changeWorld1((World)null);
         String serv = var2+":"+var3;
         if(!serv.equals(mc.gameSettings.realLastServer)) {
         	LastSeenSpotsHack.reset();
         }
+        WeatherLockHack.raining = false;
         this.mc.gameSettings.realLastServer = serv;
         PlayerlistHack.resetDetected();
         (new ThreadConnectToServer(this, var1, var2, var3)).start();

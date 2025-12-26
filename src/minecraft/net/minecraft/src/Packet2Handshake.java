@@ -15,11 +15,11 @@ public class Packet2Handshake extends Packet {
     }
 
     public void readPacketData(DataInputStream var1) throws IOException {
-        this.username = func_27048_a(var1, 32);
+        this.username = readString(var1, 32);
     }
 
     public void writePacketData(DataOutputStream var1) throws IOException {
-        func_27049_a(this.username, var1);
+        writeString(this.username, var1);
     }
 
     public void processPacket(NetHandler var1) {

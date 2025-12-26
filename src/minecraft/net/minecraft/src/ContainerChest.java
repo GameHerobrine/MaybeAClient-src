@@ -33,54 +33,16 @@ public class ContainerChest extends Container {
         return this.field_20125_a.canInteractWith(var1);
     }
 
-    private void func_27281_a(ItemStack var1, int var2, int var3) {
-        int var4 = var2;
-        Slot var5;
-        ItemStack var6;
-        if (var1.func_21180_d()) {
-            for(; var1.stackSize > 0 && var4 < var3; ++var4) {
-                var5 = (Slot)this.slots.get(var4);
-                var6 = var5.getStack();
-                if (var6 != null && var6.itemID == var1.itemID && (!var1.getHasSubtypes() || var1.getItemDamage() == var6.getItemDamage())) {
-                    int var7 = var6.stackSize + var1.stackSize;
-                    if (var7 <= var1.getMaxStackSize()) {
-                        var1.stackSize = 0;
-                        var6.stackSize = var7;
-                        var5.onSlotChanged();
-                    } else if (var6.stackSize < var1.getMaxStackSize()) {
-                        var1.stackSize -= var1.getMaxStackSize() - var6.stackSize;
-                        var6.stackSize = var1.getMaxStackSize();
-                        var5.onSlotChanged();
-                    }
-                }
-            }
-        }
-
-        if (var1.stackSize > 0) {
-            for(var4 = var2; var4 < var3; ++var4) {
-                var5 = (Slot)this.slots.get(var4);
-                var6 = var5.getStack();
-                if (var6 == null) {
-                    var5.putStack(var1.copy());
-                    var5.onSlotChanged();
-                    var1.stackSize = 0;
-                    break;
-                }
-            }
-        }
-
-    }
-
-    public ItemStack func_27279_a(int var1) {
+    public ItemStack getStackInSlot(int var1) {
         ItemStack var2 = null;
         Slot var3 = (Slot)this.slots.get(var1);
         if (var3 != null && var3.getHasStack()) {
             ItemStack var4 = var3.getStack();
             var2 = var4.copy();
             if (var1 < this.field_27282_b * 9) {
-                this.func_27281_a(var4, this.field_27282_b * 9, this.slots.size());
+                this.func_28125_a(var4, this.field_27282_b * 9, this.slots.size(), true);
             } else {
-                this.func_27281_a(var4, 0, this.field_27282_b * 9);
+                this.func_28125_a(var4, 0, this.field_27282_b * 9, false);
             }
 
             if (var4.stackSize == 0) {

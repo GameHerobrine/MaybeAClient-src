@@ -370,7 +370,7 @@ public class ChunkProviderHell implements IChunkProvider {
         return true;
     }
 
-    public String toString() {
+    public String makeString() {
         return "HellRandomLevelSource";
     }
 }

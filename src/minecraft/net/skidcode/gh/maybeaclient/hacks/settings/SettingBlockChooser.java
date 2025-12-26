@@ -8,6 +8,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
@@ -75,16 +76,16 @@ public class SettingBlockChooser extends Setting{
 	}
 	
 	@Override
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(this.minimized) return;
 		
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int yReduce = ClickGUIHack.theme().settingYreduce;
 		
 		if(ClickGUIHack.theme() == Theme.NODUS) {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
 		}else if(ClickGUIHack.theme() != Theme.HEPHAESTUS) {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xStart += 5;
@@ -104,8 +105,8 @@ public class SettingBlockChooser extends Setting{
 				if(this.blocks[id]) {
 					int xb = xStart + drawn*18;
 					int yb = yStart + yOff;
-					if(ClickGUIHack.theme() == Theme.NODUS) tab.renderFrameBackGround(xb, yb, xb+16, yb+16, 0, 0, 0, 0x80/255f);
-					else tab.renderFrameBackGround(xb, yb, xb+16, yb+16, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+					if(ClickGUIHack.theme() == Theme.NODUS) Tab.renderFrameBackGround(xb, yb, xb+16, yb+16, 0, 0, 0, 0x80/255f);
+					else Tab.renderFrameBackGround(xb, yb, xb+16, yb+16, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 					
 				}
 				++drawn;
@@ -122,12 +123,12 @@ public class SettingBlockChooser extends Setting{
 	public int xoff = -1;
 	public int yoff = -1;
 	@Override
-	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onDeselect(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		xoff = yoff = -1;
 		this.minPressd = false;
 	}
 	@Override
-	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		int ySpace = ClickGUIHack.theme().yspacing;
 		if(mouseY >= yMin && mouseY < (yMin+ySpace) && mouseX > xMin && mouseX < xMax) {
 			if(!this.minPressd) {
@@ -172,7 +173,7 @@ public class SettingBlockChooser extends Setting{
 		}
 	}
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int txtColor = 0xffffff;
 		if(ClickGUIHack.theme() == Theme.NODUS) {
@@ -248,10 +249,10 @@ public class SettingBlockChooser extends Setting{
 	}
 	
 	@Override
-	public int getSettingHeight(Tab tab) {
+	public int getSettingHeight(Element tab) {
 		if(this.minimized) return ClickGUIHack.theme().yspacing;
 		if(ClickGUIHack.theme().verticalSettings) {
-			return ((int)Math.ceil((double)this.blockCount / getMaxColoumns(tab.xPos, tab.xPos + tab.width)))*18 + ClickGUIHack.theme().yspacing;
+			return ((int)Math.ceil((double)this.blockCount / getMaxColoumns(tab.startX, tab.endX)))*18 + ClickGUIHack.theme().yspacing;
 		}
 		return ((int)Math.ceil((double)this.blockCount / getMaxColoumns(0, 0)))*18 + ClickGUIHack.theme().yspacing;
 	}

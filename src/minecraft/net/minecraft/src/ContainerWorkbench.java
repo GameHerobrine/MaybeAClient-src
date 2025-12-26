@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import net.skidcode.gh.maybeaclient.hacks.InventoryTweaksHack;
-
 public class ContainerWorkbench extends Container {
     public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
     public IInventory craftResult = new InventoryCraftResult();
@@ -53,52 +51,44 @@ public class ContainerWorkbench extends Container {
         }
 
     }
-    @Override
-    public ItemStack func_27279_a(int i) {
-    	if(!InventoryTweaksHack.instance.status) return super.func_27279_a(i);
-    	ItemStack itemstack = null;
-        Slot slot = (Slot)slots.get(i);
-        if(slot != null && slot.getHasStack())
-        {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-            if(i == 0)
-            {
-            	invtweaks_func28125a(itemstack1, 10, 46, true);
-            } else
-            if(i >= 10 && i < 37)
-            {
-            	invtweaks_func28125a(itemstack1, 37, 46, false);
-            } else
-            if(i >= 37 && i < 46)
-            {
-            	invtweaks_func28125a(itemstack1, 10, 37, false);
-            } else
-            {
-            	invtweaks_func28125a(itemstack1, 10, 46, false);
-            }
-            if(itemstack1.stackSize == 0)
-            {
-                slot.putStack(null);
-            } else
-            {
-                slot.onSlotChanged();
-            }
-            if(itemstack1.stackSize != itemstack.stackSize)
-            {
-                slot.onPickupFromSlot(itemstack1);
-            } else
-            {
-                return null;
-            }
-        }
-        return itemstack;
-    }
+
     public boolean isUsableByPlayer(EntityPlayer var1) {
         if (this.field_20133_c.getBlockId(this.field_20132_h, this.field_20131_i, this.field_20130_j) != Block.workbench.blockID) {
             return false;
         } else {
             return var1.getDistanceSq((double)this.field_20132_h + 0.5D, (double)this.field_20131_i + 0.5D, (double)this.field_20130_j + 0.5D) <= 64.0D;
         }
+    }
+
+    public ItemStack getStackInSlot(int var1) {
+        ItemStack var2 = null;
+        Slot var3 = (Slot)this.slots.get(var1);
+        if (var3 != null && var3.getHasStack()) {
+            ItemStack var4 = var3.getStack();
+            var2 = var4.copy();
+            if (var1 == 0) {
+                this.func_28125_a(var4, 10, 46, true);
+            } else if (var1 >= 10 && var1 < 37) {
+                this.func_28125_a(var4, 37, 46, false);
+            } else if (var1 >= 37 && var1 < 46) {
+                this.func_28125_a(var4, 10, 37, false);
+            } else {
+                this.func_28125_a(var4, 10, 46, false);
+            }
+
+            if (var4.stackSize == 0) {
+                var3.putStack((ItemStack)null);
+            } else {
+                var3.onSlotChanged();
+            }
+
+            if (var4.stackSize == var2.stackSize) {
+                return null;
+            }
+
+            var3.onPickupFromSlot(var4);
+        }
+
+        return var2;
     }
 }

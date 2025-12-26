@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AchievementMap {
-    public static AchievementMap field_25210_a = new AchievementMap();
-    private Map field_25209_b = new HashMap();
+    public static AchievementMap instance = new AchievementMap();
+    private Map guidMap = new HashMap();
 
     private AchievementMap() {
         try {
@@ -17,7 +17,7 @@ public class AchievementMap {
             while((var2 = var1.readLine()) != null) {
                 String[] var3 = var2.split(",");
                 int var4 = Integer.parseInt(var3[0]);
-                this.field_25209_b.put(var4, var3[1]);
+                this.guidMap.put(var4, var3[1]);
             }
 
             var1.close();
@@ -27,7 +27,7 @@ public class AchievementMap {
 
     }
 
-    public static String func_25208_a(int var0) {
-        return (String)field_25210_a.field_25209_b.get(var0);
+    public static String getGuid(int var0) {
+        return (String)instance.guidMap.get(var0);
     }
 }

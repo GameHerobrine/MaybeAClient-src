@@ -7,7 +7,13 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
+import net.skidcode.gh.maybeaclient.gui.click.SettingsTab;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
+import net.skidcode.gh.maybeaclient.gui.click.element.ExpandToggleButtonElement;
+import net.skidcode.gh.maybeaclient.gui.click.element.ExpandToggleButtonElement.ExpandToggleButtonActionListener;
+import net.skidcode.gh.maybeaclient.gui.click.element.VerticalContainer;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.Setting;
@@ -17,20 +23,22 @@ import net.skidcode.gh.maybeaclient.hacks.settings.SettingKeybind;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingsProvider;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
-public class Hack implements SettingsProvider{
+public class Hack implements SettingsProvider, ExpandToggleButtonActionListener{
 	public String name;
 	public String description;
 	public SettingKeybind keybinding;
 	public SettingButton resetToDefaults;
 	public boolean status = false;
 	public boolean hasSettings = false;
-	public boolean expanded = false;
 	public HashMap<String, Setting> settings = new HashMap<>();
 	public ArrayList<Setting> settingsArr = new ArrayList<>(); 
 	public int hiddens = 0;
 	public static Minecraft mc;
 	public Category category;
 	public Tab tab = null;
+	public VerticalContainer categorybutton;
+	public VerticalContainer settingscontainer;
+	
 	public int getDescriptionHeight(Tab tab) {
 		Theme t = ClickGUIHack.theme();
 		if(t == Theme.HEPHAESTUS) {
@@ -40,7 +48,6 @@ public class Hack implements SettingsProvider{
 		
 		return 0;
 	}
-	
 
 	public void onPressed(SettingButton b) {
 		if(b == this.resetToDefaults) {
@@ -51,7 +58,6 @@ public class Hack implements SettingsProvider{
 	}
 	
 	public int totalSettingHeight(Tab tab) {
-		Theme t = ClickGUIHack.theme();
 		int result = 0;
 		result = this.getDescriptionHeight(tab);
 		
@@ -64,6 +70,10 @@ public class Hack implements SettingsProvider{
 	}
 	
 	public Hack(String name, String description, int keybind, Category category) {
+		VerticalContainer vc = new VerticalContainer();
+		vc.addElement(new ExpandToggleButtonElement(this));
+		this.settingscontainer = new VerticalContainer();
+		this.categorybutton = vc;
 		this.name = name;
 		this.description = description;
 		this.keybinding = new SettingKeybind(this, "Keybind", keybind);
@@ -74,10 +84,45 @@ public class Hack implements SettingsProvider{
 		this.addSetting(this.resetToDefaults);
 	}
 	
+	@Override
+	public String getDisplayString(boolean v) {
+		return this.name;
+	}
+
+
+	@Override
+	public boolean getValue() {
+		return this.status;
+	}
+
+
+	@Override
+	public void onPressed(int mx, int my, int click) {
+		this.toggle();
+	}
+
+
+	@Override
+	public void onExpand(Element caller, int startX, int startY, int endX, int endY, int mx, int my, int click, boolean expanded) {
+		this.expandChanged(expanded, ClickGUIHack.theme());
+	}
+
+
+	@Override
+	public boolean hoveringOver(int x, int y) {
+		if(ClickGUIHack.instance.showDescription.getValue()) {
+			ClickGUI.showDescription(x + 8, y, this);
+			return true;
+		}
+		return true;
+	}
+	
 	public void addSetting(Setting setting) {
 		this.settingsArr.add(setting);
 		this.settings.put(setting.noWhitespacesName.toLowerCase(), setting);
 		this.hasSettings = true;
+		this.settingscontainer.addElement(setting.guielement);
+		//this.categorybutton.addElement(setting.guielement);
 	}
 	
 	public void bind(int key) {
@@ -130,7 +175,39 @@ public class Hack implements SettingsProvider{
 		return this.settingsArr;
 	}
 
-	public void onExpandToggled() {
-		
+	@Override
+	public void incrHiddens(int i) {
+		this.hiddens += i;
+	}
+
+	public boolean expanded = false;
+	public void expandChanged(boolean expanded, Theme theme) {
+		if(expanded) {
+			this.expanded = true;
+			if(theme.verticalSettings) this.categorybutton.addElement(this.getSettingContainer());
+			else if(tab == null) ClickGUI.addTab(0, tab = new SettingsTab(this.categorybutton, this));
+		}else {
+			this.expanded = false;
+			if(theme.verticalSettings) this.categorybutton.removeElement(this.getSettingContainer());
+			else if(tab != null) {
+				ClickGUI.removeTab(tab);
+				tab = null;
+			}
+		}
+	}
+	public void themeChanged(Theme theme) {
+		if(theme.verticalSettings && this.tab != null) {
+			ClickGUI.removeTab(tab);
+			tab = null;
+		}
+		else this.categorybutton.removeElement(this.getSettingContainer());
+
+		this.expandChanged(this.expanded, theme);
+	}
+
+
+	@Override
+	public VerticalContainer getSettingContainer() {
+		return this.settingscontainer;
 	}
 }

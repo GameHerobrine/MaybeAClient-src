@@ -59,17 +59,19 @@ public class EntityPig extends EntityAnimal {
 
     }
 
-    public void func_27014_a(EntityLightningBolt var1) {
-        EntityPigZombie var2 = new EntityPigZombie(this.worldObj);
-        var2.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
-        this.worldObj.entityJoinedWorld(var2);
-        this.setEntityDead();
+    public void onStruckByLightning(EntityLightningBolt var1) {
+        if (!this.worldObj.multiplayerWorld) {
+            EntityPigZombie var2 = new EntityPigZombie(this.worldObj);
+            var2.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
+            this.worldObj.entityJoinedWorld(var2);
+            this.setEntityDead();
+        }
     }
 
     protected void fall(float var1) {
         super.fall(var1);
         if (var1 > 5.0F && this.riddenByEntity instanceof EntityPlayer) {
-            ((EntityPlayer)this.riddenByEntity).func_27026_a(AchievementList.field_27375_u);
+            ((EntityPlayer)this.riddenByEntity).triggerAchievement(AchievementList.flyPig);
         }
 
     }

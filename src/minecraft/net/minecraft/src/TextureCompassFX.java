@@ -3,29 +3,29 @@ package net.minecraft.src;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.Client;
 
 public class TextureCompassFX extends TextureFX {
     private Minecraft mc;
-    private int[] field_4230_h ;
+    private int[] compassIconImageData;
     private double field_4229_i;
     private double field_4228_j;
+
     public TextureCompassFX(Minecraft var1) {
-        super(Item.compass.func_27009_a(0));
+        super(Item.compass.getIconFromDamage(0));
         this.mc = var1;
         this.tileImage = 1;
 
         try {
-            BufferedImage var2 = Client.getResource("/gui/items.png"); //XXX ImageIO.read(mc.texturePackList.selectedTexturePack.func_6481_a("/gui/items.png"));
+        	BufferedImage var2 = Client.getResource("/gui/items.png"); //XXX ImageIO.read(mc.texturePackList.selectedTexturePack.func_6481_a("/gui/items.png"));
             int tsize = this.textureRes = var2.getWidth() / 16;
             
             int xoff = this.iconIndex % 16 * tsize;
             int yoff = this.iconIndex / 16 * tsize;
-            this.field_4230_h = new int[tsize*tsize];
-            this.imageData = new byte[this.field_4230_h.length*4];
-            var2.getRGB(xoff, yoff, tsize, tsize, this.field_4230_h, 0, tsize);
+            this.compassIconImageData = new int[tsize*tsize];
+            this.imageData = new byte[this.compassIconImageData.length*4];
+            var2.getRGB(xoff, yoff, tsize, tsize, this.compassIconImageData, 0, 16);
         } catch (IOException var5) {
             var5.printStackTrace();
         }
@@ -33,11 +33,11 @@ public class TextureCompassFX extends TextureFX {
     }
 
     public void onTick() {
-        for(int var1 = 0; var1 < this.field_4230_h.length; ++var1) {
-            int var2 = this.field_4230_h[var1] >> 24 & 255;
-            int var3 = this.field_4230_h[var1] >> 16 & 255;
-            int var4 = this.field_4230_h[var1] >> 8 & 255;
-            int var5 = this.field_4230_h[var1] >> 0 & 255;
+        for(int var1 = 0; var1 < 256; ++var1) {
+            int var2 = this.compassIconImageData[var1] >> 24 & 255;
+            int var3 = this.compassIconImageData[var1] >> 16 & 255;
+            int var4 = this.compassIconImageData[var1] >> 8 & 255;
+            int var5 = this.compassIconImageData[var1] >> 0 & 255;
             if (this.anaglyphEnabled) {
                 int var6 = (var3 * 30 + var4 * 59 + var5 * 11) / 100;
                 int var7 = (var3 * 30 + var4 * 70) / 100;
@@ -109,8 +109,6 @@ public class TextureCompassFX extends TextureFX {
             var10 = (int)(compassCenterMax + cos * (double)var9 * 0.3D);
             var11 = (int)(compassCenterMin - sin * (double)var9 * 0.3D * 0.5D);
             var12 = var11 * this.textureRes + var10;
-            //int i8 = (((int) (TileSize.double_compassCenterMin - (((sin * i7) * 0.3d) * 0.5d))) * TileSize.int_size) + ((int) (TileSize.double_compassCenterMax + (cos * i7 * 0.3d)));
-            
             var13 = 100;
             var14 = 100;
             var15 = 100;

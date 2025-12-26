@@ -24,12 +24,21 @@ public class StatsSyncher {
     private int field_27426_m = 0;
 
     public StatsSyncher(Session var1, StatFileWriter var2, File var3) {
-        this.field_27434_e = new File(var3, "stats_" + var1.username + "_unsent.dat");
-        this.field_27433_f = new File(var3, "stats_" + var1.username + ".dat");
-        this.field_27430_i = new File(var3, "stats_" + var1.username + "_unsent.old");
-        this.field_27429_j = new File(var3, "stats_" + var1.username + ".old");
-        this.field_27432_g = new File(var3, "stats_" + var1.username + "_unsent.tmp");
-        this.field_27431_h = new File(var3, "stats_" + var1.username + ".tmp");
+        this.field_27434_e = new File(var3, "stats_" + var1.username.toLowerCase() + "_unsent.dat");
+        this.field_27433_f = new File(var3, "stats_" + var1.username.toLowerCase() + ".dat");
+        this.field_27430_i = new File(var3, "stats_" + var1.username.toLowerCase() + "_unsent.old");
+        this.field_27429_j = new File(var3, "stats_" + var1.username.toLowerCase() + ".old");
+        this.field_27432_g = new File(var3, "stats_" + var1.username.toLowerCase() + "_unsent.tmp");
+        this.field_27431_h = new File(var3, "stats_" + var1.username.toLowerCase() + ".tmp");
+        if (!var1.username.toLowerCase().equals(var1.username)) {
+            this.func_28214_a(var3, "stats_" + var1.username + "_unsent.dat", this.field_27434_e);
+            this.func_28214_a(var3, "stats_" + var1.username + ".dat", this.field_27433_f);
+            this.func_28214_a(var3, "stats_" + var1.username + "_unsent.old", this.field_27430_i);
+            this.func_28214_a(var3, "stats_" + var1.username + ".old", this.field_27429_j);
+            this.func_28214_a(var3, "stats_" + var1.username + "_unsent.tmp", this.field_27432_g);
+            this.func_28214_a(var3, "stats_" + var1.username + ".tmp", this.field_27431_h);
+        }
+
         this.field_27435_d = var2;
         this.field_27428_k = var1;
         if (this.field_27434_e.exists()) {
@@ -37,6 +46,14 @@ public class StatsSyncher {
         }
 
         this.func_27418_a();
+    }
+
+    private void func_28214_a(File var1, String var2, File var3) {
+        File var4 = new File(var1, var2);
+        if (var4.exists() && !var4.isDirectory() && !var3.exists()) {
+            var4.renameTo(var3);
+        }
+
     }
 
     private Map func_27415_a(File var1, File var2, File var3) {

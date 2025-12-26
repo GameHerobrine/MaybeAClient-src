@@ -66,19 +66,19 @@ public class ChestCheckerHack extends Hack implements EventListener{
 	public void requestChestContent(int x, int y, int z) {
 		if(!mc.isMultiplayerWorld()) {
 			IInventory var6 = (TileEntityChest)mc.theWorld.getBlockTileEntity(x, y, z);
-			if (mc.theWorld.getBlockId(x - 1, y, z) == Block.crate.blockID) {
+			if (mc.theWorld.getBlockId(x - 1, y, z) == Block.chest.blockID) {
 				var6 = new InventoryLargeChest("Large chest", (TileEntityChest)mc.theWorld.getBlockTileEntity(x - 1, y, z), var6);
 			}
 
-			if (mc.theWorld.getBlockId(x + 1, y, z) == Block.crate.blockID) {
+			if (mc.theWorld.getBlockId(x + 1, y, z) == Block.chest.blockID) {
 				var6 = new InventoryLargeChest("Large chest", (IInventory)var6, (TileEntityChest)mc.theWorld.getBlockTileEntity(x + 1, y, z));
 			}
 
-			if (mc.theWorld.getBlockId(x, y, z - 1) == Block.crate.blockID) {
+			if (mc.theWorld.getBlockId(x, y, z - 1) == Block.chest.blockID) {
 				var6 = new InventoryLargeChest("Large chest", (TileEntityChest)mc.theWorld.getBlockTileEntity(x, y, z - 1), var6);
 			}
 
-			if (mc.theWorld.getBlockId(x, y, z + 1) == Block.crate.blockID) {
+			if (mc.theWorld.getBlockId(x, y, z + 1) == Block.chest.blockID) {
 				var6 = new InventoryLargeChest("Large chest", (IInventory)var6, (TileEntityChest)mc.theWorld.getBlockTileEntity(x, y, z + 1));
 			}
 			ItemStack[] chest = new ItemStack[var6.getSizeInventory()];

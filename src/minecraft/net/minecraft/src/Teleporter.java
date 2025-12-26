@@ -67,7 +67,6 @@ public class Teleporter {
                 var18 += 0.5D;
             }
 
-            System.out.println("Teleporting to " + var22 + ", " + var16 + ", " + var18);
             var2.setLocationAndAngles(var22, var16, var18, var2.rotationYaw, 0.0F);
             var2.motionX = var2.motionY = var2.motionZ = 0.0D;
             return true;

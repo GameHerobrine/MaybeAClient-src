@@ -12,15 +12,15 @@ class GuiWorldSlot extends GuiSlot {
     }
 
     protected int getSize() {
-        return this.parentWorldGui.saveList.size();
+        return GuiSelectWorld.getSize(this.parentWorldGui).size();
     }
 
     protected void elementClicked(int var1, boolean var2) {
-    	this.parentWorldGui.selectedWorld = var1;
-        boolean var3 = this.parentWorldGui.selectedWorld >= 0 && this.parentWorldGui.selectedWorld < this.getSize();
-        this.parentWorldGui.buttonSelect.enabled = var3;
-        this.parentWorldGui.buttonRename.enabled = var3;
-        this.parentWorldGui.buttonDelete.enabled = var3;
+        GuiSelectWorld.onElementSelected(this.parentWorldGui, var1);
+        boolean var3 = GuiSelectWorld.getSelectedWorld(this.parentWorldGui) >= 0 && GuiSelectWorld.getSelectedWorld(this.parentWorldGui) < this.getSize();
+        GuiSelectWorld.getSelectButton(this.parentWorldGui).enabled = var3;
+        GuiSelectWorld.getRenameButton(this.parentWorldGui).enabled = var3;
+        GuiSelectWorld.getDeleteButton(this.parentWorldGui).enabled = var3;
         if (var2 && var3) {
             this.parentWorldGui.selectWorld(var1);
         }
@@ -28,11 +28,11 @@ class GuiWorldSlot extends GuiSlot {
     }
 
     protected boolean isSelected(int var1) {
-        return var1 == this.parentWorldGui.selectedWorld;
+        return var1 == GuiSelectWorld.getSelectedWorld(this.parentWorldGui);
     }
 
     protected int getContentHeight() {
-        return this.parentWorldGui.saveList.size() * 36;
+        return GuiSelectWorld.getSize(this.parentWorldGui).size() * 36;
     }
 
     protected void drawBackground() {
@@ -40,19 +40,19 @@ class GuiWorldSlot extends GuiSlot {
     }
 
     protected void drawSlot(int var1, int var2, int var3, int var4, Tessellator var5) {
-        SaveFormatComparator var6 = (SaveFormatComparator)this.parentWorldGui.saveList.get(var1);
+        SaveFormatComparator var6 = (SaveFormatComparator)GuiSelectWorld.getSize(this.parentWorldGui).get(var1);
         String var7 = var6.getDisplayName();
         if (var7 == null || MathHelper.stringNullOrLengthZero(var7)) {
-            var7 = this.parentWorldGui.field_22098_o + " " + (var1 + 1);
+            var7 = GuiSelectWorld.func_22087_f(this.parentWorldGui) + " " + (var1 + 1);
         }
 
         String var8 = var6.getFileName();
-        var8 = var8 + " (" + this.parentWorldGui.dateFormatter.format(new Date(var6.func_22163_e()));
+        var8 = var8 + " (" + GuiSelectWorld.getDateFormatter(this.parentWorldGui).format(new Date(var6.func_22163_e()));
         long var9 = var6.func_22159_c();
         var8 = var8 + ", " + (float)(var9 / 1024L * 100L / 1024L) / 100.0F + " MB)";
         String var11 = "";
         if (var6.func_22161_d()) {
-            var11 = this.parentWorldGui.field_22097_p + " " + var11;
+            var11 = GuiSelectWorld.func_22088_h(this.parentWorldGui) + " " + var11;
         }
 
         this.parentWorldGui.drawString(this.parentWorldGui.fontRenderer, var7, var2 + 2, var3 + 1, 16777215);

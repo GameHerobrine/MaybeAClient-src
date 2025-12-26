@@ -19,11 +19,6 @@ public class ChunkProviderClient implements IChunkProvider {
         this.worldObj = var1;
     }
 
-    public boolean chunkExists(int var1, int var2) {
-        ChunkCoordIntPair var3 = new ChunkCoordIntPair(var1, var2);
-        return this.chunkMapping.containsKey(var3);
-    }
-    
     private void saveChunk(Chunk chunk)
 	{
 		if(!((WorldClient)worldObj).downloadThisWorld)
@@ -60,6 +55,15 @@ public class ChunkProviderClient implements IChunkProvider {
 		}
 	}
     
+    public boolean chunkExists(int var1, int var2) {
+        if (this != null) {
+            return true;
+        } else {
+            ChunkCoordIntPair var3 = new ChunkCoordIntPair(var1, var2);
+            return this.chunkMapping.containsKey(var3);
+        }
+    }
+
     public void func_539_c(int var1, int var2) {
         Chunk var3 = this.provideChunk(var1, var2);
         if (!var3.func_21167_h()) {
@@ -87,12 +91,10 @@ public class ChunkProviderClient implements IChunkProvider {
         Arrays.fill(var5.skylightMap.data, (byte)-1);
         this.chunkMapping.put(var3, var5);
         var5.isChunkLoaded = true;
-        
         if(((WorldClient)worldObj).downloadThisWorld)
         {
             var5.importOldChunkTileEntities();
         }
-        
         return var5;
     }
 
@@ -150,11 +152,11 @@ public class ChunkProviderClient implements IChunkProvider {
     public void populate(IChunkProvider var1, int var2, int var3) {
     }
 
-    public String toString() {
+    public String makeString() {
         return "MultiplayerChunkCache: " + this.chunkMapping.size();
     }
 
-	public void importOldTileEntities() {
+    public void importOldTileEntities() {
 		Iterator iterator = chunkMapping.keySet().iterator();
         do
         {

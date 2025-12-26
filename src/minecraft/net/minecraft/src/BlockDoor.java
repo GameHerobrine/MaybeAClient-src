@@ -58,10 +58,10 @@ public class BlockDoor extends Block {
     }
 
     public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
-        this.func_313_b(this.getState(var1.getBlockMetadata(var2, var3, var4)));
+        this.setDoorRotation(this.getState(var1.getBlockMetadata(var2, var3, var4)));
     }
 
-    public void func_313_b(int var1) {
+    public void setDoorRotation(int var1) {
         float var2 = 0.1875F;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 2.0F, 1.0F);
         if (var1 == 0) {
@@ -104,22 +104,17 @@ public class BlockDoor extends Block {
 
                 var1.setBlockMetadataWithNotify(var2, var3, var4, var6 ^ 4);
                 var1.markBlocksDirty(var2, var3 - 1, var4, var2, var3, var4);
-                if (Math.random() < 0.5D) {
-                    var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_open", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-                } else {
-                    var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_close", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-                }
-
+                var1.func_28107_a(var5, 1003, var2, var3, var4, 0);
                 return true;
             }
         }
     }
 
-    public void func_311_a(World var1, int var2, int var3, int var4, boolean var5) {
+    public void openDoor(World var1, int var2, int var3, int var4, boolean var5) {
         int var6 = var1.getBlockMetadata(var2, var3, var4);
         if ((var6 & 8) != 0) {
             if (var1.getBlockId(var2, var3 - 1, var4) == this.blockID) {
-                this.func_311_a(var1, var2, var3 - 1, var4, var5);
+                this.openDoor(var1, var2, var3 - 1, var4, var5);
             }
 
         } else {
@@ -131,12 +126,7 @@ public class BlockDoor extends Block {
 
                 var1.setBlockMetadataWithNotify(var2, var3, var4, var6 ^ 4);
                 var1.markBlocksDirty(var2, var3 - 1, var4, var2, var3, var4);
-                if (Math.random() < 0.5D) {
-                    var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_open", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-                } else {
-                    var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_close", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-                }
-
+                var1.func_28107_a((EntityPlayer)null, 1003, var2, var3, var4, 0);
             }
         }
     }
@@ -158,7 +148,7 @@ public class BlockDoor extends Block {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+            if (!var1.func_28100_h(var2, var3 - 1, var4)) {
                 var1.setBlockWithNotify(var2, var3, var4, 0);
                 var7 = true;
                 if (var1.getBlockId(var2, var3 + 1, var4) == this.blockID) {
@@ -172,7 +162,7 @@ public class BlockDoor extends Block {
                 }
             } else if (var5 > 0 && Block.blocksList[var5].canProvidePower()) {
                 boolean var8 = var1.isBlockIndirectlyGettingPowered(var2, var3, var4) || var1.isBlockIndirectlyGettingPowered(var2, var3 + 1, var4);
-                this.func_311_a(var1, var2, var3, var4, var8);
+                this.openDoor(var1, var2, var3, var4, var8);
             }
         }
 
@@ -199,11 +189,11 @@ public class BlockDoor extends Block {
         if (var3 >= 127) {
             return false;
         } else {
-            return var1.isBlockOpaqueCube(var2, var3 - 1, var4) && super.canPlaceBlockAt(var1, var2, var3, var4) && super.canPlaceBlockAt(var1, var2, var3 + 1, var4);
+            return var1.func_28100_h(var2, var3 - 1, var4) && super.canPlaceBlockAt(var1, var2, var3, var4) && super.canPlaceBlockAt(var1, var2, var3 + 1, var4);
         }
     }
 
-    public static boolean func_27047_e(int var0) {
+    public static boolean isOpen(int var0) {
         return (var0 & 4) != 0;
     }
 }

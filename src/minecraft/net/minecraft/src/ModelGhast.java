@@ -11,7 +11,7 @@ public class ModelGhast extends ModelBase {
         this.body = new ModelRenderer(0, 0);
         this.body.addBox(-8.0F, -8.0F, -8.0F, 16, 16, 16);
         ModelRenderer var10000 = this.body;
-        var10000.offsetY += (float)(24 + var1);
+        var10000.rotationPointY += (float)(24 + var1);
         Random var2 = new Random(1660L);
 
         for(int var3 = 0; var3 < this.tentacles.length; ++var3) {
@@ -20,9 +20,9 @@ public class ModelGhast extends ModelBase {
             float var5 = ((float)(var3 / 3) / 2.0F * 2.0F - 1.0F) * 5.0F;
             int var6 = var2.nextInt(7) + 8;
             this.tentacles[var3].addBox(-1.0F, 0.0F, -1.0F, 2, var6, 2);
-            this.tentacles[var3].offsetX = var4;
-            this.tentacles[var3].offsetZ = var5;
-            this.tentacles[var3].offsetY = (float)(31 + var1);
+            this.tentacles[var3].rotationPointX = var4;
+            this.tentacles[var3].rotationPointZ = var5;
+            this.tentacles[var3].rotationPointY = (float)(31 + var1);
         }
 
     }

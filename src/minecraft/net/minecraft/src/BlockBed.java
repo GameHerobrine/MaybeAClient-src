@@ -1,5 +1,6 @@
 package net.minecraft.src;
 
+import java.util.Iterator;
 import java.util.Random;
 
 public class BlockBed extends Block {
@@ -11,32 +12,72 @@ public class BlockBed extends Block {
     }
 
     public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-        int var6 = var1.getBlockMetadata(var2, var3, var4);
-        if (!isBlockFootOfBed(var6)) {
-            int var7 = getDirectionFromMetadata(var6);
-            var2 += headBlockToFootBlockMap[var7][0];
-            var4 += headBlockToFootBlockMap[var7][1];
-            if (var1.getBlockId(var2, var3, var4) != this.blockID) {
-                return true;
-            }
-
-            var6 = var1.getBlockMetadata(var2, var3, var4);
-        }
-
-        if (isBedOccupied(var6)) {
-            var5.addChatMessage("tile.bed.occupied");
+        if (var1.multiplayerWorld) {
             return true;
         } else {
-            EnumStatus var8 = var5.sleepInBedAt(var2, var3, var4);
-            if (var8 == EnumStatus.OK) {
-                setBedOccupied(var1, var2, var3, var4, true);
-                return true;
-            } else {
-                if (var8 == EnumStatus.NOT_POSSIBLE_NOW) {
-                    var5.addChatMessage("tile.bed.noSleep");
+            int var6 = var1.getBlockMetadata(var2, var3, var4);
+            if (!isBlockFootOfBed(var6)) {
+                int var7 = getDirectionFromMetadata(var6);
+                var2 += headBlockToFootBlockMap[var7][0];
+                var4 += headBlockToFootBlockMap[var7][1];
+                if (var1.getBlockId(var2, var3, var4) != this.blockID) {
+                    return true;
                 }
 
+                var6 = var1.getBlockMetadata(var2, var3, var4);
+            }
+
+            if (!var1.worldProvider.canRespawnHere()) {
+                double var16 = (double)var2 + 0.5D;
+                double var17 = (double)var3 + 0.5D;
+                double var11 = (double)var4 + 0.5D;
+                var1.setBlockWithNotify(var2, var3, var4, 0);
+                int var13 = getDirectionFromMetadata(var6);
+                var2 += headBlockToFootBlockMap[var13][0];
+                var4 += headBlockToFootBlockMap[var13][1];
+                if (var1.getBlockId(var2, var3, var4) == this.blockID) {
+                    var1.setBlockWithNotify(var2, var3, var4, 0);
+                    var16 = (var16 + (double)var2 + 0.5D) / 2.0D;
+                    var17 = (var17 + (double)var3 + 0.5D) / 2.0D;
+                    var11 = (var11 + (double)var4 + 0.5D) / 2.0D;
+                }
+
+                var1.newExplosion((Entity)null, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F), 5.0F, true);
                 return true;
+            } else {
+                if (isBedOccupied(var6)) {
+                    EntityPlayer var14 = null;
+                    Iterator var8 = var1.playerEntities.iterator();
+
+                    while(var8.hasNext()) {
+                        EntityPlayer var9 = (EntityPlayer)var8.next();
+                        if (var9.isPlayerSleeping()) {
+                            ChunkCoordinates var10 = var9.bedChunkCoordinates;
+                            if (var10.x == var2 && var10.y == var3 && var10.z == var4) {
+                                var14 = var9;
+                            }
+                        }
+                    }
+
+                    if (var14 != null) {
+                        var5.addChatMessage("tile.bed.occupied");
+                        return true;
+                    }
+
+                    setBedOccupied(var1, var2, var3, var4, false);
+                }
+
+                EnumStatus var15 = var5.sleepInBedAt(var2, var3, var4);
+                if (var15 == EnumStatus.OK) {
+                    setBedOccupied(var1, var2, var3, var4, true);
+                    return true;
+                } else {
+                    if (var15 == EnumStatus.NOT_POSSIBLE_NOW) {
+                        var5.addChatMessage("tile.bed.noSleep");
+                    }
+
+                    return true;
+                }
             }
         }
     }
@@ -136,7 +177,7 @@ public class BlockBed extends Block {
 
             for(int var12 = var8; var12 <= var10; ++var12) {
                 for(int var13 = var9; var13 <= var11; ++var13) {
-                    if (var0.isBlockOpaqueCube(var12, var2 - 1, var13) && var0.isAirBlock(var12, var2, var13) && var0.isAirBlock(var12, var2 + 1, var13)) {
+                    if (var0.func_28100_h(var12, var2 - 1, var13) && var0.isAirBlock(var12, var2, var13) && var0.isAirBlock(var12, var2 + 1, var13)) {
                         if (var4 <= 0) {
                             return new ChunkCoordinates(var12, var2, var13);
                         }

@@ -3,6 +3,7 @@ package net.skidcode.gh.maybeaclient.hacks;
 import org.lwjgl.input.Keyboard;
 
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingInteger;
@@ -30,7 +31,7 @@ public class AutoMouseClickHack extends Hack{
 			}
 			
 			@Override
-			public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+			public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 				if(!this.currentMode.equalsIgnoreCase("Disabled")) super.renderElement(tab, xStart, yStart, xEnd, yEnd);
 			}
 		};
@@ -42,7 +43,7 @@ public class AutoMouseClickHack extends Hack{
 			}
 			
 			@Override
-			public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+			public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 				if(!this.currentMode.equalsIgnoreCase("Disabled")) super.renderElement(tab, xStart, yStart, xEnd, yEnd);
 			}
 		};

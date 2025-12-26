@@ -45,26 +45,35 @@ public class ChunkCache implements IBlockAccess {
         return this.chunkArray[var4][var5].getChunkBlockTileEntity(var1 & 15, var2, var3 & 15);
     }
 
+    public float getBrightness(int var1, int var2, int var3, int var4) {
+        int var5 = this.getLightValue(var1, var2, var3);
+        if (var5 < var4) {
+            var5 = var4;
+        }
+
+        return this.worldObj.worldProvider.lightBrightnessTable[var5];
+    }
+
     public float getLightBrightness(int var1, int var2, int var3) {
         return this.worldObj.worldProvider.lightBrightnessTable[this.getLightValue(var1, var2, var3)];
     }
 
     public int getLightValue(int var1, int var2, int var3) {
-        return this.func_716_a(var1, var2, var3, true);
+        return this.getLightValueExt(var1, var2, var3, true);
     }
 
-    public int func_716_a(int var1, int var2, int var3, boolean var4) {
+    public int getLightValueExt(int var1, int var2, int var3, boolean var4) {
         if (var1 >= -32000000 && var3 >= -32000000 && var1 < 32000000 && var3 <= 32000000) {
             int var5;
             int var6;
             if (var4) {
                 var5 = this.getBlockId(var1, var2, var3);
-                if (var5 == Block.stairSingle.blockID || var5 == Block.tilledField.blockID) {
-                    var6 = this.func_716_a(var1, var2 + 1, var3, false);
-                    int var7 = this.func_716_a(var1 + 1, var2, var3, false);
-                    int var8 = this.func_716_a(var1 - 1, var2, var3, false);
-                    int var9 = this.func_716_a(var1, var2, var3 + 1, false);
-                    int var10 = this.func_716_a(var1, var2, var3 - 1, false);
+                if (var5 == Block.stairSingle.blockID || var5 == Block.tilledField.blockID || var5 == Block.stairCompactPlanks.blockID || var5 == Block.stairCompactCobblestone.blockID) {
+                    var6 = this.getLightValueExt(var1, var2 + 1, var3, false);
+                    int var7 = this.getLightValueExt(var1 + 1, var2, var3, false);
+                    int var8 = this.getLightValueExt(var1 - 1, var2, var3, false);
+                    int var9 = this.getLightValueExt(var1, var2, var3 + 1, false);
+                    int var10 = this.getLightValueExt(var1, var2, var3 - 1, false);
                     if (var7 > var6) {
                         var6 = var7;
                     }
@@ -121,12 +130,21 @@ public class ChunkCache implements IBlockAccess {
         return var4 == 0 ? Material.air : Block.blocksList[var4].blockMaterial;
     }
 
+    public WorldChunkManager getWorldChunkManager() {
+        return this.worldObj.getWorldChunkManager();
+    }
+
     public boolean isBlockOpaqueCube(int var1, int var2, int var3) {
         Block var4 = Block.blocksList[this.getBlockId(var1, var2, var3)];
         return var4 == null ? false : var4.isOpaqueCube();
     }
 
-    public WorldChunkManager getWorldChunkManager() {
-        return this.worldObj.getWorldChunkManager();
+    public boolean func_28100_h(int var1, int var2, int var3) {
+        Block var4 = Block.blocksList[this.getBlockId(var1, var2, var3)];
+        if (var4 == null) {
+            return false;
+        } else {
+            return var4.blockMaterial.getIsSolid() && var4.renderAsNormalBlock();
+        }
     }
 }

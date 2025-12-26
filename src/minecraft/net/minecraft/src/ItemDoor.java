@@ -1,11 +1,11 @@
 package net.minecraft.src;
 
 public class ItemDoor extends Item {
-    private Material field_321_a;
+    private Material material;
 
     public ItemDoor(int var1, Material var2) {
         super(var1);
-        this.field_321_a = var2;
+        this.material = var2;
         this.maxStackSize = 1;
     }
 
@@ -15,7 +15,7 @@ public class ItemDoor extends Item {
         } else {
             ++var5;
             Block var8;
-            if (this.field_321_a == Material.wood) {
+            if (this.material == Material.wood) {
                 var8 = Block.doorWood;
             } else {
                 var8 = Block.doorSteel;
@@ -43,8 +43,8 @@ public class ItemDoor extends Item {
                     var10 = 1;
                 }
 
-                int var12 = (var3.isBlockOpaqueCube(var4 - var10, var5, var6 - var11) ? 1 : 0) + (var3.isBlockOpaqueCube(var4 - var10, var5 + 1, var6 - var11) ? 1 : 0);
-                int var13 = (var3.isBlockOpaqueCube(var4 + var10, var5, var6 + var11) ? 1 : 0) + (var3.isBlockOpaqueCube(var4 + var10, var5 + 1, var6 + var11) ? 1 : 0);
+                int var12 = (var3.func_28100_h(var4 - var10, var5, var6 - var11) ? 1 : 0) + (var3.func_28100_h(var4 - var10, var5 + 1, var6 - var11) ? 1 : 0);
+                int var13 = (var3.func_28100_h(var4 + var10, var5, var6 + var11) ? 1 : 0) + (var3.func_28100_h(var4 + var10, var5 + 1, var6 + var11) ? 1 : 0);
                 boolean var14 = var3.getBlockId(var4 - var10, var5, var6 - var11) == var8.blockID || var3.getBlockId(var4 - var10, var5 + 1, var6 - var11) == var8.blockID;
                 boolean var15 = var3.getBlockId(var4 + var10, var5, var6 + var11) == var8.blockID || var3.getBlockId(var4 + var10, var5 + 1, var6 + var11) == var8.blockID;
                 boolean var16 = false;
@@ -59,10 +59,12 @@ public class ItemDoor extends Item {
                     var9 += 4;
                 }
 
-                var3.setBlockWithNotify(var4, var5, var6, var8.blockID);
-                var3.setBlockMetadataWithNotify(var4, var5, var6, var9);
-                var3.setBlockWithNotify(var4, var5 + 1, var6, var8.blockID);
-                var3.setBlockMetadataWithNotify(var4, var5 + 1, var6, var9 + 8);
+                var3.editingBlocks = true;
+                var3.setBlockAndMetadataWithNotify(var4, var5, var6, var8.blockID, var9);
+                var3.setBlockAndMetadataWithNotify(var4, var5 + 1, var6, var8.blockID, var9 + 8);
+                var3.editingBlocks = false;
+                var3.notifyBlocksOfNeighborChange(var4, var5, var6, var8.blockID);
+                var3.notifyBlocksOfNeighborChange(var4, var5 + 1, var6, var8.blockID);
                 --var1.stackSize;
                 return true;
             }

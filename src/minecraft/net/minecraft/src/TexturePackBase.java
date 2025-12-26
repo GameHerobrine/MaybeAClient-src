@@ -25,7 +25,7 @@ public abstract class TexturePackBase {
     public void bindThumbnailTexture(Minecraft var1) {
     }
 
-    public InputStream func_6481_a(String var1) {
+    public InputStream getResourceAsStream(String var1) {
         return TexturePackBase.class.getResourceAsStream(var1);
     }
 }

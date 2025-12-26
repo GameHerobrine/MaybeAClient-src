@@ -15,11 +15,11 @@ public class Packet255KickDisconnect extends Packet {
     }
 
     public void readPacketData(DataInputStream var1) throws IOException {
-        this.reason = func_27048_a(var1, 100);
+        this.reason = readString(var1, 100);
     }
 
     public void writePacketData(DataOutputStream var1) throws IOException {
-        func_27049_a(this.reason, var1);
+        writeString(this.reason, var1);
     }
 
     public void processPacket(NetHandler var1) {

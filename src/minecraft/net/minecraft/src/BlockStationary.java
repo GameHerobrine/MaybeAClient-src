@@ -15,12 +15,12 @@ public class BlockStationary extends BlockFluid {
     public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
         super.onNeighborBlockChange(var1, var2, var3, var4, var5);
         if (var1.getBlockId(var2, var3, var4) == this.blockID) {
-            this.func_27038_j(var1, var2, var3, var4);
+            this.func_30004_j(var1, var2, var3, var4);
         }
 
     }
 
-    private void func_27038_j(World var1, int var2, int var3, int var4) {
+    private void func_30004_j(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockMetadata(var2, var3, var4);
         var1.editingBlocks = true;
         var1.setBlockAndMetadata(var2, var3, var4, this.blockID - 1, var5);

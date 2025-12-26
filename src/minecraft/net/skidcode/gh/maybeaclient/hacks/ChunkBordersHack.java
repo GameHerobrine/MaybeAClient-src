@@ -1,11 +1,7 @@
 package net.skidcode.gh.maybeaclient.hacks;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.src.MathHelper;
-import net.minecraft.src.RenderManager;
-import net.minecraft.src.Tessellator;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;

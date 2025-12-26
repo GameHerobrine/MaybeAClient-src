@@ -13,12 +13,15 @@ public class TextureWaterFlowFX extends TextureFX {
         super(Block.waterMoving.blockIndexInTexture + 1);
         this.tileSize = 2;
     }
+    
+    
     public boolean hasTexture = false;
     public void onTick() {
         ++this.field_1134_k;
         if(this.hasTexture && NoRenderHack.instance.status && NoRenderHack.instance.waterAnim.value) {
         	return;
         }
+        
         int var1;
         int var2;
         float var3;
@@ -88,5 +91,6 @@ public class TextureWaterFlowFX extends TextureFX {
             this.imageData[var2 * 4 + 3] = (byte)var8;
         }
         hasTexture = true;
+
     }
 }

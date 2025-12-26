@@ -8,7 +8,7 @@ public class RenderWolf extends RenderLiving {
     }
 
     public void func_25005_a(EntityWolf e, double x, double y, double z, float var8, float var9) {
-        if(DogOwnerHack.instance.status) {
+    	if(DogOwnerHack.instance.status) {
         	String nick = e.getWolfOwner();
         	String owner = "".equals(nick) ? "No Owner" : ("Owner: "+nick);
         	this.renderLivingLabel(e, owner, x, y-1, z, 64);
@@ -17,7 +17,7 @@ public class RenderWolf extends RenderLiving {
     }
 
     protected float func_25004_a(EntityWolf var1, float var2) {
-        return var1.func_25037_z();
+        return var1.setTailRotation();
     }
 
     protected void func_25006_b(EntityWolf var1, float var2) {

@@ -3,6 +3,7 @@ package net.minecraft.src;
 import java.util.Iterator;
 import java.util.List;
 
+import net.skidcode.gh.maybeaclient.hacks.CustomHandPositionHack;
 import net.skidcode.gh.maybeaclient.hacks.FreecamHack;
 import net.skidcode.gh.maybeaclient.hacks.LockTimeHack;
 
@@ -26,13 +27,17 @@ public abstract class EntityPlayer extends EntityLiving {
     public double field_20062_v;
     public double field_20061_w;
     protected boolean sleeping;
-    private ChunkCoordinates bedChunkCoordinates;
+    public ChunkCoordinates bedChunkCoordinates;
     private int sleepTimer;
     public float field_22063_x;
     public float field_22062_y;
     public float field_22061_z;
     private ChunkCoordinates playerSpawnCoordinate;
-    private ChunkCoordinates field_26907_d;
+    private ChunkCoordinates startMinecartRidingCoordinate;
+    public int field_28024_y = 20;
+    protected boolean inPortal = false;
+    public float timeInPortal;
+    public float prevTimeInPortal;
     private int damageRemainder = 0;
     public EntityFish fishEntity = null;
 
@@ -61,6 +66,7 @@ public abstract class EntityPlayer extends EntityLiving {
             if (this.sleepTimer > 100) {
                 this.sleepTimer = 100;
             }
+            
             boolean isDay = this.worldObj.isDaytime();
         	if(LockTimeHack.INSTANCE.status) {
         		long oldtime = this.worldObj.getWorldTime();
@@ -68,10 +74,13 @@ public abstract class EntityPlayer extends EntityLiving {
         		isDay = this.worldObj.calculateSkylightSubtracted(1.0f) < 4;
         		this.worldObj.setWorldTime(oldtime);
         	}
-            if (!this.isInBed()) {
-                this.wakeUpPlayer(true, true, false);
-            } else if (!this.worldObj.multiplayerWorld && isDay) {
-                this.wakeUpPlayer(false, true, true);
+        	
+            if (!this.worldObj.multiplayerWorld) {
+                if (!this.isInBed()) {
+                    this.wakeUpPlayer(true, true, false);
+                } else if (isDay) {
+                    this.wakeUpPlayer(false, true, true);
+                }
             }
         } else if (this.sleepTimer > 0) {
             ++this.sleepTimer;
@@ -120,9 +129,9 @@ public abstract class EntityPlayer extends EntityLiving {
         this.field_20063_u += var1 * 0.25D;
         this.field_20061_w += var5 * 0.25D;
         this.field_20062_v += var3 * 0.25D;
-        this.addStat(StatList.field_25179_j, 1);
+        this.addStat(StatList.minutesPlayedStat, 1);
         if (this.ridingEntity == null) {
-            this.field_26907_d = null;
+            this.startMinecartRidingCoordinate = null;
         }
 
     }
@@ -147,7 +156,7 @@ public abstract class EntityPlayer extends EntityLiving {
         super.updateRidden();
         this.field_775_e = this.field_774_f;
         this.field_774_f = 0.0F;
-        this.func_27024_i(this.posX - var1, this.posY - var3, this.posZ - var5);
+        this.addMountedMovementStat(this.posX - var1, this.posY - var3, this.posZ - var5);
     }
 
     public void preparePlayerToSpawn() {
@@ -159,9 +168,15 @@ public abstract class EntityPlayer extends EntityLiving {
     }
 
     protected void updatePlayerActionState() {
+    	int swingspeed = 8;
+    	if(CustomHandPositionHack.instance.status) {
+    		swingspeed = CustomHandPositionHack.instance.swingSpeed.getValue();
+    	}
+    	
+    	float swingspeedf = (float) swingspeed;
         if (this.isSwinging) {
             ++this.swingProgressInt;
-            if (this.swingProgressInt == 8) {
+            if (this.swingProgressInt >= swingspeed) {
                 this.swingProgressInt = 0;
                 this.isSwinging = false;
             }
@@ -169,7 +184,7 @@ public abstract class EntityPlayer extends EntityLiving {
             this.swingProgressInt = 0;
         }
 
-        this.swingProgress = (float)this.swingProgressInt / 8.0F;
+        this.swingProgress = (float)(this.swingProgressInt / swingspeedf);
     }
 
     public void onLivingUpdate() {
@@ -236,15 +251,15 @@ public abstract class EntityPlayer extends EntityLiving {
         }
 
         this.yOffset = 0.1F;
-        this.addStat(StatList.field_25163_u, 1);
+        this.addStat(StatList.deathsStat, 1);
     }
 
     public void addToPlayerScore(Entity var1, int var2) {
         this.score += var2;
         if (var1 instanceof EntityPlayer) {
-            this.addStat(StatList.field_25161_w, 1);
+            this.addStat(StatList.playerKillsStat, 1);
         } else {
-            this.addStat(StatList.field_25162_v, 1);
+            this.addStat(StatList.mobKillsStat, 1);
         }
 
     }
@@ -283,7 +298,7 @@ public abstract class EntityPlayer extends EntityLiving {
             }
 
             this.joinEntityItemWithWorld(var3);
-            this.addStat(StatList.field_25168_r, 1);
+            this.addStat(StatList.dropStat, 1);
         }
     }
 
@@ -358,11 +373,11 @@ public abstract class EntityPlayer extends EntityLiving {
     }
 
     public boolean attackEntityFrom(Entity var1, int var2) {
-        this.field_9344_ag = 0;
+        this.entityAge = 0;
         if (this.health <= 0) {
             return false;
         } else {
-            if (this.isPlayerSleeping()) {
+            if (this.isPlayerSleeping() && !this.worldObj.multiplayerWorld) {
                 this.wakeUpPlayer(true, true, false);
             }
 
@@ -392,7 +407,7 @@ public abstract class EntityPlayer extends EntityLiving {
                     this.alertWolves((EntityLiving)var3, false);
                 }
 
-                this.addStat(StatList.field_25165_t, var2);
+                this.addStat(StatList.damageTakenStat, var2);
                 return super.attackEntityFrom(var1, var2);
             }
         }
@@ -510,7 +525,7 @@ public abstract class EntityPlayer extends EntityLiving {
                     this.alertWolves((EntityLiving)var1, true);
                 }
 
-                this.addStat(StatList.field_25167_s, var2);
+                this.addStat(StatList.damageDealtStat, var2);
             }
         }
 
@@ -543,62 +558,73 @@ public abstract class EntityPlayer extends EntityLiving {
     }
 
     public EnumStatus sleepInBedAt(int var1, int var2, int var3) {
-        if (!this.isPlayerSleeping() && this.isEntityAlive()) {
-        	boolean isDay = this.worldObj.isDaytime();
-        	if(LockTimeHack.INSTANCE.status) {
-        		long oldtime = this.worldObj.getWorldTime();
-        		this.worldObj.setWorldTime(LockTimeHack.INSTANCE.realTime);
-        		isDay = this.worldObj.calculateSkylightSubtracted(1.0f) < 4;
-        		this.worldObj.setWorldTime(oldtime);
-        	}
-        	
-            if (this.worldObj.worldProvider.isNether) {
-                return EnumStatus.NOT_POSSIBLE_HERE;
-            } else if (isDay) {
-                return EnumStatus.NOT_POSSIBLE_NOW;
-            } else if (Math.abs(this.posX - (double)var1) <= 3.0D && Math.abs(this.posY - (double)var2) <= 2.0D && Math.abs(this.posZ - (double)var3) <= 3.0D) {
-                this.setSize(0.2F, 0.2F);
-                this.yOffset = 0.2F;
-                if (this.worldObj.blockExists(var1, var2, var3)) {
-                    int var4 = this.worldObj.getBlockMetadata(var1, var2, var3);
-                    int var5 = BlockBed.getDirectionFromMetadata(var4);
-                    float var6 = 0.5F;
-                    float var7 = 0.5F;
-                    switch(var5) {
-                    case 0:
-                        var7 = 0.9F;
-                        break;
-                    case 1:
-                        var6 = 0.1F;
-                        break;
-                    case 2:
-                        var7 = 0.1F;
-                        break;
-                    case 3:
-                        var6 = 0.9F;
+        if (!this.worldObj.multiplayerWorld) {
+            label53: {
+                if (!this.isPlayerSleeping() && this.isEntityAlive()) {
+                	
+                	boolean isDay = this.worldObj.isDaytime();
+                	if(LockTimeHack.INSTANCE.status) {
+                		long oldtime = this.worldObj.getWorldTime();
+                		this.worldObj.setWorldTime(LockTimeHack.INSTANCE.realTime);
+                		isDay = this.worldObj.calculateSkylightSubtracted(1.0f) < 4;
+                		this.worldObj.setWorldTime(oldtime);
+                	}
+                	
+                    if (this.worldObj.worldProvider.isNether) {
+                        return EnumStatus.NOT_POSSIBLE_HERE;
                     }
 
-                    this.func_22052_e(var5);
-                    this.setPosition((double)((float)var1 + var6), (double)((float)var2 + 0.9375F), (double)((float)var3 + var7));
-                } else {
-                    this.setPosition((double)((float)var1 + 0.5F), (double)((float)var2 + 0.9375F), (double)((float)var3 + 0.5F));
+                    if (isDay) {
+                        return EnumStatus.NOT_POSSIBLE_NOW;
+                    }
+
+                    if (Math.abs(this.posX - (double)var1) <= 3.0D && Math.abs(this.posY - (double)var2) <= 2.0D && Math.abs(this.posZ - (double)var3) <= 3.0D) {
+                        break label53;
+                    }
+
+                    return EnumStatus.TOO_FAR_AWAY;
                 }
 
-                this.sleeping = true;
-                this.sleepTimer = 0;
-                this.bedChunkCoordinates = new ChunkCoordinates(var1, var2, var3);
-                this.motionX = this.motionZ = this.motionY = 0.0D;
-                if (!this.worldObj.multiplayerWorld) {
-                    this.worldObj.updateAllPlayersSleepingFlag();
-                }
-
-                return EnumStatus.OK;
-            } else {
-                return EnumStatus.TOO_FAR_AWAY;
+                return EnumStatus.OTHER_PROBLEM;
             }
-        } else {
-            return EnumStatus.OTHER_PROBLEM;
         }
+
+        this.setSize(0.2F, 0.2F);
+        this.yOffset = 0.2F;
+        if (this.worldObj.blockExists(var1, var2, var3)) {
+            int var4 = this.worldObj.getBlockMetadata(var1, var2, var3);
+            int var5 = BlockBed.getDirectionFromMetadata(var4);
+            float var6 = 0.5F;
+            float var7 = 0.5F;
+            switch(var5) {
+            case 0:
+                var7 = 0.9F;
+                break;
+            case 1:
+                var6 = 0.1F;
+                break;
+            case 2:
+                var7 = 0.1F;
+                break;
+            case 3:
+                var6 = 0.9F;
+            }
+
+            this.func_22052_e(var5);
+            this.setPosition((double)((float)var1 + var6), (double)((float)var2 + 0.9375F), (double)((float)var3 + var7));
+        } else {
+            this.setPosition((double)((float)var1 + 0.5F), (double)((float)var2 + 0.9375F), (double)((float)var3 + 0.5F));
+        }
+
+        this.sleeping = true;
+        this.sleepTimer = 0;
+        this.bedChunkCoordinates = new ChunkCoordinates(var1, var2, var3);
+        this.motionX = this.motionZ = this.motionY = 0.0D;
+        if (!this.worldObj.multiplayerWorld) {
+            this.worldObj.updateAllPlayersSleepingFlag();
+        }
+
+        return EnumStatus.OK;
     }
 
     private void func_22052_e(int var1) {
@@ -717,7 +743,7 @@ public abstract class EntityPlayer extends EntityLiving {
 
     }
 
-    public void func_27026_a(StatBase var1) {
+    public void triggerAchievement(StatBase var1) {
         this.addStat(var1, 1);
     }
 
@@ -726,7 +752,7 @@ public abstract class EntityPlayer extends EntityLiving {
 
     protected void jump() {
         super.jump();
-        this.addStat(StatList.field_25171_q, 1);
+        this.addStat(StatList.jumpStat, 1);
     }
 
     public void moveEntityWithHeading(float var1, float var2) {
@@ -743,47 +769,47 @@ public abstract class EntityPlayer extends EntityLiving {
             if (this.isInsideOfMaterial(Material.water)) {
                 var7 = Math.round(MathHelper.sqrt_double(var1 * var1 + var3 * var3 + var5 * var5) * 100.0F);
                 if (var7 > 0) {
-                    this.addStat(StatList.field_25173_p, var7);
+                    this.addStat(StatList.distanceDoveStat, var7);
                 }
-            } else if (this.func_27013_ag()) {
+            } else if (this.isInWater()) {
                 var7 = Math.round(MathHelper.sqrt_double(var1 * var1 + var5 * var5) * 100.0F);
                 if (var7 > 0) {
-                    this.addStat(StatList.field_25177_l, var7);
+                    this.addStat(StatList.distanceSwumStat, var7);
                 }
             } else if (this.isOnLadder()) {
                 if (var3 > 0.0D) {
-                    this.addStat(StatList.field_25175_n, (int)Math.round(var3 * 100.0D));
+                    this.addStat(StatList.distanceClimbedStat, (int)Math.round(var3 * 100.0D));
                 }
             } else if (this.onGround) {
                 var7 = Math.round(MathHelper.sqrt_double(var1 * var1 + var5 * var5) * 100.0F);
                 if (var7 > 0) {
-                    this.addStat(StatList.field_25178_k, var7);
+                    this.addStat(StatList.distanceWalkedStat, var7);
                 }
             } else {
                 var7 = Math.round(MathHelper.sqrt_double(var1 * var1 + var5 * var5) * 100.0F);
                 if (var7 > 25) {
-                    this.addStat(StatList.field_25174_o, var7);
+                    this.addStat(StatList.distanceFlownStat, var7);
                 }
             }
 
         }
     }
 
-    private void func_27024_i(double var1, double var3, double var5) {
+    private void addMountedMovementStat(double var1, double var3, double var5) {
         if (this.ridingEntity != null) {
             int var7 = Math.round(MathHelper.sqrt_double(var1 * var1 + var3 * var3 + var5 * var5) * 100.0F);
             if (var7 > 0) {
                 if (this.ridingEntity instanceof EntityMinecart) {
-                    this.addStat(StatList.field_27364_r, var7);
-                    if (this.field_26907_d == null) {
-                        this.field_26907_d = new ChunkCoordinates(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
-                    } else if (this.field_26907_d.func_27439_a(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) >= 1000.0D) {
-                        this.addStat(AchievementList.field_27379_q, 1);
+                    this.addStat(StatList.distanceByMinecartStat, var7);
+                    if (this.startMinecartRidingCoordinate == null) {
+                        this.startMinecartRidingCoordinate = new ChunkCoordinates(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
+                    } else if (this.startMinecartRidingCoordinate.getSqDistanceTo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) >= 1000.0D) {
+                        this.addStat(AchievementList.onARail, 1);
                     }
                 } else if (this.ridingEntity instanceof EntityBoat) {
-                    this.addStat(StatList.field_27363_s, var7);
+                    this.addStat(StatList.distanceByBoatStat, var7);
                 } else if (this.ridingEntity instanceof EntityPig) {
-                    this.addStat(StatList.field_27362_t, var7);
+                    this.addStat(StatList.distanceByPigStat, var7);
                 }
             }
         }
@@ -792,16 +818,33 @@ public abstract class EntityPlayer extends EntityLiving {
 
     protected void fall(float var1) {
         if (var1 >= 2.0F) {
-            this.addStat(StatList.field_25176_m, (int)Math.round((double)var1 * 100.0D));
+            this.addStat(StatList.distanceFallenStat, (int)Math.round((double)var1 * 100.0D));
         }
 
         super.fall(var1);
     }
 
-    public void func_27015_a(EntityLiving var1) {
+    public void onKillEntity(EntityLiving var1) {
         if (var1 instanceof EntityMob) {
-            this.func_27026_a(AchievementList.field_27377_s);
+            this.triggerAchievement(AchievementList.killEnemy);
         }
 
+    }
+
+    public int getItemIcon(ItemStack var1) {
+        int var2 = super.getItemIcon(var1);
+        if (var1.itemID == Item.fishingRod.shiftedIndex && this.fishEntity != null) {
+            var2 = var1.getIconIndex() + 16;
+        }
+
+        return var2;
+    }
+
+    public void setInPortal() {
+        if (this.field_28024_y > 0) {
+            this.field_28024_y = 10;
+        } else {
+            this.inPortal = true;
+        }
     }
 }

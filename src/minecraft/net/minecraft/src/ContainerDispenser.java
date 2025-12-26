@@ -10,7 +10,7 @@ public class ContainerDispenser extends Container {
         int var4;
         for(var3 = 0; var3 < 3; ++var3) {
             for(var4 = 0; var4 < 3; ++var4) {
-                this.addSlot(new Slot(var2, var4 + var3 * 3, 61 + var4 * 18, 17 + var3 * 18));
+                this.addSlot(new Slot(var2, var4 + var3 * 3, 62 + var4 * 18, 17 + var3 * 18));
             }
         }
 

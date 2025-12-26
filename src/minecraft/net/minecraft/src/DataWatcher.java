@@ -32,11 +32,11 @@ public class DataWatcher {
         return (Byte)((WatchableObject)this.watchedObjects.get(var1)).getObject();
     }
 
-    public int func_25115_b(int var1) {
+    public int getWatchableObjectInt(int var1) {
         return (Integer)((WatchableObject)this.watchedObjects.get(var1)).getObject();
     }
 
-    public String func_25116_c(int var1) {
+    public String getWatchableObjectString(int var1) {
         return (String)((WatchableObject)this.watchedObjects.get(var1)).getObject();
     }
 
@@ -91,7 +91,7 @@ public class DataWatcher {
             var0.writeFloat((Float)var1.getObject());
             break;
         case 4:
-            Packet.func_27049_a((String)var1.getObject(), var0);
+            Packet.writeString((String)var1.getObject(), var0);
             break;
         case 5:
             ItemStack var4 = (ItemStack)var1.getObject();
@@ -133,7 +133,7 @@ public class DataWatcher {
                 var5 = new WatchableObject(var3, var4, var0.readFloat());
                 break;
             case 4:
-                var5 = new WatchableObject(var3, var4, Packet.func_27048_a(var0, 64));
+                var5 = new WatchableObject(var3, var4, Packet.readString(var0, 64));
                 break;
             case 5:
                 short var9 = var0.readShort();

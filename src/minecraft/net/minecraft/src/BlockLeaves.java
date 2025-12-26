@@ -130,7 +130,7 @@ public class BlockLeaves extends BlockLeavesBase {
 
                 var12 = this.adjacentTreeBlocks[var11 * var10 + var11 * var9 + var11];
                 if (var12 >= 0) {
-                    var1.setBlockMetadataWithNotify(var2, var3, var4, var6 & -9);
+                    var1.setBlockMetadata(var2, var3, var4, var6 & -9);
                 } else {
                     this.removeLeaves(var1, var2, var3, var4);
                 }

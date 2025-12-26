@@ -59,7 +59,7 @@ public class EntityFallingSand extends Entity {
                 this.motionZ *= 0.699999988079071D;
                 this.motionY *= -0.5D;
                 this.setEntityDead();
-                if ((!this.worldObj.canBlockBePlacedAt(this.blockID, var1, var2, var3, true) || !this.worldObj.setBlockWithNotify(var1, var2, var3, this.blockID)) && !this.worldObj.multiplayerWorld) {
+                if ((!this.worldObj.canBlockBePlacedAt(this.blockID, var1, var2, var3, true, 1) || BlockSand.canFallBelow(this.worldObj, var1, var2 - 1, var3) || !this.worldObj.setBlockWithNotify(var1, var2, var3, this.blockID)) && !this.worldObj.multiplayerWorld) {
                     this.dropItem(this.blockID, 1);
                 }
             } else if (this.fallTime > 100 && !this.worldObj.multiplayerWorld) {
@@ -82,7 +82,7 @@ public class EntityFallingSand extends Entity {
         return 0.0F;
     }
 
-    public World func_465_i() {
+    public World getWorld() {
         return this.worldObj;
     }
 }

@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import net.skidcode.gh.maybeaclient.Client;
+
 public class ScaledResolution {
     private int scaledWidth;
     private int scaledHeight;
@@ -33,4 +35,15 @@ public class ScaledResolution {
     public int getScaledHeight() {
         return this.scaledHeight;
     }
+
+    //XXX MaybeAClient
+    static {
+    	Client.class.getClass();
+    }
+    public int screenX(double x) {
+		return (int)(x * scaleFactor);
+	}
+	public int screenY(double y) {
+		return (int)(y * scaleFactor);
+	}
 }

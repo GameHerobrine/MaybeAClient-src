@@ -23,7 +23,7 @@ public class ClientInfoHack extends Hack{
 	public SettingBoolean fps = new SettingBoolean(this, "Show fps", false);
 	public SettingBoolean username = new SettingBoolean(this, "Show username", false);
 	public SettingBoolean showNetherCoords;
-	public SettingMode isInNether = new SettingMode(this, "IsInNether", "Detect", "Nether", "Overworld");
+	
 	public SettingBoolean walkingSpeed;
 	public SettingBoolean useHorizontal = new SettingBoolean(this, "Use horizontal speed", true);
 	
@@ -39,7 +39,6 @@ public class ClientInfoHack extends Hack{
 			@Override
 			public void setValue(boolean value) {
 				super.setValue(value);
-				ClientInfoHack.instance.isInNether.hidden = !this.value;
 			}
 		};
 		
@@ -61,7 +60,6 @@ public class ClientInfoHack extends Hack{
 		
 		this.addSetting(coords);
 		this.addSetting(this.showNetherCoords);
-		this.addSetting(this.isInNether);
 		this.addSetting(facing);
 		this.addSetting(fps);
 		this.addSetting(username);

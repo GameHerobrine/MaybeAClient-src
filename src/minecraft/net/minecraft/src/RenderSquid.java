@@ -43,7 +43,7 @@ public class RenderSquid extends RenderLiving {
 
     // $FF: synthetic method
     // $FF: bridge method
-    protected void func_21004_a(EntityLiving var1, float var2, float var3, float var4) {
+    protected void rotateCorpse(EntityLiving var1, float var2, float var3, float var4) {
         this.func_21007_a((EntitySquid)var1, var2, var3, var4);
     }
 

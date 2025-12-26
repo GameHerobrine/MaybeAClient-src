@@ -10,22 +10,22 @@ public class ModelQuadruped extends ModelBase {
 
     public ModelQuadruped(int var1, float var2) {
         this.head.addBox(-4.0F, -4.0F, -8.0F, 8, 8, 8, var2);
-        this.head.setPosition(0.0F, (float)(18 - var1), -6.0F);
+        this.head.setRotationPoint(0.0F, (float)(18 - var1), -6.0F);
         this.body = new ModelRenderer(28, 8);
         this.body.addBox(-5.0F, -10.0F, -7.0F, 10, 16, 8, var2);
-        this.body.setPosition(0.0F, (float)(17 - var1), 2.0F);
+        this.body.setRotationPoint(0.0F, (float)(17 - var1), 2.0F);
         this.leg1 = new ModelRenderer(0, 16);
         this.leg1.addBox(-2.0F, 0.0F, -2.0F, 4, var1, 4, var2);
-        this.leg1.setPosition(-3.0F, (float)(24 - var1), 7.0F);
+        this.leg1.setRotationPoint(-3.0F, (float)(24 - var1), 7.0F);
         this.leg2 = new ModelRenderer(0, 16);
         this.leg2.addBox(-2.0F, 0.0F, -2.0F, 4, var1, 4, var2);
-        this.leg2.setPosition(3.0F, (float)(24 - var1), 7.0F);
+        this.leg2.setRotationPoint(3.0F, (float)(24 - var1), 7.0F);
         this.leg3 = new ModelRenderer(0, 16);
         this.leg3.addBox(-2.0F, 0.0F, -2.0F, 4, var1, 4, var2);
-        this.leg3.setPosition(-3.0F, (float)(24 - var1), -5.0F);
+        this.leg3.setRotationPoint(-3.0F, (float)(24 - var1), -5.0F);
         this.leg4 = new ModelRenderer(0, 16);
         this.leg4.addBox(-2.0F, 0.0F, -2.0F, 4, var1, 4, var2);
-        this.leg4.setPosition(3.0F, (float)(24 - var1), -5.0F);
+        this.leg4.setRotationPoint(3.0F, (float)(24 - var1), -5.0F);
     }
 
     public void render(float var1, float var2, float var3, float var4, float var5, float var6) {

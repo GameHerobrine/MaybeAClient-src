@@ -127,13 +127,13 @@ public class GuiCreateWorld extends GuiScreen {
         super.drawScreen(var1, var2, var3);
     }
 
-    public void func_27108_j() {
+    public void selectNextField() {
         if (this.textboxWorldName.isFocused) {
-            this.textboxWorldName.func_27106_a(false);
-            this.textboxSeed.func_27106_a(true);
+            this.textboxWorldName.setFocused(false);
+            this.textboxSeed.setFocused(true);
         } else {
-            this.textboxWorldName.func_27106_a(true);
-            this.textboxSeed.func_27106_a(false);
+            this.textboxWorldName.setFocused(true);
+            this.textboxSeed.setFocused(false);
         }
 
     }

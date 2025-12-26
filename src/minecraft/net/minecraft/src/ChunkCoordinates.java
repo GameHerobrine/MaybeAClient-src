@@ -33,7 +33,7 @@ public class ChunkCoordinates implements Comparable {
         return this.x + this.z << 8 + this.y << 16;
     }
 
-    public int func_22393_a(ChunkCoordinates var1) {
+    public int compareChunkCoordinate(ChunkCoordinates var1) {
         if (this.y == var1.y) {
             return this.z == var1.z ? this.x - var1.x : this.z - var1.z;
         } else {
@@ -41,7 +41,7 @@ public class ChunkCoordinates implements Comparable {
         }
     }
 
-    public double func_27439_a(int var1, int var2, int var3) {
+    public double getSqDistanceTo(int var1, int var2, int var3) {
         int var4 = this.x - var1;
         int var5 = this.y - var2;
         int var6 = this.z - var3;
@@ -51,6 +51,6 @@ public class ChunkCoordinates implements Comparable {
     // $FF: synthetic method
     // $FF: bridge method
     public int compareTo(Object var1) {
-        return this.func_22393_a((ChunkCoordinates)var1);
+        return this.compareChunkCoordinate((ChunkCoordinates)var1);
     }
 }

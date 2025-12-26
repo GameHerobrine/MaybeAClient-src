@@ -178,7 +178,7 @@ public class SoundManager {
         }
     }
 
-    public void func_337_a(String var1, float var2, float var3) {
+    public void playSoundFX(String var1, float var2, float var3) {
         if (loaded && this.options.soundVolume != 0.0F) {
             SoundPoolEntry var4 = this.soundPoolSounds.getRandomSoundFromSoundPool(var1);
             if (var4 != null) {

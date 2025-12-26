@@ -1,12 +1,11 @@
 package net.skidcode.gh.maybeaclient.hacks.settings;
 
 import java.util.HashMap;
-import net.skidcode.gh.maybeaclient.hacks.Hack;
 
 public class SettingEnum<T extends Enum<T>> extends SettingMode{
 	public HashMap<String, T> map;
-	//private String currentMode = "";
-	public SettingEnum(Hack hack, String name, T def) {
+	
+	public SettingEnum(SettingsProvider hack, String name, T def) {
 		super(hack, name, getValues(def));
 	}
 	

@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.skidcode.gh.maybeaclient.hacks.InventoryTweaksHack;
-
 public abstract class Container {
     public List field_20123_d = new ArrayList();
     public List slots = new ArrayList();
@@ -41,17 +39,17 @@ public abstract class Container {
         return (Slot)this.slots.get(var1);
     }
 
-    public ItemStack func_27279_a(int var1) {
+    public ItemStack getStackInSlot(int var1) {
         Slot var2 = (Slot)this.slots.get(var1);
         return var2 != null ? var2.getStack() : null;
     }
 
-    public ItemStack func_27280_a(int moveTo, int var2, boolean holdingShift, EntityPlayer var4) {
+    public ItemStack func_27280_a(int var1, int var2, boolean var3, EntityPlayer var4) {
         ItemStack var5 = null;
         if (var2 == 0 || var2 == 1) {
             InventoryPlayer var6 = var4.inventory;
-            if (moveTo == -999) {
-                if (var6.getItemStack() != null && moveTo == -999) {
+            if (var1 == -999) {
+                if (var6.getItemStack() != null && var1 == -999) {
                     if (var2 == 0) {
                         var4.dropPlayerItem(var6.getItemStack());
                         var6.setItemStack((ItemStack)null);
@@ -64,92 +62,79 @@ public abstract class Container {
                         }
                     }
                 }
-            } else if (holdingShift) {
-                ItemStack var7 = this.func_27279_a(moveTo);
-                if (var7 != null) {
-                	int origStackSize = var7.stackSize;
-                    var5 = var7.copy();
-                    if(InventoryTweaksHack.instance.status) {
-                    	Slot sltTo = (Slot) this.slots.get(moveTo);
-                    	if(sltTo != null && sltTo.getStack() != null) {
-                    		int stackSize2 = sltTo.getStack().stackSize;
-                    		if(stackSize2 < origStackSize) {
-                    			func_27280_a(moveTo, var2, holdingShift, var4);
-                    		}
-                    	}
-                    }
-                }
             } else {
-                Slot var12 = (Slot)this.slots.get(moveTo);
-                if (var12 != null) {
-                    var12.onSlotChanged();
-                    ItemStack var8 = var12.getStack();
-                    ItemStack var9 = var6.getItemStack();
-                    if (var8 != null) {
-                        var5 = var8.copy();
-                    }
-
-                    int var10;
-                    if (var8 == null) {
-                        if (var9 != null && var12.isItemValid(var9)) {
-                            var10 = var2 == 0 ? var9.stackSize : 1;
-                            if (var10 > var12.getSlotStackLimit()) {
-                                var10 = var12.getSlotStackLimit();
-                            }
-
-                            var12.putStack(var9.splitStack(var10));
-                            if (var9.stackSize == 0) {
-                                var6.setItemStack((ItemStack)null);
+                int var10;
+                if (var3) {
+                    ItemStack var7 = this.getStackInSlot(var1);
+                    if (var7 != null) {
+                        int var8 = var7.stackSize;
+                        var5 = var7.copy();
+                        Slot var9 = (Slot)this.slots.get(var1);
+                        if (var9 != null && var9.getStack() != null) {
+                            var10 = var9.getStack().stackSize;
+                            if (var10 < var8) {
+                                this.func_27280_a(var1, var2, var3, var4);
                             }
                         }
-                    } else {
-                        ItemStack var11;
-                        if (var9 == null) {
-                            var10 = var2 == 0 ? var8.stackSize : (var8.stackSize + 1) / 2;
-                            var11 = var12.decrStackSize(var10);
-                            if (var11 != null && var12.func_25014_f()) {
-                                var4.addStat(StatList.field_25158_z[var11.itemID], var11.stackSize);
-                            }
+                    }
+                } else {
+                    Slot var12 = (Slot)this.slots.get(var1);
+                    if (var12 != null) {
+                        var12.onSlotChanged();
+                        ItemStack var13 = var12.getStack();
+                        ItemStack var14 = var6.getItemStack();
+                        if (var13 != null) {
+                            var5 = var13.copy();
+                        }
 
+                        if (var13 == null) {
+                            if (var14 != null && var12.isItemValid(var14)) {
+                                var10 = var2 == 0 ? var14.stackSize : 1;
+                                if (var10 > var12.getSlotStackLimit()) {
+                                    var10 = var12.getSlotStackLimit();
+                                }
+
+                                var12.putStack(var14.splitStack(var10));
+                                if (var14.stackSize == 0) {
+                                    var6.setItemStack((ItemStack)null);
+                                }
+                            }
+                        } else if (var14 == null) {
+                            var10 = var2 == 0 ? var13.stackSize : (var13.stackSize + 1) / 2;
+                            ItemStack var11 = var12.decrStackSize(var10);
                             var6.setItemStack(var11);
-                            if (var8.stackSize == 0) {
+                            if (var13.stackSize == 0) {
                                 var12.putStack((ItemStack)null);
                             }
 
                             var12.onPickupFromSlot(var6.getItemStack());
-                        } else if (var12.isItemValid(var9)) {
-                            if (var8.itemID != var9.itemID || var8.getHasSubtypes() && var8.getItemDamage() != var9.getItemDamage()) {
-                                if (var9.stackSize <= var12.getSlotStackLimit()) {
-                                    var12.putStack(var9);
-                                    var6.setItemStack(var8);
-                                }
-                            } else {
-                                var10 = var2 == 0 ? var9.stackSize : 1;
-                                if (var10 > var12.getSlotStackLimit() - var8.stackSize) {
-                                    var10 = var12.getSlotStackLimit() - var8.stackSize;
+                        } else if (var12.isItemValid(var14)) {
+                            if (var13.itemID == var14.itemID && (!var13.getHasSubtypes() || var13.getItemDamage() == var14.getItemDamage())) {
+                                var10 = var2 == 0 ? var14.stackSize : 1;
+                                if (var10 > var12.getSlotStackLimit() - var13.stackSize) {
+                                    var10 = var12.getSlotStackLimit() - var13.stackSize;
                                 }
 
-                                if (var10 > var9.getMaxStackSize() - var8.stackSize) {
-                                    var10 = var9.getMaxStackSize() - var8.stackSize;
+                                if (var10 > var14.getMaxStackSize() - var13.stackSize) {
+                                    var10 = var14.getMaxStackSize() - var13.stackSize;
                                 }
 
-                                var9.splitStack(var10);
-                                if (var9.stackSize == 0) {
+                                var14.splitStack(var10);
+                                if (var14.stackSize == 0) {
                                     var6.setItemStack((ItemStack)null);
                                 }
 
-                                var8.stackSize += var10;
+                                var13.stackSize += var10;
+                            } else if (var14.stackSize <= var12.getSlotStackLimit()) {
+                                var12.putStack(var14);
+                                var6.setItemStack(var13);
                             }
-                        } else if (var8.itemID == var9.itemID && var9.getMaxStackSize() > 1 && (!var8.getHasSubtypes() || var8.getItemDamage() == var9.getItemDamage())) {
-                            var10 = var8.stackSize;
-                            if (var10 > 0 && var10 + var9.stackSize <= var9.getMaxStackSize()) {
-                                var9.stackSize += var10;
-                                var11 = var8.splitStack(var10);
-                                if (var11 != null && var12.func_25014_f()) {
-                                    var4.addStat(StatList.field_25158_z[var11.itemID], var11.stackSize);
-                                }
-
-                                if (var8.stackSize == 0) {
+                        } else if (var13.itemID == var14.itemID && var14.getMaxStackSize() > 1 && (!var13.getHasSubtypes() || var13.getItemDamage() == var14.getItemDamage())) {
+                            var10 = var13.stackSize;
+                            if (var10 > 0 && var10 + var14.stackSize <= var14.getMaxStackSize()) {
+                                var14.stackSize += var10;
+                                var13.splitStack(var10);
+                                if (var13.stackSize == 0) {
                                     var12.putStack((ItemStack)null);
                                 }
 
@@ -188,80 +173,6 @@ public abstract class Container {
 
     }
 
-    protected void invtweaks_func28125a(ItemStack itemstack, int slt, int j, boolean flag)
-    {
-        int k = slt;
-        if(flag)
-        {
-            k = j - 1;
-        }
-        if(itemstack.func_21180_d())
-        {
-            while(itemstack.stackSize > 0 && (!flag && k < j || flag && k >= slt)) 
-            {
-                Slot slot = (Slot)slots.get(k);
-                ItemStack itemstack1 = slot.getStack();
-                if(itemstack1 != null && itemstack1.itemID == itemstack.itemID && (!itemstack.getHasSubtypes() || itemstack.getItemDamage() == itemstack1.getItemDamage()))
-                {
-                    int i1 = itemstack1.stackSize + itemstack.stackSize;
-                    if(i1 <= itemstack.getMaxStackSize())
-                    {
-                        itemstack.stackSize = 0;
-                        itemstack1.stackSize = i1;
-                        slot.onSlotChanged();
-                    } else
-                    if(itemstack1.stackSize < itemstack.getMaxStackSize())
-                    {
-                        itemstack.stackSize -= itemstack.getMaxStackSize() - itemstack1.stackSize;
-                        itemstack1.stackSize = itemstack.getMaxStackSize();
-                        slot.onSlotChanged();
-                    }
-                }
-                if(flag)
-                {
-                    k--;
-                } else
-                {
-                    k++;
-                }
-            }
-        }
-        if(itemstack.stackSize > 0)
-        {
-            int l;
-            if(flag)
-            {
-                l = j - 1;
-            } else
-            {
-                l = slt;
-            }
-            do
-            {
-                if((flag || l >= j) && (!flag || l < slt))
-                {
-                    break;
-                }
-                Slot slot1 = (Slot)slots.get(l);
-                ItemStack itemstack2 = slot1.getStack();
-                if(itemstack2 == null)
-                {
-                    slot1.putStack(itemstack.copy());
-                    slot1.onSlotChanged();
-                    itemstack.stackSize = 0;
-                    break;
-                }
-                if(flag)
-                {
-                    l--;
-                } else
-                {
-                    l++;
-                }
-            } while(true);
-        }
-    }
-    
     public void func_20112_a(int var1, int var2) {
     }
 
@@ -277,4 +188,64 @@ public abstract class Container {
     }
 
     public abstract boolean isUsableByPlayer(EntityPlayer var1);
+
+    protected void func_28125_a(ItemStack var1, int var2, int var3, boolean var4) {
+        int var5 = var2;
+        if (var4) {
+            var5 = var3 - 1;
+        }
+
+        Slot var6;
+        ItemStack var7;
+        if (var1.isStackable()) {
+            while(var1.stackSize > 0 && (!var4 && var5 < var3 || var4 && var5 >= var2)) {
+                var6 = (Slot)this.slots.get(var5);
+                var7 = var6.getStack();
+                if (var7 != null && var7.itemID == var1.itemID && (!var1.getHasSubtypes() || var1.getItemDamage() == var7.getItemDamage())) {
+                    int var8 = var7.stackSize + var1.stackSize;
+                    if (var8 <= var1.getMaxStackSize()) {
+                        var1.stackSize = 0;
+                        var7.stackSize = var8;
+                        var6.onSlotChanged();
+                    } else if (var7.stackSize < var1.getMaxStackSize()) {
+                        var1.stackSize -= var1.getMaxStackSize() - var7.stackSize;
+                        var7.stackSize = var1.getMaxStackSize();
+                        var6.onSlotChanged();
+                    }
+                }
+
+                if (var4) {
+                    --var5;
+                } else {
+                    ++var5;
+                }
+            }
+        }
+
+        if (var1.stackSize > 0) {
+            if (var4) {
+                var5 = var3 - 1;
+            } else {
+                var5 = var2;
+            }
+
+            while(!var4 && var5 < var3 || var4 && var5 >= var2) {
+                var6 = (Slot)this.slots.get(var5);
+                var7 = var6.getStack();
+                if (var7 == null) {
+                    var6.putStack(var1.copy());
+                    var6.onSlotChanged();
+                    var1.stackSize = 0;
+                    break;
+                }
+
+                if (var4) {
+                    --var5;
+                } else {
+                    ++var5;
+                }
+            }
+        }
+
+    }
 }

@@ -41,6 +41,7 @@ public class EntityESPHack extends Hack{
 	
 	public static EntityESPHack instance;
 	public static boolean allowRendering = false;
+	public static boolean currentlyRendering = false;
 	
 	@Override
 	public String getPrefix() {

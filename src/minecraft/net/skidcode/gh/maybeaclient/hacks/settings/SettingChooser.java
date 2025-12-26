@@ -5,6 +5,7 @@ import java.util.HashMap;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
@@ -18,7 +19,7 @@ public class SettingChooser extends Setting{
 	public boolean[] initial;
 	public boolean minimized = false;
 	
-	public SettingChooser(Hack hack, String name, String[] choices, boolean[] initial) {
+	public SettingChooser(SettingsProvider hack, String name, String[] choices, boolean[] initial) {
 		super(hack, name);
 		if(choices.length != initial.length) throw new RuntimeException("Lengths of choices and initial are different!");
 		
@@ -119,18 +120,19 @@ public class SettingChooser extends Setting{
 	}
 	
 	@Override
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int yReduce = ClickGUIHack.theme().settingYreduce;
 		
 		if(this.minimized) return;
+		if(ClickGUIHack.theme() == Theme.IRIDIUM) return;
 		if(ClickGUIHack.theme() == Theme.NODUS) {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
 		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS){
 			
 		}else{
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 		
 		yStart += ySpace;
@@ -146,14 +148,14 @@ public class SettingChooser extends Setting{
 					b = ClickGUIHack.b();
 					a = 255/255f;
 				}
-				tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - 7, yStart+3, xEnd - Theme.HEPH_OPT_XADD + 1, yStart + ySpace - 3, r, g, b, a);
-				tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - 7, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD + 1, (double)yStart + ySpace - 3);
+				Tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - 7, yStart+3, xEnd - Theme.HEPH_OPT_XADD + 1, yStart + ySpace - 3, r, g, b, a);
+				Tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - 7, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD + 1, (double)yStart + ySpace - 3);
 				
 			}else if(bb) {
 				if(ClickGUIHack.theme() == Theme.NODUS) {
-					tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+					Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
 				}else {
-					tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+					Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 				}
 			}
 			yStart += ySpace;
@@ -161,7 +163,7 @@ public class SettingChooser extends Setting{
 	}
 	public int lastPressed = -1;
 	@Override
-	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		if(this.lastPressed != -1) return;
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int diff = mouseY - yMin;
@@ -187,11 +189,11 @@ public class SettingChooser extends Setting{
 	}
 	
 	@Override
-	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onDeselect(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		this.lastPressed = -1;
 	}
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int txtColor = 0xffffff;
 		if(ClickGUIHack.theme() == Theme.NODUS) {
@@ -203,7 +205,16 @@ public class SettingChooser extends Setting{
 				}
 			}
 		}
-		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+		
+		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+			if(this == NoRenderHack.instance.particles) {
+				txtColor = this.minimized ? Theme.IRIDIUM_DISABLED_COLOR : Theme.IRIDIUM_ENABLED_COLOR;
+			}else {
+				txtColor = Theme.IRIDIUM_ENABLED_COLOR;
+			}
+			
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			if(this == NoRenderHack.instance.particles) {
 				txtColor = this.minimized ? Theme.HEPH_DISABLED_COLOR : 0xffffff;
 			}
@@ -230,7 +241,11 @@ public class SettingChooser extends Setting{
 					}
 				}
 			}
-			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+				int color = txtColor = !this.getValue(this.choices[i]) ? Theme.IRIDIUM_DISABLED_COLOR : Theme.IRIDIUM_ENABLED_COLOR;
+				
+				Client.mc.fontRenderer.drawStringWithShadow(this.choices[i], rx + 2, ry + i*ySpace + ClickGUIHack.theme().yaddtocenterText, color);
+			}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				int color = 0xffffff;
 				//if(!this.getValue(this.choices[i])) color = Theme.HEPH_DISABLED_COLOR;
 				

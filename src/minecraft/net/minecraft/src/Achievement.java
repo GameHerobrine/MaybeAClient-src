@@ -1,13 +1,13 @@
 package net.minecraft.src;
 
 public class Achievement extends StatBase {
-    public final int field_25075_a;
-    public final int field_25074_b;
-    public final Achievement field_25076_c;
-    private final String field_27096_l;
-    private IStatStringFormat field_27095_m;
-    public final ItemStack field_27097_d;
-    private boolean field_27098_n;
+    public final int displayColumn;
+    public final int displayRow;
+    public final Achievement parentAchievement;
+    private final String achievementDescription;
+    private IStatStringFormat statStringFormatter;
+    public final ItemStack theItemStack;
+    private boolean isSpecial;
 
     public Achievement(int var1, String var2, int var3, int var4, Item var5, Achievement var6) {
         this(var1, var2, var3, var4, new ItemStack(var5), var6);
@@ -19,27 +19,27 @@ public class Achievement extends StatBase {
 
     public Achievement(int var1, String var2, int var3, int var4, ItemStack var5, Achievement var6) {
         super(5242880 + var1, StatCollector.translateToLocal("achievement." + var2));
-        this.field_27097_d = var5;
-        this.field_27096_l = StatCollector.translateToLocal("achievement." + var2 + ".desc");
-        this.field_25075_a = var3;
-        this.field_25074_b = var4;
-        if (var3 < AchievementList.field_27392_a) {
-            AchievementList.field_27392_a = var3;
+        this.theItemStack = var5;
+        this.achievementDescription = StatCollector.translateToLocal("achievement." + var2 + ".desc");
+        this.displayColumn = var3;
+        this.displayRow = var4;
+        if (var3 < AchievementList.minDisplayColumn) {
+            AchievementList.minDisplayColumn = var3;
         }
 
-        if (var4 < AchievementList.field_27391_b) {
-            AchievementList.field_27391_b = var4;
+        if (var4 < AchievementList.minDisplayRow) {
+            AchievementList.minDisplayRow = var4;
         }
 
-        if (var3 > AchievementList.field_27390_c) {
-            AchievementList.field_27390_c = var3;
+        if (var3 > AchievementList.maxDisplayColumn) {
+            AchievementList.maxDisplayColumn = var3;
         }
 
-        if (var4 > AchievementList.field_27389_d) {
-            AchievementList.field_27389_d = var4;
+        if (var4 > AchievementList.maxDisplayRow) {
+            AchievementList.maxDisplayRow = var4;
         }
 
-        this.field_25076_c = var6;
+        this.parentAchievement = var6;
     }
 
     public Achievement func_27089_a() {
@@ -47,14 +47,14 @@ public class Achievement extends StatBase {
         return this;
     }
 
-    public Achievement func_27094_b() {
-        this.field_27098_n = true;
+    public Achievement setSpecial() {
+        this.isSpecial = true;
         return this;
     }
 
-    public Achievement func_27091_c() {
-        super.func_25068_c();
-        AchievementList.field_27388_e.add(this);
+    public Achievement registerAchievement() {
+        super.registerStat();
+        AchievementList.achievementList.add(this);
         return this;
     }
 
@@ -62,23 +62,23 @@ public class Achievement extends StatBase {
         return true;
     }
 
-    public String func_27090_e() {
-        return this.field_27095_m != null ? this.field_27095_m.func_27343_a(this.field_27096_l) : this.field_27096_l;
+    public String getDescription() {
+        return this.statStringFormatter != null ? this.statStringFormatter.formatString(this.achievementDescription) : this.achievementDescription;
     }
 
-    public Achievement func_27092_a(IStatStringFormat var1) {
-        this.field_27095_m = var1;
+    public Achievement setStatStringFormatter(IStatStringFormat var1) {
+        this.statStringFormatter = var1;
         return this;
     }
 
-    public boolean func_27093_f() {
-        return this.field_27098_n;
+    public boolean getSpecial() {
+        return this.isSpecial;
     }
 
     // $FF: synthetic method
     // $FF: bridge method
-    public StatBase func_25068_c() {
-        return this.func_27091_c();
+    public StatBase registerStat() {
+        return this.registerAchievement();
     }
 
     // $FF: synthetic method

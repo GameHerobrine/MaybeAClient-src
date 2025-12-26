@@ -50,8 +50,4 @@ public class Slot {
     public ItemStack decrStackSize(int var1) {
         return this.inventory.decrStackSize(this.slotIndex, var1);
     }
-
-    public boolean func_25014_f() {
-        return false;
-    }
 }

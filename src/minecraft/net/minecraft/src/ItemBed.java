@@ -30,7 +30,7 @@ public class ItemBed extends Item {
                 var10 = 1;
             }
 
-            if (var3.isAirBlock(var4, var5, var6) && var3.isAirBlock(var4 + var10, var5, var6 + var11) && var3.isBlockOpaqueCube(var4, var5 - 1, var6) && var3.isBlockOpaqueCube(var4 + var10, var5 - 1, var6 + var11)) {
+            if (var3.isAirBlock(var4, var5, var6) && var3.isAirBlock(var4 + var10, var5, var6 + var11) && var3.func_28100_h(var4, var5 - 1, var6) && var3.func_28100_h(var4 + var10, var5 - 1, var6 + var11)) {
                 var3.setBlockAndMetadataWithNotify(var4, var5, var6, var8.blockID, var9);
                 var3.setBlockAndMetadataWithNotify(var4 + var10, var5, var6 + var11, var8.blockID, var9 + 8);
                 --var1.stackSize;

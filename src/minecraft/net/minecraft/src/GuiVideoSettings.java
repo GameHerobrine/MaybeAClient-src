@@ -36,7 +36,7 @@ public class GuiVideoSettings extends GuiScreen {
         if (var1.enabled) {
             if (var1.id < 100 && var1 instanceof GuiSmallButton) {
                 this.field_22109_i.setOptionValue(((GuiSmallButton)var1).returnEnumOptions(), 1);
-                var1.displayString = this.field_22109_i.getKeyBinding(EnumOptions.func_20137_a(var1.id));
+                var1.displayString = this.field_22109_i.getKeyBinding(EnumOptions.getEnumOptions(var1.id));
             }
 
             if (var1.id == 200) {
@@ -58,6 +58,6 @@ public class GuiVideoSettings extends GuiScreen {
     }
 
     static {
-        field_22108_k = new EnumOptions[]{EnumOptions.GRAPHICS, EnumOptions.RENDER_DISTANCE, EnumOptions.LIMIT_FRAMERATE, EnumOptions.ANAGLYPH, EnumOptions.VIEW_BOBBING, EnumOptions.AMBIENT_OCCLUSION, EnumOptions.GUI_SCALE, EnumOptions.ADVANCED_OPENGL};
+        field_22108_k = new EnumOptions[]{EnumOptions.GRAPHICS, EnumOptions.RENDER_DISTANCE, EnumOptions.AMBIENT_OCCLUSION, EnumOptions.LIMIT_FRAMERATE, EnumOptions.ANAGLYPH, EnumOptions.VIEW_BOBBING, EnumOptions.GUI_SCALE, EnumOptions.ADVANCED_OPENGL};
     }
 }

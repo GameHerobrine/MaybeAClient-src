@@ -11,6 +11,7 @@ public class ClientNameHack extends Hack{
 
 	public static ClientNameHack instance;
 	public SettingBoolean overrideName;
+	public SettingBoolean overrideInChat = new SettingBoolean(this, "Override in chat", false);
 	public SettingTextBox nameOverride = new SettingTextBox(this, "Name", Client.clientName+" "+Client.clientVersion, 100);
 	
 	public ClientNameHack() {
@@ -22,9 +23,11 @@ public class ClientNameHack extends Hack{
 			public void setValue(boolean d) {
 				super.setValue(d);
 				ClientNameHack.instance.nameOverride.hidden = !this.getValue();
+				ClientNameHack.instance.overrideInChat.hidden = !this.getValue();
 			}
 		});
 		this.addSetting(this.nameOverride);
+		this.addSetting(this.overrideInChat);
 	}
 	public String getPrefix() {
 		return this.overrideName.getValue() ? "Overriden" : super.getPrefix();
@@ -34,5 +37,8 @@ public class ClientNameHack extends Hack{
 			return this.nameOverride.value;
 		}
 		return Client.clientName+" "+Client.clientVersion;
+	}
+	public boolean overrideInChat() {
+		return this.overrideName.getValue() && this.overrideInChat.getValue();
 	}
 }

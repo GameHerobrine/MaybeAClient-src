@@ -41,6 +41,7 @@ public class EntityOtherPlayerMP extends EntityPlayer {
     }
 
     public void onUpdate() {
+        this.field_22062_y = 0.0F;
         super.onUpdate();
         this.field_705_Q = this.field_704_R;
         double var1 = this.posX - this.prevPosX;

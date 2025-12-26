@@ -3,14 +3,14 @@ package net.minecraft.src;
 import org.lwjgl.opengl.GL11;
 
 public class TextureFX {
-    public byte[] imageData = new byte[1024];
+    public byte[] imageData = new byte[1024 /*GL_FRONT_LEFT*/];
     public int iconIndex;
     public boolean anaglyphEnabled = false;
-    public int field_1130_d = 0;
+    public int textureId = 0;
     public int tileSize = 1;
     public int tileImage = 0;
-    public int textureRes = 16;
-    
+	public int textureRes = 16;
+
     public TextureFX(int var1) {
         this.iconIndex = var1;
     }

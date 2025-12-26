@@ -8,7 +8,7 @@ public class StatBase {
     public final int statId;
     public final String statName;
     public boolean field_27088_g;
-    public String field_25069_f;
+    public String statGuid;
     private final IStatType field_26902_a;
     private static NumberFormat field_26903_b;
     public static IStatType field_27087_i;
@@ -32,13 +32,13 @@ public class StatBase {
         return this;
     }
 
-    public StatBase func_25068_c() {
+    public StatBase registerStat() {
         if (StatList.field_25169_C.containsKey(this.statId)) {
             throw new RuntimeException("Duplicate stat id: \"" + ((StatBase)StatList.field_25169_C.get(this.statId)).statName + "\" and \"" + this.statName + "\" at id " + this.statId);
         } else {
             StatList.field_25188_a.add(this);
             StatList.field_25169_C.put(this.statId, this);
-            this.field_25069_f = AchievementMap.func_25208_a(this.statId);
+            this.statGuid = AchievementMap.getGuid(this.statId);
             return this;
         }
     }

@@ -170,7 +170,7 @@ public class Pathfinder {
                             }
                         } else {
                             int var10 = this.worldMap.getBlockMetadata(var6, var7, var8);
-                            if (!BlockDoor.func_27047_e(var10)) {
+                            if (!BlockDoor.isOpen(var10)) {
                                 return 0;
                             }
                         }

@@ -198,7 +198,7 @@ public class EntityEgg extends Entity {
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
         float var19 = 0.99F;
         float var22 = 0.03F;
-        if (this.func_27013_ag()) {
+        if (this.isInWater()) {
             for(int var7 = 0; var7 < 4; ++var7) {
                 float var23 = 0.25F;
                 this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var23, this.posY - this.motionY * (double)var23, this.posZ - this.motionZ * (double)var23, this.motionX, this.motionY, this.motionZ);

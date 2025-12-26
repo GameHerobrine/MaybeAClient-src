@@ -19,11 +19,11 @@ public class Packet3Chat extends Packet {
     }
 
     public void readPacketData(DataInputStream var1) throws IOException {
-        this.message = func_27048_a(var1, 119);
+        this.message = readString(var1, 119);
     }
 
     public void writePacketData(DataOutputStream var1) throws IOException {
-        func_27049_a(this.message, var1);
+        writeString(this.message, var1);
     }
 
     public void processPacket(NetHandler var1) {

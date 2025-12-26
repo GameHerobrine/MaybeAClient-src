@@ -2,7 +2,7 @@ package net.minecraft.src;
 
 import net.skidcode.gh.maybeaclient.hacks.CustomSkyHack;
 
-public class WorldProvider {
+public abstract class WorldProvider {
     public World worldObj;
     public WorldChunkManager worldChunkMgr;
     public boolean isNether = false;
@@ -45,7 +45,7 @@ public class WorldProvider {
     	if(CustomSkyHack.instance.status) {
         	return CustomSkyHack.calculateCelestialAngle(var1, var3);
         }
-    	int var4 = (int)(var1 % 24000L);
+        int var4 = (int)(var1 % 24000L);
         float var5 = ((float)var4 + var3) / 24000.0F - 0.25F;
         if (var5 < 0.0F) {
             ++var5;
@@ -62,10 +62,11 @@ public class WorldProvider {
     }
 
     public float[] calcSunriseSunsetColors(float var1, float var2) {
-        if(CustomSkyHack.instance.status) {
+    	if(CustomSkyHack.instance.status) {
         	return CustomSkyHack.calcSunriseSunsetColors(var1, var2);
         }
-    	float var3 = 0.4F;
+    	
+        float var3 = 0.4F;
         float var4 = MathHelper.cos(var1 * 3.1415927F * 2.0F) - 0.0F;
         float var5 = -0.0F;
         if (var4 >= var5 - var3 && var4 <= var5 + var3) {
@@ -86,7 +87,7 @@ public class WorldProvider {
     	if(CustomSkyHack.instance.status) {
         	return CustomSkyHack.getFogColor(var1, var2);
         }
-    	float var3 = MathHelper.cos(var1 * 3.1415927F * 2.0F) * 2.0F + 0.5F;
+        float var3 = MathHelper.cos(var1 * 3.1415927F * 2.0F) * 2.0F + 0.5F;
         if (var3 < 0.0F) {
             var3 = 0.0F;
         }
@@ -108,11 +109,21 @@ public class WorldProvider {
         return true;
     }
 
-    public static WorldProvider func_4101_a(int var0) {
-        if (var0 == 0) {
-            return new WorldProvider();
+    public static WorldProvider getProviderForDimension(int var0) {
+        if (var0 == -1) {
+            return new WorldProviderHell();
+        } else if (var0 == 0) {
+            return new WorldProviderSurface();
         } else {
-            return var0 == -1 ? new WorldProviderHell() : null;
+            return var0 == 1 ? new WorldProviderSky() : null;
         }
+    }
+
+    public float getCloudHeight() {
+        return 108.0F;
+    }
+
+    public boolean func_28112_c() {
+        return true;
     }
 }

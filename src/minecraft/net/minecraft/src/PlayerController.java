@@ -2,13 +2,11 @@ package net.minecraft.src;
 
 import lunatrius.schematica.Settings;
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.NoClientSideDestroyHack;
 import net.skidcode.gh.maybeaclient.hacks.SwastikaBuilderHack;
 import net.skidcode.gh.maybeaclient.hacks.TunnelESPHack;
-import net.skidcode.gh.maybeaclient.utils.Direction;
-import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
 import net.skidcode.gh.maybeaclient.utils.WorldUtils;
-import net.skidcode.gh.maybeaclient.utils.PlayerUtils.LookStatus;
 
 public class PlayerController {
     protected final Minecraft mc;
@@ -22,15 +20,16 @@ public class PlayerController {
     }
 
     public void clickBlock(int var1, int var2, int var3, int var4) {
+        this.mc.theWorld.onBlockHit(this.mc.thePlayer, var1, var2, var3, var4);
         this.sendBlockRemoved(var1, var2, var3, var4);
     }
 
     public boolean sendBlockRemoved(int var1, int var2, int var3, int var4) {
-        this.mc.effectRenderer.addBlockDestroyEffects(var1, var2, var3);
         World var5 = this.mc.theWorld;
         Block var6 = Block.blocksList[var5.getBlockId(var1, var2, var3)];
+        var5.func_28106_e(2001, var1, var2, var3, var6.blockID + var5.getBlockMetadata(var1, var2, var3) * 256);
         int var7 = var5.getBlockMetadata(var1, var2, var3);
-        boolean var8; // = var5.setBlockWithNotify(var1, var2, var3, 0);
+        boolean var8;
         
         if(NoClientSideDestroyHack.instance.status && NoClientSideDestroyHack.instance.noDestroy.value) {
         	var8 = false;
@@ -39,18 +38,16 @@ public class PlayerController {
         }
         
         if (var6 != null && var8) {
-            this.mc.sndManager.playSound(var6.stepSound.func_1146_a(), (float)var1 + 0.5F, (float)var2 + 0.5F, (float)var3 + 0.5F, (var6.stepSound.func_1147_b() + 1.0F) / 2.0F, var6.stepSound.func_1144_c() * 0.8F);
             var6.onBlockDestroyedByPlayer(var5, var1, var2, var3, var7);
         }
-        //XXX schematica
-        Settings.instance().tryUpdating(var1, var2, var3);
+
         return var8;
     }
 
     public void sendBlockRemoving(int var1, int var2, int var3, int var4) {
     }
 
-    public void func_6468_a() {
+    public void resetBlockRemoving() {
     }
 
     public void setPartialTime(float var1) {
@@ -90,9 +87,11 @@ public class PlayerController {
 
     public boolean sendPlaceBlock(EntityPlayer var1, World var2, ItemStack var3, int x, int y, int z, int var7) {
         int id = var2.getBlockId(x, y, z);
+        
         //XXX schematica
         {
-			WorldUtils.toBlockPos(x, y, z, var7);
+			Client.class.getClass();
+        	WorldUtils.toBlockPos(x, y, z, var7);
 			int tx = WorldUtils.resX;
 			int ty = WorldUtils.resY;
 			int tz = WorldUtils.resZ;
@@ -126,11 +125,11 @@ public class PlayerController {
         return new EntityPlayerSP(this.mc, var1, this.mc.session, var1.worldProvider.worldType);
     }
 
-    public void func_6475_a(EntityPlayer var1, Entity var2) {
+    public void interactWithEntity(EntityPlayer var1, Entity var2) {
         var1.useCurrentItemOnEntity(var2);
     }
 
-    public void func_6472_b(EntityPlayer var1, Entity var2) {
+    public void attackEntity(EntityPlayer var1, Entity var2) {
         var1.attackTargetEntityWithCurrentItem(var2);
     }
 
@@ -142,7 +141,7 @@ public class PlayerController {
         var2.craftingInventory.onCraftGuiClosed(var2);
         var2.craftingInventory = var2.inventorySlots;
     }
-
+    
 	public boolean isBeingUsed() {
 		return false;
 	}

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import net.skidcode.gh.maybeaclient.hacks.LockTimeHack;
+import net.skidcode.gh.maybeaclient.hacks.WeatherLockHack;
 
 public class WorldClient extends World {
     private LinkedList field_1057_z = new LinkedList();
@@ -17,11 +18,12 @@ public class WorldClient extends World {
     public SaveHandler downloadSaveHandler;
 	public IChunkLoader downloadChunkLoader;
 	public boolean downloadThisWorld = false;
-    
+	
     public WorldClient(NetClientHandler var1, long var2, int var4) {
-        super(new SaveHandlerMP(), "MpServer", WorldProvider.func_4101_a(var4), var2);
+        super(new SaveHandlerMP(), "MpServer", WorldProvider.getProviderForDimension(var4), var2);
         this.sendQueue = var1;
         this.setSpawnPoint(new ChunkCoordinates(8, 64, 8));
+        this.field_28108_z = var1.field_28118_b;
     }
 
     public void setNewBlockTileEntity(int x, int y, int z, TileEntity tile) {
@@ -32,6 +34,25 @@ public class WorldClient extends World {
         }
 	}
     
+    public void playNoteAt(int x, int y, int z, int var4, int var5) {
+    	super.playNoteAt(x, y, z, var4, var5);
+    	if(!downloadThisWorld)
+        {
+            return;
+        }
+        if(getBlockId(x, y, z) == Block.musicBlock.blockID)
+        {
+            TileEntityNote tileentitynote = (TileEntityNote)getBlockTileEntity(x, y, z);
+            if(tileentitynote == null)
+            {
+                setBlockTileEntity(x, y, z, new TileEntityNote());
+            }
+            tileentitynote.note = (byte)(var5 % 25);
+            tileentitynote.y_();
+            setNewBlockTileEntity(x, y, z, tileentitynote);
+        }
+    }
+    
     public void saveWorld(boolean var1, IProgressUpdate var2) {
     	if(this.downloadThisWorld) {
     		this.downloadSaveHandler.saveWorldInfoAndPlayer(this.worldInfo, this.playerEntities);
@@ -41,6 +62,20 @@ public class WorldClient extends World {
     }
     
     public void tick() {
+    	if(WeatherLockHack.instance.status) {
+    		boolean v = (WeatherLockHack.instance.weather.getValue() == WeatherLockHack.Weather.RAIN);
+    		if(this.getWorldInfo().getRaining() != v) {
+    			this.getWorldInfo().setRaining(v);
+    			if(this.getWorldInfo().getRaining()) {
+    				this.func_27158_h(1.0F);
+    			}else {
+    				this.func_27158_h(0.0F);
+    			}
+                
+    		}
+    	}
+    	
+    	
         this.setWorldTime(this.getWorldTime() + 1L);
         
         long oldTime = this.getWorldTime();
@@ -57,7 +92,7 @@ public class WorldClient extends World {
                 ((IWorldAccess)this.worldAccesses.get(var2)).updateAllRenderers();
             }
         }
-        
+
         if(LockTimeHack.INSTANCE.status) {
         	LockTimeHack.INSTANCE.realTime = oldTime;
         	this.worldInfo.setWorldTime(oldTime);
@@ -93,25 +128,6 @@ public class WorldClient extends World {
 
     }
 
-    public void playNoteAt(int x, int y, int z, int var4, int var5) {
-    	super.playNoteAt(x, y, z, var4, var5);
-    	if(!downloadThisWorld)
-        {
-            return;
-        }
-        if(getBlockId(x, y, z) == Block.musicBlock.blockID)
-        {
-            TileEntityNote tileentitynote = (TileEntityNote)getBlockTileEntity(x, y, z);
-            if(tileentitynote == null)
-            {
-                setBlockTileEntity(x, y, z, new TileEntityNote());
-            }
-            tileentitynote.note = (byte)(var5 % 25);
-            tileentitynote.y_();
-            setNewBlockTileEntity(x, y, z, tileentitynote);
-        }
-    }
-    
     protected IChunkProvider getChunkProvider() {
         this.field_20915_C = new ChunkProviderClient(this);
         return this.field_20915_C;
@@ -131,7 +147,7 @@ public class WorldClient extends World {
         return false;
     }
 
-    public void func_713_a(int var1, int var2, boolean var3) {
+    public void doPreChunk(int var1, int var2, boolean var3) {
         if (var3) {
             this.field_20915_C.func_538_d(var1, var2);
         } else {
@@ -248,6 +264,45 @@ public class WorldClient extends World {
     }
 
     public void sendQuittingDisconnectingPacket() {
-        this.sendQueue.addToSendQueue(new Packet255KickDisconnect("Quitting"));
+        this.sendQueue.func_28117_a(new Packet255KickDisconnect("Quitting"));
+    }
+
+    protected void updateWeather() {
+        if (!this.worldProvider.field_6478_e) {
+            if (this.field_27168_F > 0) {
+                --this.field_27168_F;
+            }
+
+            this.prevRainingStrength = this.rainingStrength;
+            if (this.worldInfo.getRaining()) {
+                this.rainingStrength = (float)((double)this.rainingStrength + 0.01D);
+            } else {
+                this.rainingStrength = (float)((double)this.rainingStrength - 0.01D);
+            }
+
+            if (this.rainingStrength < 0.0F) {
+                this.rainingStrength = 0.0F;
+            }
+
+            if (this.rainingStrength > 1.0F) {
+                this.rainingStrength = 1.0F;
+            }
+
+            this.prevThunderingStrength = this.thunderingStrength;
+            if (this.worldInfo.getThundering()) {
+                this.thunderingStrength = (float)((double)this.thunderingStrength + 0.01D);
+            } else {
+                this.thunderingStrength = (float)((double)this.thunderingStrength - 0.01D);
+            }
+
+            if (this.thunderingStrength < 0.0F) {
+                this.thunderingStrength = 0.0F;
+            }
+
+            if (this.thunderingStrength > 1.0F) {
+                this.thunderingStrength = 1.0F;
+            }
+
+        }
     }
 }

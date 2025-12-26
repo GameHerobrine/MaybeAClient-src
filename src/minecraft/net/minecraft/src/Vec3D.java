@@ -14,6 +14,11 @@ public class Vec3D {
         return new Vec3D(var0, var2, var4);
     }
 
+    public static void func_28215_a() {
+        vectorList.clear();
+        nextVector = 0;
+    }
+
     public static void initialize() {
         nextVector = 0;
     }

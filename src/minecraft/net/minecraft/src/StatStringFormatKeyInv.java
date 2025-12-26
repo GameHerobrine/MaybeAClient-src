@@ -11,7 +11,7 @@ public class StatStringFormatKeyInv implements IStatStringFormat {
         this.field_27344_a = var1;
     }
 
-    public String func_27343_a(String var1) {
+    public String formatString(String var1) {
         return String.format(var1, Keyboard.getKeyName(this.field_27344_a.gameSettings.keyBindInventory.keyCode));
     }
 }

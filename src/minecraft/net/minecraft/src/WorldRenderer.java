@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 
-import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.BlockESPHack;
 import net.skidcode.gh.maybeaclient.hacks.TunnelESPHack;
 import net.skidcode.gh.maybeaclient.hacks.UnsafeLightLevelsHack;
@@ -24,25 +23,25 @@ public class WorldRenderer {
     public int sizeWidth;
     public int sizeHeight;
     public int sizeDepth;
-    public int field_1755_i;
-    public int field_1754_j;
-    public int field_1753_k;
-    public int field_1752_l;
-    public int field_1751_m;
-    public int field_1750_n;
+    public int posXMinus;
+    public int posYMinus;
+    public int posZMinus;
+    public int posXClip;
+    public int posYClip;
+    public int posZClip;
     public boolean isInFrustum = false;
     public boolean[] skipRenderPass = new boolean[2];
-    public int field_1746_q;
-    public int field_1743_r;
-    public int field_1741_s;
-    public float field_1740_t;
+    public int posXPlus;
+    public int posYPlus;
+    public int posZPlus;
+    public float rendererRadius;
     public boolean needsUpdate;
     public AxisAlignedBB rendererBoundingBox;
-    public int field_1735_w;
+    public int chunkIndex;
     public boolean isVisible = true;
     public boolean isWaitingOnOcclusionQuery;
-    public int field_1732_z;
-    public boolean field_1747_A;
+    public int glOcclusionQuery;
+    public boolean isChunkLit;
     private boolean isInitialized = false;
     public List tileEntityRenderers = new ArrayList();
     private List tileEntities;
@@ -51,13 +50,12 @@ public class WorldRenderer {
         this.worldObj = var1;
         this.tileEntities = var2;
         this.sizeWidth = this.sizeHeight = this.sizeDepth = var6;
-        this.field_1740_t = MathHelper.sqrt_float((float)(this.sizeWidth * this.sizeWidth + this.sizeHeight * this.sizeHeight + this.sizeDepth * this.sizeDepth)) / 2.0F;
+        this.rendererRadius = MathHelper.sqrt_float((float)(this.sizeWidth * this.sizeWidth + this.sizeHeight * this.sizeHeight + this.sizeDepth * this.sizeDepth)) / 2.0F;
         this.glRenderList = var7;
         this.posX = -999;
         this.setPosition(var3, var4, var5);
         this.needsUpdate = false;
     }
-
     public ArrayList<ChunkPos> chunksOccupied = new ArrayList<>();
     
     public void setPosition(int var1, int var2, int var3) {
@@ -66,32 +64,34 @@ public class WorldRenderer {
             this.posX = var1;
             this.posY = var2;
             this.posZ = var3;
+            
             chunksOccupied.clear();
             for(int x = this.posX >> 4; x < (this.posX+this.sizeWidth) >> 4; x += 1) {
             	for(int z = this.posZ >> 4; z < (this.posZ+this.sizeDepth) >> 4; z += 1) {
             		chunksOccupied.add(new ChunkPos(x, z));
                 }
             }
-            this.field_1746_q = var1 + this.sizeWidth / 2;
-            this.field_1743_r = var2 + this.sizeHeight / 2;
-            this.field_1741_s = var3 + this.sizeDepth / 2;
-            this.field_1752_l = var1 & 1023;
-            this.field_1751_m = var2;
-            this.field_1750_n = var3 & 1023;
-            this.field_1755_i = var1 - this.field_1752_l;
-            this.field_1754_j = var2 - this.field_1751_m;
-            this.field_1753_k = var3 - this.field_1750_n;
+            
+            this.posXPlus = var1 + this.sizeWidth / 2;
+            this.posYPlus = var2 + this.sizeHeight / 2;
+            this.posZPlus = var3 + this.sizeDepth / 2;
+            this.posXClip = var1 & 1023;
+            this.posYClip = var2;
+            this.posZClip = var3 & 1023;
+            this.posXMinus = var1 - this.posXClip;
+            this.posYMinus = var2 - this.posYClip;
+            this.posZMinus = var3 - this.posZClip;
             float var4 = 6.0F;
             this.rendererBoundingBox = AxisAlignedBB.getBoundingBox((double)((float)var1 - var4), (double)((float)var2 - var4), (double)((float)var3 - var4), (double)((float)(var1 + this.sizeWidth) + var4), (double)((float)(var2 + this.sizeHeight) + var4), (double)((float)(var3 + this.sizeDepth) + var4));
             GL11.glNewList(this.glRenderList + 2, 4864 /*GL_COMPILE*/);
-            RenderItem.renderAABB(AxisAlignedBB.getBoundingBoxFromPool((double)((float)this.field_1752_l - var4), (double)((float)this.field_1751_m - var4), (double)((float)this.field_1750_n - var4), (double)((float)(this.field_1752_l + this.sizeWidth) + var4), (double)((float)(this.field_1751_m + this.sizeHeight) + var4), (double)((float)(this.field_1750_n + this.sizeDepth) + var4)));
+            RenderItem.renderAABB(AxisAlignedBB.getBoundingBoxFromPool((double)((float)this.posXClip - var4), (double)((float)this.posYClip - var4), (double)((float)this.posZClip - var4), (double)((float)(this.posXClip + this.sizeWidth) + var4), (double)((float)(this.posYClip + this.sizeHeight) + var4), (double)((float)(this.posZClip + this.sizeDepth) + var4)));
             GL11.glEndList();
             this.markDirty();
         }
     }
 
     private void setupGLTranslation() {
-        GL11.glTranslatef((float)this.field_1752_l, (float)this.field_1751_m, (float)this.field_1750_n);
+        GL11.glTranslatef((float)this.posXClip, (float)this.posYClip, (float)this.posZClip);
     }
 
     public void updateRenderer() {
@@ -115,12 +115,11 @@ public class WorldRenderer {
             byte var8 = 1;
             ChunkCache var9 = new ChunkCache(this.worldObj, var1 - var8, var2 - var8, var3 - var8, var4 + var8, var5 + var8, var6 + var8);
             RenderBlocks var10 = new RenderBlocks(var9);
-            
+
             boolean opacityEnabled = XRayHack.INSTANCE.status && XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity");
             for(int var11 = 0; var11 < 2; ++var11) {
             	XRayHack.applyOpacity = var11 != 0;
             	XRayHack.applyOpacity &= opacityEnabled;
-            	
                 boolean var12 = false;
                 boolean var13 = false;
                 boolean var14 = false;
@@ -146,7 +145,7 @@ public class WorldRenderer {
                                     tessellator.startDrawingQuads();
                                     tessellator.setTranslationD((double)(-this.posX), (double)(-this.posY), (double)(-this.posZ));
                                 }
-                                
+
                                 if(BlockESPHack.instance.status && var11 == 0) {
         							if(BlockESPHack.instance.blocks.blocks[id]) {
         								BlockPos pos = new BlockPos(x, y, z);
@@ -196,22 +195,22 @@ public class WorldRenderer {
                     break;
                 }
             }
-
+            XRayHack.applyOpacity = false;
             HashSet var22 = new HashSet();
             var22.addAll(this.tileEntityRenderers);
             var22.removeAll(var21);
             this.tileEntities.addAll(var22);
             var21.removeAll(this.tileEntityRenderers);
             this.tileEntities.removeAll(var21);
-            this.field_1747_A = Chunk.isLit;
+            this.isChunkLit = Chunk.isLit;
             this.isInitialized = true;
         }
     }
 
     public float distanceToEntitySquared(Entity var1) {
-        float var2 = (float)(var1.posX - (double)this.field_1746_q);
-        float var3 = (float)(var1.posY - (double)this.field_1743_r);
-        float var4 = (float)(var1.posZ - (double)this.field_1741_s);
+        float var2 = (float)(var1.posX - (double)this.posXPlus);
+        float var3 = (float)(var1.posY - (double)this.posYPlus);
+        float var4 = (float)(var1.posZ - (double)this.posZPlus);
         return var2 * var2 + var3 * var3 + var4 * var4;
     }
 

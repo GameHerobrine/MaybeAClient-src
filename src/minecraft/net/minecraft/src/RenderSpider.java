@@ -8,7 +8,7 @@ public class RenderSpider extends RenderLiving {
         this.setRenderPassModel(new ModelSpider());
     }
 
-    protected float func_191_a(EntitySpider var1) {
+    protected float setSpiderDeathMaxRotation(EntitySpider var1) {
         return 180.0F;
     }
 
@@ -30,8 +30,8 @@ public class RenderSpider extends RenderLiving {
 
     // $FF: synthetic method
     // $FF: bridge method
-    protected float func_172_a(EntityLiving var1) {
-        return this.func_191_a((EntitySpider)var1);
+    protected float getDeathMaxRotation(EntityLiving var1) {
+        return this.setSpiderDeathMaxRotation((EntitySpider)var1);
     }
 
     // $FF: synthetic method

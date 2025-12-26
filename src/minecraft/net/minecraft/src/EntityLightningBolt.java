@@ -65,7 +65,7 @@ public class EntityLightningBolt extends EntityWeatherEffect {
 
             for(int var4 = 0; var4 < var7.size(); ++var4) {
                 Entity var5 = (Entity)var7.get(var4);
-                var5.func_27014_a(this);
+                var5.onStruckByLightning(this);
             }
 
             this.worldObj.field_27172_i = 2;

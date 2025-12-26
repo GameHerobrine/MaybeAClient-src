@@ -3,10 +3,10 @@ package net.minecraft.src;
 import org.lwjgl.opengl.GL11;
 
 public class RenderSnowball extends Render {
-    private int field_20003_a;
+    private int itemIconIndex;
 
     public RenderSnowball(int var1) {
-        this.field_20003_a = var1;
+        this.itemIconIndex = var1;
     }
 
     public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
@@ -16,10 +16,10 @@ public class RenderSnowball extends Render {
         GL11.glScalef(0.5F, 0.5F, 0.5F);
         this.loadTexture("/gui/items.png");
         Tessellator var10 = Tessellator.instance;
-        float var11 = (float)(this.field_20003_a % 16 * 16 + 0) / 256.0F;
-        float var12 = (float)(this.field_20003_a % 16 * 16 + 16) / 256.0F;
-        float var13 = (float)(this.field_20003_a / 16 * 16 + 0) / 256.0F;
-        float var14 = (float)(this.field_20003_a / 16 * 16 + 16) / 256.0F;
+        float var11 = (float)(this.itemIconIndex % 16 * 16 + 0) / 256.0F;
+        float var12 = (float)(this.itemIconIndex % 16 * 16 + 16) / 256.0F;
+        float var13 = (float)(this.itemIconIndex / 16 * 16 + 0) / 256.0F;
+        float var14 = (float)(this.itemIconIndex / 16 * 16 + 16) / 256.0F;
         float var15 = 1.0F;
         float var16 = 0.5F;
         float var17 = 0.25F;

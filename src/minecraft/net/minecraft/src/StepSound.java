@@ -11,15 +11,15 @@ public class StepSound {
         this.field_1679_c = var3;
     }
 
-    public float func_1147_b() {
+    public float getVolume() {
         return this.field_1677_b;
     }
 
-    public float func_1144_c() {
+    public float getPitch() {
         return this.field_1679_c;
     }
 
-    public String func_1146_a() {
+    public String stepSoundDir() {
         return "step." + this.field_1678_a;
     }
 

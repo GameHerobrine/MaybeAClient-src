@@ -11,7 +11,7 @@ public class ItemMinecart extends Item {
 
     public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
         int var8 = var3.getBlockId(var4, var5, var6);
-        if (BlockRail.func_27041_c(var8)) {
+        if (BlockRail.isRailBlock(var8)) {
             if (!var3.multiplayerWorld) {
                 var3.entityJoinedWorld(new EntityMinecart(var3, (double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), this.minecartType));
             }

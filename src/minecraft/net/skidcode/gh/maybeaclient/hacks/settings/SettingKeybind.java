@@ -7,6 +7,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
@@ -56,8 +57,14 @@ public class SettingKeybind extends Setting implements InputHandler{
 	}
 	
 	@Override
-	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-		this.listening = ClickGUI.setInputHandler(this);
+	public void onDeselect(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(selected) this.listening = ClickGUI.setInputHandler(this);
+		selected = false;
+	}
+	public boolean selected = false;
+	@Override
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		selected = true;
 	}
 	
 	public boolean canRelease = false;
@@ -88,14 +95,15 @@ public class SettingKeybind extends Setting implements InputHandler{
 		
 	}
 	
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		Theme theme = ClickGUIHack.theme();
+		if(theme == Theme.IRIDIUM) return;
 		if(theme == Theme.NODUS) {
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
 		}else if(theme == Theme.HEPHAESTUS){
 			
 		}else{
-			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 	}
 	
@@ -107,7 +115,7 @@ public class SettingKeybind extends Setting implements InputHandler{
 	boolean listening = false;
 	
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		Theme theme = ClickGUIHack.theme();
 		int txtColor = 0xffffff;
 		if(theme == Theme.NODUS) {
@@ -117,6 +125,10 @@ public class SettingKeybind extends Setting implements InputHandler{
 			}
 		}
 		this.mouseHovering = false;
+		if(theme == Theme.IRIDIUM) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name + ": "+ (listening ? ChatColor.LIGHTGRAY+"Listening..." : this.valueToString()), x + 2, y + ClickGUIHack.theme().yaddtocenterText, Theme.IRIDIUM_ENABLED_COLOR);
+			return;
+		}
 		if(theme == Theme.HEPHAESTUS){
 			if(listening) {
 				Client.mc.fontRenderer.drawStringWithShadow("Listening...", x+Theme.HEPH_OPT_XADD, y+ClickGUIHack.theme().yaddtocenterText, 0xffffff);
@@ -134,6 +146,4 @@ public class SettingKeybind extends Setting implements InputHandler{
 	public void readFromNBT(NBTTagCompound input) {
 		if(input.hasKey(this.name)) this.setValue(input.getInteger(this.name));
 	}
-
-	
 }

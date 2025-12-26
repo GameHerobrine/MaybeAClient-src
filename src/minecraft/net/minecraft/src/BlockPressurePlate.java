@@ -6,12 +6,12 @@ import java.util.Random;
 public class BlockPressurePlate extends Block {
     private EnumMobType triggerMobType;
 
-    protected BlockPressurePlate(int var1, int var2, EnumMobType var3) {
-        super(var1, var2, Material.rock);
+    protected BlockPressurePlate(int var1, int var2, EnumMobType var3, Material var4) {
+        super(var1, var2, var4);
         this.triggerMobType = var3;
         this.setTickOnLoad(true);
-        float var4 = 0.0625F;
-        this.setBlockBounds(var4, 0.0F, var4, 1.0F - var4, 0.03125F, 1.0F - var4);
+        float var5 = 0.0625F;
+        this.setBlockBounds(var5, 0.0F, var5, 1.0F - var5, 0.03125F, 1.0F - var5);
     }
 
     public int tickRate() {
@@ -31,7 +31,7 @@ public class BlockPressurePlate extends Block {
     }
 
     public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-        return var1.isBlockOpaqueCube(var2, var3 - 1, var4);
+        return var1.func_28100_h(var2, var3 - 1, var4);
     }
 
     public void onBlockAdded(World var1, int var2, int var3, int var4) {
@@ -39,7 +39,7 @@ public class BlockPressurePlate extends Block {
 
     public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
         boolean var6 = false;
-        if (!var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+        if (!var1.func_28100_h(var2, var3 - 1, var4)) {
             var6 = true;
         }
 

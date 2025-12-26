@@ -35,7 +35,7 @@ public class RenderTileEntity {
 			GL11.glTranslatef(par1TileEntitySign.xCoord + 0.5f, par1TileEntitySign.yCoord + 0.75f * var10, par1TileEntitySign.zCoord + 0.5f);
 			float var11 = getBlockMetadata(par1TileEntitySign) * 360 / 16.0f;
 			GL11.glRotatef(-var11, 0.0f, 1.0f, 0.0f);
-			this.modelSign.field_1345_b.showModel = true;
+			this.modelSign.signStick.showModel = true;
 		} else {
 			int var16 = getBlockMetadata(par1TileEntitySign);
 			var12 = 0.0f;
@@ -55,7 +55,7 @@ public class RenderTileEntity {
 			GL11.glTranslatef(par1TileEntitySign.xCoord + 0.5f, par1TileEntitySign.yCoord + 0.75f * var10, par1TileEntitySign.zCoord + 0.5f);
 			GL11.glRotatef(-var12, 0.0f, 1.0f, 0.0f);
 			GL11.glTranslatef(0.0f, -0.3125f, -0.4375f);
-			this.modelSign.field_1345_b.showModel = false;
+			this.modelSign.signStick.showModel = false;
 		}
 
 		this.bindTextureByName("/item/sign.png");

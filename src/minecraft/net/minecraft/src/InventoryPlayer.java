@@ -28,7 +28,7 @@ public class InventoryPlayer implements IInventory {
 
     private int storeItemStack(ItemStack var1) {
         for(int var2 = 0; var2 < this.mainInventory.length; ++var2) {
-            if (this.mainInventory[var2] != null && this.mainInventory[var2].itemID == var1.itemID && this.mainInventory[var2].func_21180_d() && this.mainInventory[var2].stackSize < this.mainInventory[var2].getMaxStackSize() && this.mainInventory[var2].stackSize < this.getInventoryStackLimit() && (!this.mainInventory[var2].getHasSubtypes() || this.mainInventory[var2].getItemDamage() == var1.getItemDamage())) {
+            if (this.mainInventory[var2] != null && this.mainInventory[var2].itemID == var1.itemID && this.mainInventory[var2].isStackable() && this.mainInventory[var2].stackSize < this.mainInventory[var2].getMaxStackSize() && this.mainInventory[var2].stackSize < this.getInventoryStackLimit() && (!this.mainInventory[var2].getHasSubtypes() || this.mainInventory[var2].getItemDamage() == var1.getItemDamage())) {
                 return var2;
             }
         }
@@ -109,8 +109,8 @@ public class InventoryPlayer implements IInventory {
 
     public void decrementAnimations() {
         for(int var1 = 0; var1 < this.mainInventory.length; ++var1) {
-            if (this.mainInventory[var1] != null && this.mainInventory[var1].animationsToGo > 0) {
-                --this.mainInventory[var1].animationsToGo;
+            if (this.mainInventory[var1] != null) {
+                this.mainInventory[var1].updateAnimation(this.player.worldObj, this.player, var1, this.currentItem == var1);
             }
         }
 
@@ -130,20 +130,24 @@ public class InventoryPlayer implements IInventory {
     }
 
     public boolean addItemStackToInventory(ItemStack var1) {
-        if (!var1.isItemDamaged()) {
-            var1.stackSize = this.storePartialItemStack(var1);
-            if (var1.stackSize == 0) {
+        int var2;
+        if (var1.isItemDamaged()) {
+            var2 = this.getFirstEmptyStack();
+            if (var2 >= 0) {
+                this.mainInventory[var2] = ItemStack.copyItemStack(var1);
+                this.mainInventory[var2].animationsToGo = 5;
+                var1.stackSize = 0;
                 return true;
+            } else {
+                return false;
             }
-        }
-
-        int var2 = this.getFirstEmptyStack();
-        if (var2 >= 0) {
-            this.mainInventory[var2] = var1;
-            this.mainInventory[var2].animationsToGo = 5;
-            return true;
         } else {
-            return false;
+            do {
+                var2 = var1.stackSize;
+                var1.stackSize = this.storePartialItemStack(var1);
+            } while(var1.stackSize > 0 && var1.stackSize < var2);
+
+            return var1.stackSize < var2;
         }
     }
 
@@ -304,7 +308,7 @@ public class InventoryPlayer implements IInventory {
     public void damageArmor(int var1) {
         for(int var2 = 0; var2 < this.armorInventory.length; ++var2) {
             if (this.armorInventory[var2] != null && this.armorInventory[var2].getItem() instanceof ItemArmor) {
-                this.armorInventory[var2].func_25190_a(var1, this.player);
+                this.armorInventory[var2].damageItem(var1, this.player);
                 if (this.armorInventory[var2].stackSize == 0) {
                     this.armorInventory[var2].func_1097_a(this.player);
                     this.armorInventory[var2] = null;
@@ -351,5 +355,22 @@ public class InventoryPlayer implements IInventory {
         } else {
             return var1.getDistanceSqToEntity(this.player) <= 64.0D;
         }
+    }
+
+    public boolean func_28018_c(ItemStack var1) {
+        int var2;
+        for(var2 = 0; var2 < this.armorInventory.length; ++var2) {
+            if (this.armorInventory[var2] != null && this.armorInventory[var2].isStackEqual(var1)) {
+                return true;
+            }
+        }
+
+        for(var2 = 0; var2 < this.mainInventory.length; ++var2) {
+            if (this.mainInventory[var2] != null && this.mainInventory[var2].isStackEqual(var1)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

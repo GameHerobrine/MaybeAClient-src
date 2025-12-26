@@ -9,23 +9,27 @@ public class ClientNameTab extends Tab{
 	public static ClientNameTab instance;
 	public ClientNameTab() {
 		super("ClientName");
-		this.xDefPos = this.xPos = 0;
-		this.yDefPos = this.yPos = 0;
-		this.height = 12;
+		this.xDefPos = this.startX = 0;
+		this.yDefPos = this.startY = 0;
 		this.canMinimize = false;
 		instance = this;
+		this.isHUD = true;
 	}
-	public void renderName() {
-		String name = this.name;
-		this.name = ClientNameHack.instance.clientName();
-		super.renderName();
-		this.name = name;
+	@Override
+	public void renderName(boolean right) {
+		String name = this.getTabName();
+		this.name.setValue(ClientNameHack.instance.clientName());
+		super.renderName(right);
+		this.name.setValue(name);
 	}
-	public void render() {
-		this.width = Client.mc.fontRenderer.getStringWidth(ClientNameHack.instance.clientName()) + ClickGUIHack.theme().titleXadd;
-		this.renderName();
+	@Override
+	public void preRender() {
+		this.endX = this.startX + Client.mc.fontRenderer.getStringWidth(ClientNameHack.instance.clientName()) + ClickGUIHack.theme().titleXadd;
+		this.endY = this.startY + ClickGUIHack.theme().yspacing; //12
+		super.preRender();
 	}
 	
+	@Override
 	public void renderIngame() {
 		if(ClientNameHack.instance.status) super.renderIngame();
 	}

@@ -28,6 +28,13 @@ public class GLAllocation {
 
     }
 
+    public static synchronized void func_28194_b(int var0) {
+        int var1 = displayLists.indexOf(var0);
+        GL11.glDeleteLists((Integer)displayLists.get(var1), (Integer)displayLists.get(var1 + 1));
+        displayLists.remove(var1);
+        displayLists.remove(var1);
+    }
+
     public static synchronized void deleteTexturesAndDisplayLists() {
         for(int var0 = 0; var0 < displayLists.size(); var0 += 2) {
             GL11.glDeleteLists((Integer)displayLists.get(var0), (Integer)displayLists.get(var0 + 1));

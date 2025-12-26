@@ -10,7 +10,7 @@ public class RenderSlime extends RenderLiving {
         this.scaleAmount = var2;
     }
 
-    protected boolean func_179_a(EntitySlime var1, int var2, float var3) {
+    protected boolean renderSlimePassModel(EntitySlime var1, int var2, float var3) {
         if (var2 == 0) {
             this.setRenderPassModel(this.scaleAmount);
             GL11.glEnable(2977 /*GL_NORMALIZE*/);
@@ -44,6 +44,6 @@ public class RenderSlime extends RenderLiving {
     // $FF: synthetic method
     // $FF: bridge method
     protected boolean shouldRenderPass(EntityLiving var1, int var2, float var3) {
-        return this.func_179_a((EntitySlime)var1, var2, var3);
+        return this.renderSlimePassModel((EntitySlime)var1, var2, var3);
     }
 }

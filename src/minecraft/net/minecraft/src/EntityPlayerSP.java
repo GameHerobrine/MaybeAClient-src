@@ -14,10 +14,6 @@ import net.skidcode.gh.maybeaclient.hacks.StrafeHack;
 public class EntityPlayerSP extends EntityPlayer {
     public MovementInput movementInput;
     protected Minecraft mc;
-    public int field_9373_b = 20;
-    private boolean inPortal = false;
-    public float timeInPortal;
-    public float prevTimeInPortal;
     private MouseFilter field_21903_bJ = new MouseFilter();
     private MouseFilter field_21904_bK = new MouseFilter();
     private MouseFilter field_21902_bL = new MouseFilter();
@@ -33,10 +29,6 @@ public class EntityPlayerSP extends EntityPlayer {
         this.username = var3.username;
     }
 
-    public void moveEntity(double var1, double var3, double var5) {
-        super.moveEntity(var1, var3, var5);
-    }
-    
     @Override
     public boolean attackEntityFrom(Entity var1, int var2) {
     	boolean b = super.attackEntityFrom(var1, var2);
@@ -50,6 +42,10 @@ public class EntityPlayerSP extends EntityPlayer {
     	return b;
     }
     
+    public void moveEntity(double var1, double var3, double var5) {
+        super.moveEntity(var1, var3, var5);
+    }
+
     public void updatePlayerActionState() {
         super.updatePlayerActionState();
         
@@ -68,30 +64,39 @@ public class EntityPlayerSP extends EntityPlayer {
         if(StrafeHack.instance.enabled()) {
         	this.moveForward = this.moveStrafing = 0;
         }
-        
     }
 
     public void onLivingUpdate() {
-        if (!this.mc.field_25001_G.func_27183_a(AchievementList.field_25195_b)) {
-            this.mc.field_25002_t.func_27101_b(AchievementList.field_25195_b);
+        if (!this.mc.statFileWriter.hasAchievementUnlocked(AchievementList.openInventory)) {
+            this.mc.guiAchievement.queueAchievementInformation(AchievementList.openInventory);
         }
-        
+
         this.prevTimeInPortal = this.timeInPortal;
         
         EventPlayerUpdatePre e = new EventPlayerUpdatePre();
         EventRegistry.handleEvent(e);
         
         if (this.inPortal) {
+            if (!this.worldObj.multiplayerWorld && this.ridingEntity != null) {
+                this.mountEntity((Entity)null);
+            }
+
+            if (this.mc.currentScreen != null) {
+                this.mc.displayGuiScreen((GuiScreen)null);
+            }
+
             if (this.timeInPortal == 0.0F) {
-                this.mc.sndManager.func_337_a("portal.trigger", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
+                this.mc.sndManager.playSoundFX("portal.trigger", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
             }
 
             this.timeInPortal += 0.0125F;
             if (this.timeInPortal >= 1.0F) {
                 this.timeInPortal = 1.0F;
-                this.field_9373_b = 10;
-                this.mc.sndManager.func_337_a("portal.travel", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
-                this.mc.usePortal();
+                if (!this.worldObj.multiplayerWorld) {
+                    this.field_28024_y = 10;
+                    this.mc.sndManager.playSoundFX("portal.travel", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
+                    this.mc.usePortal();
+                }
             }
 
             this.inPortal = false;
@@ -105,10 +110,20 @@ public class EntityPlayerSP extends EntityPlayer {
             }
         }
 
-        if (this.field_9373_b > 0) {
-            --this.field_9373_b;
+        if (this.field_28024_y > 0) {
+            --this.field_28024_y;
         }
 
+        this.movementInput.updatePlayerMoveState(this);
+        if (this.movementInput.sneak && this.ySize < 0.2F) {
+            this.ySize = 0.2F;
+        }
+
+        this.func_28014_c(this.posX - (double)this.width * 0.35D, this.boundingBox.minY + 0.5D, this.posZ + (double)this.width * 0.35D);
+        this.func_28014_c(this.posX - (double)this.width * 0.35D, this.boundingBox.minY + 0.5D, this.posZ - (double)this.width * 0.35D);
+        this.func_28014_c(this.posX + (double)this.width * 0.35D, this.boundingBox.minY + 0.5D, this.posZ - (double)this.width * 0.35D);
+        this.func_28014_c(this.posX + (double)this.width * 0.35D, this.boundingBox.minY + 0.5D, this.posZ + (double)this.width * 0.35D);
+        
         if(!FreecamHack.movementTaken()) {
         	this.movementInput.updatePlayerMoveState(this);
         	if (this.movementInput.sneak && this.ySize < 0.2F) {
@@ -116,7 +131,6 @@ public class EntityPlayerSP extends EntityPlayer {
             }
         }
         
-
         EventPlayerUpdatePost ee = new EventPlayerUpdatePost();
         EventRegistry.handleEvent(ee);
         
@@ -124,11 +138,11 @@ public class EntityPlayerSP extends EntityPlayer {
     }
 
     public void resetPlayerKeyState() {
-    	this.movementInput.resetKeyState();
+        this.movementInput.resetKeyState();
     }
 
     public void handleKeyPress(int var1, boolean var2) {
-    	this.movementInput.checkKeyForMovementInput(var1, var2);
+        this.movementInput.checkKeyForMovementInput(var1, var2);
     }
 
     public void writeEntityToNBT(NBTTagCompound var1) {
@@ -181,18 +195,13 @@ public class EntityPlayerSP extends EntityPlayer {
         return this.movementInput.sneak && !this.sleeping;
     }
 
-    public void setInPortal() {
-        if (this.field_9373_b > 0) {
-            this.field_9373_b = 10;
-        } else {
-            this.inPortal = true;
-        }
-    }
-
     public void setHealth(int var1) {
         int var2 = this.health - var1;
         if (var2 <= 0) {
             this.health = var1;
+            if (var2 < 0) {
+                this.field_9306_bj = this.field_9366_o / 2;
+            }
         } else {
             this.field_9346_af = var2;
             this.prevHealth = this.health;
@@ -204,7 +213,7 @@ public class EntityPlayerSP extends EntityPlayer {
     }
 
     public void respawnPlayer() {
-        this.mc.respawn(false);
+        this.mc.respawn(false, 0);
     }
 
     public void func_6420_o() {
@@ -220,19 +229,75 @@ public class EntityPlayerSP extends EntityPlayer {
         if (var1 != null) {
             if (var1.func_25067_a()) {
                 Achievement var3 = (Achievement)var1;
-                if (var3.field_25076_c == null || this.mc.field_25001_G.func_27183_a(var3.field_25076_c)) {
-                    if (!this.mc.field_25001_G.func_27183_a(var3)) {
-                        this.mc.field_25002_t.func_27102_a(var3);
+                if (var3.parentAchievement == null || this.mc.statFileWriter.hasAchievementUnlocked(var3.parentAchievement)) {
+                    if (!this.mc.statFileWriter.hasAchievementUnlocked(var3)) {
+                        this.mc.guiAchievement.queueTakenAchievement(var3);
                     }
 
-                    this.mc.field_25001_G.func_25100_a(var1, var2);
+                    this.mc.statFileWriter.func_25100_a(var1, var2);
                 }
             } else {
-                this.mc.field_25001_G.func_25100_a(var1, var2);
+                this.mc.statFileWriter.func_25100_a(var1, var2);
             }
 
         }
     }
 
-	
+    private boolean func_28027_d(int var1, int var2, int var3) {
+        return this.worldObj.func_28100_h(var1, var2, var3);
+    }
+
+    protected boolean func_28014_c(double var1, double var3, double var5) {
+        int var7 = MathHelper.floor_double(var1);
+        int var8 = MathHelper.floor_double(var3);
+        int var9 = MathHelper.floor_double(var5);
+        double var10 = var1 - (double)var7;
+        double var12 = var5 - (double)var9;
+        if (this.func_28027_d(var7, var8, var9) || this.func_28027_d(var7, var8 + 1, var9)) {
+            boolean var14 = !this.func_28027_d(var7 - 1, var8, var9) && !this.func_28027_d(var7 - 1, var8 + 1, var9);
+            boolean var15 = !this.func_28027_d(var7 + 1, var8, var9) && !this.func_28027_d(var7 + 1, var8 + 1, var9);
+            boolean var16 = !this.func_28027_d(var7, var8, var9 - 1) && !this.func_28027_d(var7, var8 + 1, var9 - 1);
+            boolean var17 = !this.func_28027_d(var7, var8, var9 + 1) && !this.func_28027_d(var7, var8 + 1, var9 + 1);
+            byte var18 = -1;
+            double var19 = 9999.0D;
+            if (var14 && var10 < var19) {
+                var19 = var10;
+                var18 = 0;
+            }
+
+            if (var15 && 1.0D - var10 < var19) {
+                var19 = 1.0D - var10;
+                var18 = 1;
+            }
+
+            if (var16 && var12 < var19) {
+                var19 = var12;
+                var18 = 4;
+            }
+
+            if (var17 && 1.0D - var12 < var19) {
+                var19 = 1.0D - var12;
+                var18 = 5;
+            }
+
+            float var21 = 0.1F;
+            if (var18 == 0) {
+                this.motionX = (double)(-var21);
+            }
+
+            if (var18 == 1) {
+                this.motionX = (double)var21;
+            }
+
+            if (var18 == 4) {
+                this.motionZ = (double)(-var21);
+            }
+
+            if (var18 == 5) {
+                this.motionZ = (double)var21;
+            }
+        }
+
+        return false;
+    }
 }

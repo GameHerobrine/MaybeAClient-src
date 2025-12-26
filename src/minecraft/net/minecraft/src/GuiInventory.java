@@ -9,7 +9,7 @@ public class GuiInventory extends GuiContainer {
     public GuiInventory(EntityPlayer var1) {
         super(var1.inventorySlots);
         this.field_948_f = true;
-        var1.addStat(AchievementList.field_25195_b, 1);
+        var1.addStat(AchievementList.openInventory, 1);
     }
 
     public void initGui() {
@@ -53,6 +53,7 @@ public class GuiInventory extends GuiContainer {
         this.mc.thePlayer.rotationYaw = (float)Math.atan((double)(var9 / 40.0F)) * 40.0F;
         this.mc.thePlayer.rotationPitch = -((float)Math.atan((double)(var10 / 40.0F))) * 20.0F;
         GL11.glTranslatef(0.0F, this.mc.thePlayer.yOffset, 0.0F);
+        RenderManager.instance.playerViewY = 180.0F;
         RenderManager.instance.renderEntityWithPosYaw(this.mc.thePlayer, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
         this.mc.thePlayer.renderYawOffset = var6;
         this.mc.thePlayer.rotationYaw = var7;
@@ -64,11 +65,11 @@ public class GuiInventory extends GuiContainer {
 
     public void actionPerformed(GuiButton var1) {
         if (var1.id == 0) {
-            this.mc.displayGuiScreen(new GuiAchievements(this.mc.field_25001_G));
+            this.mc.displayGuiScreen(new GuiAchievements(this.mc.statFileWriter));
         }
 
         if (var1.id == 1) {
-            this.mc.displayGuiScreen(new GuiStats(this, this.mc.field_25001_G));
+            this.mc.displayGuiScreen(new GuiStats(this, this.mc.statFileWriter));
         }
 
     }

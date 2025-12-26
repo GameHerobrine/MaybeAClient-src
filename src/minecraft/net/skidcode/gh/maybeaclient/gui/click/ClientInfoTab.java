@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.gui.click.element.TextElement;
+import net.skidcode.gh.maybeaclient.gui.click.element.VerticalContainer;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.ClientInfoHack;
@@ -12,141 +14,76 @@ import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumStaticPos;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
 
-public class ClientInfoTab extends Tab{
+public class ClientInfoTab extends ElementTab{
 	
 	public static ClientInfoTab instance;
 	
+	
+	public TextElement coordX, coordY, coordZ;
+	public TextElement facing, fps, username, walkingSpeed;
+	public VerticalContainer vc = new VerticalContainer();
+	
 	public ClientInfoTab() {
-		super("Player info", 0, 12);
-		this.xDefPos = this.xPos = 255;
-		this.yDefPos = this.yPos = 10;
+		super("Player info");
+		this.xDefPos = this.startX = 255;
+		this.yDefPos = this.startY = 10;
 		instance = this;
+		this.addElement(vc);
+		vc.addElement(this.coordX = new TextElement(""));
+		vc.addElement(this.coordY = new TextElement(""));
+		vc.addElement(this.coordZ = new TextElement(""));
+		vc.addElement(this.facing = new TextElement(""));
+		vc.addElement(this.fps = new TextElement(""));
+		vc.addElement(this.username = new TextElement(""));
+		vc.addElement(this.walkingSpeed = new TextElement(""));
+		this.isHUD = true;
 	}
 	
 	public void renderIngame() {
 		if(ClientInfoHack.instance.status) super.renderIngame();
 	}
 	
-	public void renderName(boolean alignRight) {
-		if(alignRight) {
-			int xStart = this.xPos;
-			int yStart = this.yPos;
-			this.renderNameBG();
-			this.renderNameAt(xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name) - ClickGUIHack.theme().headerXAdd, yStart); //XXX - 2 is needed
-		}else {
-			super.renderName();
-		}
-	}
-	
-	public void renderMinimized() {
-		this.height = 12;
-		this.renderName(this.isAlignedRight(ClientInfoHack.instance.staticPositon.getValue(), ClientInfoHack.instance.alignment.getValue()));
-	}
-	
 	boolean first = true;
 	public ArrayList<String> toRender;
 	
-	public void addRenderString(String s) {
-		int wid = Client.mc.fontRenderer.getStringWidth(s) + 2;
-		if(wid > this.width) this.width = wid;
-		toRender.add(s);
-		this.height += ClickGUIHack.theme().yspacing;
-	}
-	
-	public void render() {
-		int savdWidth = this.width;
-		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
+	@Override
+	public void preRender() {
+		//this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
+		this.coordX.shown = this.coordY.shown = this.coordZ.shown = ClientInfoHack.instance.coords.value;
+		this.facing.shown = ClientInfoHack.instance.facing.value;
+		this.fps.shown = ClientInfoHack.instance.fps.value;
+		this.username.shown = ClientInfoHack.instance.username.value;
+		this.walkingSpeed.shown = ClientInfoHack.instance.walkingSpeed.value;
 		
+		this.facing.text = String.format("Facing: %s", PlayerUtils.getDirection());
+		this.fps.text = String.format("FPS: %s", Client.mc.fps);
+		this.username.text = String.format("Username: %s", Client.mc.session.username);
+		this.walkingSpeed.text = String.format("Speed: %.4f BPS", PlayerUtils.getSpeed(ClientInfoHack.instance.useHorizontal.value));	
 		
-		boolean renderCoords = ClientInfoHack.instance.coords.value;
-		boolean renderFacing = ClientInfoHack.instance.facing.value;
-		boolean renderFPS = ClientInfoHack.instance.fps.value;
-		boolean renderUsername = ClientInfoHack.instance.username.value;
-		boolean renderSpeed = ClientInfoHack.instance.walkingSpeed.value;
-		int ySpace = ClickGUIHack.theme().yspacing;
-		int prevSpace = ClickGUIHack.theme().titlebasediff;
-		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
-		
-		String coordX = "", coordY = "", coordZ = "";
-		String facing = String.format("Facing: %s", PlayerUtils.getDirection());
-		String fps = String.format("FPS: %s", Client.mc.fps);
-		String username = String.format("Username: %s", Client.mc.session.username);
-		String walkingSpeed = String.format("Speed: %.4f BPS", PlayerUtils.getSpeed(ClientInfoHack.instance.useHorizontal.value));	
-		int baseOff = ySpace + prevSpace;
-		this.height = baseOff;
-		toRender = new ArrayList<>();
-		if(this.minimized) this.height = ySpace;
-		else {
-			if(renderCoords) {
-				if(ClientInfoHack.instance.showNetherCoords.value) {
-					boolean inNether = Client.mc.theWorld.worldProvider.isHellWorld;
-					if(Client.mc.isMultiplayerWorld()) {
-						if(ClientInfoHack.instance.isInNether.currentMode.equals("Detect")) {
-							inNether = PlayerUtils.isInNether();
-						}else if(ClientInfoHack.instance.isInNether.currentMode.equals("Nether")) {
-							inNether = true;
-						}else if(ClientInfoHack.instance.isInNether.currentMode.equals("Overworld")) {
-							inNether = false;
-						}
-					}
-					
-					
-					if(inNether) {
-						coordX = String.format("X: %.2f %s%.2f", Client.mc.thePlayer.posX, ChatColor.LIGHTGREEN, Client.mc.thePlayer.posX*8);
-						coordY = String.format("Y: %.2f %s%.2f", Client.mc.thePlayer.posY, ChatColor.LIGHTGREEN, Client.mc.thePlayer.posY);
-						coordZ = String.format("Z: %.2f %s%.2f", Client.mc.thePlayer.posZ, ChatColor.LIGHTGREEN, Client.mc.thePlayer.posZ*8);
-					}else {
-						coordX = String.format("X: %.2f %s%.2f", Client.mc.thePlayer.posX, ChatColor.LIGHTRED, Client.mc.thePlayer.posX/8);
-						coordY = String.format("Y: %.2f %s%.2f", Client.mc.thePlayer.posY, ChatColor.LIGHTRED, Client.mc.thePlayer.posY);
-						coordZ = String.format("Z: %.2f %s%.2f", Client.mc.thePlayer.posZ, ChatColor.LIGHTRED, Client.mc.thePlayer.posZ/8);
-					}
+		//this.height = baseOff;
+		if(this.coordX.shown) {
+			if(ClientInfoHack.instance.showNetherCoords.value) {
+				boolean inNether = Client.mc.theWorld.worldProvider.isHellWorld;
+				if(inNether) {
+					this.coordX.text = String.format("X: %.2f %s%.2f", Client.mc.thePlayer.posX, ChatColor.LIGHTGREEN, Client.mc.thePlayer.posX*8);
+					this.coordY.text = String.format("Y: %.2f %s%.2f", Client.mc.thePlayer.posY, ChatColor.LIGHTGREEN, Client.mc.thePlayer.posY);
+					this.coordZ.text = String.format("Z: %.2f %s%.2f", Client.mc.thePlayer.posZ, ChatColor.LIGHTGREEN, Client.mc.thePlayer.posZ*8);
 				}else {
-					coordX = String.format("X: %.2f", Client.mc.thePlayer.posX);
-					coordY = String.format("Y: %.2f", Client.mc.thePlayer.posY);
-					coordZ = String.format("Z: %.2f", Client.mc.thePlayer.posZ);
+					this.coordX.text = String.format("X: %.2f %s%.2f", Client.mc.thePlayer.posX, ChatColor.LIGHTRED, Client.mc.thePlayer.posX/8);
+					this.coordY.text = String.format("Y: %.2f %s%.2f", Client.mc.thePlayer.posY, ChatColor.LIGHTRED, Client.mc.thePlayer.posY);
+					this.coordZ.text = String.format("Z: %.2f %s%.2f", Client.mc.thePlayer.posZ, ChatColor.LIGHTRED, Client.mc.thePlayer.posZ/8);
 				}
-				
-				this.addRenderString(coordX);
-				this.addRenderString(coordY);
-				this.addRenderString(coordZ);
+			}else {
+				this.coordX.text = String.format("X: %.2f", Client.mc.thePlayer.posX);
+				this.coordY.text = String.format("Y: %.2f", Client.mc.thePlayer.posY);
+				this.coordZ.text = String.format("Z: %.2f", Client.mc.thePlayer.posZ);
 			}
-			if(renderFacing) this.addRenderString(facing);
-			if(renderFPS) this.addRenderString(fps);
-			if(renderUsername) this.addRenderString(username);
-			if(renderSpeed) this.addRenderString(walkingSpeed);
 		}
 		
 		this.setPosition(ClientInfoHack.instance.staticPositon.getValue(), ClientInfoHack.instance.alignment.getValue());
-		boolean alignRight = this.isAlignedRight(ClientInfoHack.instance.staticPositon.getValue(), ClientInfoHack.instance.alignment.getValue());
-		int rendX = this.xPos + 2; 
+		alignRight = this.isAlignedRight(ClientInfoHack.instance.staticPositon.getValue(), ClientInfoHack.instance.alignment.getValue());
 		
-		if(!this.minimized) {
-			if(first) {
-				first = false;
-			}else {
-				boolean sav = false;
-				if(alignRight && savdWidth != this.width){
-					this.xPos -= (this.width - savdWidth);
-					sav = true;
-				}
-				
-				if(sav) Client.saveClickGUI();
-			}
-		}
+		super.preRender();
 		
-		if(this.minimized) {
-			this.renderMinimized();
-			return;
-		}
-		
-		this.renderName(alignRight);
-		this.renderFrame(this.xPos, this.yPos + baseOff, this.xPos + this.width, this.yPos + this.height);
-		int tcolor = ClickGUIHack.normTextColor();
-		
-		for(int i = 0; i < toRender.size(); ++i) {
-			String s = toRender.get(i);
-			if(alignRight) rendX = (this.xPos + this.width) - Client.mc.fontRenderer.getStringWidth(s);
-			Client.mc.fontRenderer.drawString(s, rendX, this.yPos + (i+1)*ySpace + prevSpace + txtCenter, tcolor);
-		}
 	}
 }

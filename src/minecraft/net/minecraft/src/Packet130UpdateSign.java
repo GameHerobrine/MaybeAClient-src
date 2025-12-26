@@ -29,7 +29,7 @@ public class Packet130UpdateSign extends Packet {
         this.signLines = new String[4];
 
         for(int var2 = 0; var2 < 4; ++var2) {
-            this.signLines[var2] = func_27048_a(var1, 15);
+            this.signLines[var2] = readString(var1, 15);
         }
 
     }
@@ -40,7 +40,7 @@ public class Packet130UpdateSign extends Packet {
         var1.writeInt(this.zPosition);
 
         for(int var2 = 0; var2 < 4; ++var2) {
-            func_27049_a(this.signLines[var2], var1);
+            writeString(this.signLines[var2], var1);
         }
 
     }

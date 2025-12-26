@@ -91,7 +91,7 @@ public class BlockRedstoneTorch extends BlockTorch {
         }
     }
 
-    private boolean func_27036_h(World var1, int var2, int var3, int var4) {
+    private boolean func_30002_h(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockMetadata(var2, var3, var4);
         if (var5 == 5 && var1.isBlockIndirectlyProvidingPowerTo(var2, var3 - 1, var4, 0)) {
             return true;
@@ -107,7 +107,7 @@ public class BlockRedstoneTorch extends BlockTorch {
     }
 
     public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-        boolean var6 = this.func_27036_h(var1, var2, var3, var4);
+        boolean var6 = this.func_30002_h(var1, var2, var3, var4);
 
         while(torchUpdates.size() > 0 && var1.getWorldTime() - ((RedstoneUpdateInfo)torchUpdates.get(0)).updateTime > 100L) {
             torchUpdates.remove(0);

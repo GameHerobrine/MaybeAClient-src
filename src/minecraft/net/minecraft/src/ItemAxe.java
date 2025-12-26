@@ -8,6 +8,6 @@ public class ItemAxe extends ItemTool {
     }
 
     static {
-        blocksEffectiveAgainst = new Block[]{Block.planks, Block.bookShelf, Block.wood, Block.crate};
+        blocksEffectiveAgainst = new Block[]{Block.planks, Block.bookShelf, Block.wood, Block.chest};
     }
 }

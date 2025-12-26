@@ -26,7 +26,7 @@ public class Packet25EntityPainting extends Packet {
 
     public void readPacketData(DataInputStream var1) throws IOException {
         this.entityId = var1.readInt();
-        this.title = func_27048_a(var1, EnumArt.field_27365_z);
+        this.title = readString(var1, EnumArt.maxArtTitleLength);
         this.xPosition = var1.readInt();
         this.yPosition = var1.readInt();
         this.zPosition = var1.readInt();
@@ -35,7 +35,7 @@ public class Packet25EntityPainting extends Packet {
 
     public void writePacketData(DataOutputStream var1) throws IOException {
         var1.writeInt(this.entityId);
-        func_27049_a(this.title, var1);
+        writeString(this.title, var1);
         var1.writeInt(this.xPosition);
         var1.writeInt(this.yPosition);
         var1.writeInt(this.zPosition);

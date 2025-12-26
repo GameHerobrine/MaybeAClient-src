@@ -3,7 +3,7 @@ package net.minecraft.src;
 public class EntityChicken extends EntityAnimal {
     public boolean field_753_a = false;
     public float field_752_b = 0.0F;
-    public float field_758_c = 0.0F;
+    public float destPos = 0.0F;
     public float field_757_d;
     public float field_756_e;
     public float field_755_h = 1.0F;
@@ -20,14 +20,14 @@ public class EntityChicken extends EntityAnimal {
     public void onLivingUpdate() {
         super.onLivingUpdate();
         this.field_756_e = this.field_752_b;
-        this.field_757_d = this.field_758_c;
-        this.field_758_c = (float)((double)this.field_758_c + (double)(this.onGround ? -1 : 4) * 0.3D);
-        if (this.field_758_c < 0.0F) {
-            this.field_758_c = 0.0F;
+        this.field_757_d = this.destPos;
+        this.destPos = (float)((double)this.destPos + (double)(this.onGround ? -1 : 4) * 0.3D);
+        if (this.destPos < 0.0F) {
+            this.destPos = 0.0F;
         }
 
-        if (this.field_758_c > 1.0F) {
-            this.field_758_c = 1.0F;
+        if (this.destPos > 1.0F) {
+            this.destPos = 1.0F;
         }
 
         if (!this.onGround && this.field_755_h < 1.0F) {

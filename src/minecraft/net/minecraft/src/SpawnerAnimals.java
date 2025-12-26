@@ -65,14 +65,14 @@ public final class SpawnerAnimals {
                                         }
 
                                         var10 = (ChunkCoordIntPair)var39.next();
-                                        BiomeGenBase var11 = var0.getWorldChunkManager().func_4074_a(var10);
+                                        BiomeGenBase var11 = var0.getWorldChunkManager().getBiomeGenAtChunkCoord(var10);
                                         var12 = var11.getSpawnableList(var38);
                                     } while(var12 == null);
                                 } while(var12.isEmpty());
 
                                 int var13 = 0;
 
-                                for(Iterator var14 = var12.iterator(); var14.hasNext(); var13 += var15.field_25211_b) {
+                                for(Iterator var14 = var12.iterator(); var14.hasNext(); var13 += var15.spawnRarityRate) {
                                     var15 = (SpawnListEntry)var14.next();
                                 }
 
@@ -82,7 +82,7 @@ public final class SpawnerAnimals {
 
                                 while(var16.hasNext()) {
                                     SpawnListEntry var17 = (SpawnListEntry)var16.next();
-                                    var40 -= var17.field_25211_b;
+                                    var40 -= var17.spawnRarityRate;
                                     if (var40 < 0) {
                                         var15 = var17;
                                         break;
@@ -93,7 +93,7 @@ public final class SpawnerAnimals {
                                 var42 = var41.x;
                                 var18 = var41.y;
                                 var19 = var41.z;
-                            } while(var0.isBlockOpaqueCube(var42, var18, var19));
+                            } while(var0.func_28100_h(var42, var18, var19));
                         } while(var0.getBlockMaterial(var42, var18, var19) != var38.getCreatureMaterial());
 
                         int var20 = 0;
@@ -120,7 +120,7 @@ public final class SpawnerAnimals {
                                         if (var33 >= 576.0F) {
                                             EntityLiving var43;
                                             try {
-                                                var43 = (EntityLiving)var15.field_25212_a.getConstructor(World.class).newInstance(var0);
+                                                var43 = (EntityLiving)var15.entityClass.getConstructor(World.class).newInstance(var0);
                                             } catch (Exception var34) {
                                                 var34.printStackTrace();
                                                 return var3;
@@ -152,9 +152,9 @@ public final class SpawnerAnimals {
 
     public static boolean canCreatureTypeSpawnAtLocation(EnumCreatureType var0, World var1, int var2, int var3, int var4) {
         if (var0.getCreatureMaterial() == Material.water) {
-            return var1.getBlockMaterial(var2, var3, var4).getIsLiquid() && !var1.isBlockOpaqueCube(var2, var3 + 1, var4);
+            return var1.getBlockMaterial(var2, var3, var4).getIsLiquid() && !var1.func_28100_h(var2, var3 + 1, var4);
         } else {
-            return var1.isBlockOpaqueCube(var2, var3 - 1, var4) && !var1.isBlockOpaqueCube(var2, var3, var4) && !var1.getBlockMaterial(var2, var3, var4).getIsLiquid() && !var1.isBlockOpaqueCube(var2, var3 + 1, var4);
+            return var1.func_28100_h(var2, var3 - 1, var4) && !var1.func_28100_h(var2, var3, var4) && !var1.getBlockMaterial(var2, var3, var4).getIsLiquid() && !var1.func_28100_h(var2, var3 + 1, var4);
         }
     }
 
@@ -167,6 +167,7 @@ public final class SpawnerAnimals {
         } else if (var0 instanceof EntitySheep) {
             ((EntitySheep)var0).setFleeceColor(EntitySheep.getRandomFleeceColor(var1.rand));
         }
+
     }
 
     public static boolean performSleepSpawning(World var0, List var1) {
@@ -203,7 +204,7 @@ public final class SpawnerAnimals {
                 int var12 = var0.rand.nextInt(var6.length);
 
                 int var13;
-                for(var13 = var11; var13 > 2 && !var0.isBlockOpaqueCube(var9, var13 - 1, var10); --var13) {
+                for(var13 = var11; var13 > 2 && !var0.func_28100_h(var9, var13 - 1, var10); --var13) {
                 }
 
                 while(!canCreatureTypeSpawnAtLocation(EnumCreatureType.monster, var0, var9, var13, var10) && var13 < var11 + 16 && var13 < 128) {

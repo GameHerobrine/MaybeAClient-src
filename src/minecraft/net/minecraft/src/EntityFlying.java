@@ -9,7 +9,7 @@ public class EntityFlying extends EntityLiving {
     }
 
     public void moveEntityWithHeading(float var1, float var2) {
-        if (this.func_27013_ag()) {
+        if (this.isInWater()) {
             this.moveFlying(var1, var2, 0.02F);
             this.moveEntity(this.motionX, this.motionY, this.motionZ);
             this.motionX *= 0.800000011920929D;

@@ -49,7 +49,7 @@ public class RenderCreeper extends RenderLiving {
     }
 
     protected boolean func_27006_a(EntityCreeper var1, int var2, float var3) {
-        if (var1.func_27022_s()) {
+        if (var1.getPowered()) {
             if (var2 == 1) {
                 float var4 = (float)var1.ticksExisted + var3;
                 this.loadTexture("/armor/power.png");

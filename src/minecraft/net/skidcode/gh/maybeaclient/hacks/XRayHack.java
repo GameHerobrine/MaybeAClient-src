@@ -14,7 +14,7 @@ public class XRayHack extends Hack{
 	
 	public static XRayHack INSTANCE;
 
-	public static boolean applyOpacity = true;
+	public static boolean applyOpacity = false;
 	
 	public SettingFloat opacity;
 	public SettingMode mode;
@@ -27,7 +27,7 @@ public class XRayHack extends Hack{
 			@Override
 			public void setValue(float value) {
 				super.setValue(value);
-				if(this.hack.status && mc.theWorld != null) {
+				if(INSTANCE.status && mc.theWorld != null) {
 					mc.entityRenderer.updateRenderer();
 			        mc.theWorld.markBlocksDirty((int)mc.thePlayer.posX - 256, 0, (int)mc.thePlayer.posZ - 256, (int)mc.thePlayer.posX + 256, 127, (int)mc.thePlayer.posZ + 256);
 				}

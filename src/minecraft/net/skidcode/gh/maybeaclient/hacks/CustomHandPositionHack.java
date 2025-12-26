@@ -4,6 +4,7 @@ import org.lwjgl.input.Keyboard;
 
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingFloat;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingInteger;
 
 public class CustomHandPositionHack extends Hack{
 	public static CustomHandPositionHack instance;
@@ -13,6 +14,7 @@ public class CustomHandPositionHack extends Hack{
 	public SettingFloat rotX = new SettingFloat(this, "X Rotation", 0, -180f, 180f, 3);
 	public SettingFloat rotY = new SettingFloat(this, "Y Rotation", 0, -180f, 180f, 3);
 	public SettingFloat rotZ = new SettingFloat(this, "Z Rotation", 0, -180f, 180f, 3);
+	public SettingInteger swingSpeed = new SettingInteger(this, "SwingSpeedTicks", 8, 0, 20, 1);
 	//public SettingFloat xOff = new SettingFloat(this, "X offset");
 	
 	
@@ -24,7 +26,7 @@ public class CustomHandPositionHack extends Hack{
 		this.addSetting(this.rotX);
 		this.addSetting(this.rotY);
 		this.addSetting(this.rotZ);
+		this.addSetting(this.swingSpeed);
 		instance = this;
 	}
-
 }

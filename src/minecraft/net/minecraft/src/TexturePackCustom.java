@@ -111,7 +111,7 @@ public class TexturePackCustom extends TexturePackBase {
         this.texturePackZipFile = null;
     }
 
-    public InputStream func_6481_a(String var1) {
+    public InputStream getResourceAsStream(String var1) {
         try {
             ZipEntry var2 = this.texturePackZipFile.getEntry(var1.substring(1));
             if (var2 != null) {

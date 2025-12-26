@@ -40,8 +40,9 @@ public class Tessellator {
     private int vboIndex = 0;
     private int vboCount = 10;
     private int bufferSize;
-	public boolean schematicaRendering = false;
 
+	public boolean schematicaRendering = false;
+	
     private Tessellator(int var1) {
         this.bufferSize = var1;
         this.byteBuffer = GLAllocation.createDirectByteBuffer(var1 * 4);
@@ -190,8 +191,6 @@ public class Tessellator {
     			this.setColorRGBA(var1, var2, var3, 255);
     		}
     	}
-    	
-    	//this.setColorRGBA(var1, var2, var3, 255);
     }
 
     public void setColorRGBA(int var1, int var2, int var3, int var4) {
@@ -237,13 +236,7 @@ public class Tessellator {
 
         }
     }
-    public void setColorRGBAu(int var1, int var2, int var3, int var4) {
-        if (!this.isColorDisabled) {
-            this.hasColor = true;
-            if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) this.color = var4 << 24 | var3 << 16 | var2 << 8 | var1;
-            else this.color = var1 << 24 | var2 << 16 | var3 << 8 | var4;
-        }
-    }
+
     public void addVertexWithUV(double var1, double var3, double var5, double var7, double var9) {
         this.setTextureUV(var7, var9);
         this.addVertex(var1, var3, var5);
@@ -318,7 +311,7 @@ public class Tessellator {
         if (!this.isDrawing) {
             System.out.println("But..");
         }
-        
+
         this.hasNormals = true;
         byte var4 = (byte)((int)(var1 * 128.0F));
         byte var5 = (byte)((int)(var2 * 127.0F));

@@ -9,6 +9,7 @@ import net.minecraft.src.NBTTagList;
 import net.minecraft.src.NBTTagString;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
@@ -88,6 +89,11 @@ public class SettingIgnoreList extends Setting{
 	}
 	@Override
 	public void renderText(int x, int y) {
+		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x+2, y + ClickGUIHack.theme().yaddtocenterText, this.enabled ? Theme.IRIDIUM_ENABLED_COLOR : Theme.IRIDIUM_DISABLED_COLOR);
+			this.mouseHovering = false;
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, this.enabled ? 0xffffff : Theme.HEPH_DISABLED_COLOR);
 			this.mouseHovering = false;
@@ -96,18 +102,20 @@ public class SettingIgnoreList extends Setting{
 		super.renderText(x, y);
 	}
 	@Override
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(this.enabled) {
 			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) return;
+			if(ClickGUIHack.theme() == Theme.IRIDIUM) return;
 			if(ClickGUIHack.theme() == Theme.NODUS) {
-				tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
+				Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
 			}else {
-				tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+				Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 			}
 		}
 	}
+	
 	@Override
-	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		this.enabled = !this.enabled;
 	}
 }

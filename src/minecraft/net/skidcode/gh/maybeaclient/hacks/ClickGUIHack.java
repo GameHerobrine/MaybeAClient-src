@@ -2,7 +2,9 @@ package net.skidcode.gh.maybeaclient.hacks;
 
 import org.lwjgl.input.Keyboard;
 
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
+import net.skidcode.gh.maybeaclient.gui.click.Tab;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingColor;
@@ -18,9 +20,8 @@ public class ClickGUIHack extends Hack{
 	public SettingBoolean fillEnabled = new SettingBoolean(this, "Show Enabled Modules", true);
 	public SettingBoolean resetColor = new SettingBoolean(this, "Reset Colors On Theme Switch", true);
 	public SettingBoolean showDescription = new SettingBoolean(this, "Show Description", false);
-	
 	public SettingEnum<Theme> theme;
-	
+	public SettingEnum<ShowFrame> showFrameInHud = new SettingEnum<ShowFrame>(this, "HUDFrameStyle", ShowFrame.YES);
 	
 	public ClickGUIHack() {
 		super("ClickGUI", "Open ClickGUI", Keyboard.KEY_UP, Category.UI);
@@ -29,9 +30,11 @@ public class ClickGUIHack extends Hack{
 		this.addSetting(this.theme = new SettingEnum<Theme>(this, "Theme", Theme.CLIFF) {
 			public void setValue(String value) {
 				super.setValue(value);
+				Theme theme = this.getValue();
 				boolean nodus = this.getValue() == Theme.NODUS;
 				boolean cliff = this.getValue() == Theme.CLIFF;
 				boolean hephaestus = this.getValue() == Theme.HEPHAESTUS;
+				
 				ClickGUIHack.instance.secColor.hidden = !nodus && !hephaestus;
 				ClickGUIHack.instance.fillEnabled.hidden = !nodus;
 				ClickGUIHack.instance.showDescription.hidden = hephaestus;
@@ -49,10 +52,20 @@ public class ClickGUIHack extends Hack{
 						ClickGUIHack.instance.themeColor.setValue(29, 34, 54);
 						ClickGUIHack.instance.secColor.setValue(0xfd, 0xfd, 0x96);
 					}
+					
+					if(theme == Theme.IRIDIUM) {
+						ClickGUIHack.instance.themeColor.setValue(0xff, 0x33, 0x33);
+						ClickGUIHack.instance.secColor.setValue(0xfd, 0xfd, 0x96);
+					}
 				}
 				ClickGUIHack.instance.showDescription.hidden = hephaestus;
+				
+				for(Hack h : Client.hacksByName.values()) {
+					h.themeChanged(this.getValue());
+				}
 			}
 		});
+		this.addSetting(this.showFrameInHud);
 		this.addSetting(this.resetColor);
 		this.addSetting(this.themeColor);
 		this.addSetting(this.secColor);
@@ -60,11 +73,22 @@ public class ClickGUIHack extends Hack{
 		this.addSetting(this.showDescription);
 	}
 	
+	public static boolean renderHeader(Tab tab) {
+		ShowFrame h = instance.showFrameInHud.getValue();
+		return h == ShowFrame.YES || (!tab.isHUD || tab.minimized.getValue());
+	}
+	
+	public static ShowFrame renderFrame(Tab tab) {
+		ShowFrame h = instance.showFrameInHud.getValue();
+		return (tab != null && (!tab.isHUD || tab.minimized.getValue())) ? ShowFrame.YES : h;
+	}
+	
 	public static int normTextColor() {
-		if(theme() == Theme.CLIFF || theme() == Theme.HEPHAESTUS) return 0xffffff;
+		if(theme() == Theme.CLIFF || theme() == Theme.HEPHAESTUS || theme() == Theme.IRIDIUM) return 0xffffff;
 		return ClickGUIHack.instance.themeColor.rgb();
 	}
 	public static int highlightedTextColor() {
+		if(theme() == Theme.IRIDIUM) return 0x55ffff;
 		if(theme() == Theme.CLIFF) return 0x55FFFF;
 		return ClickGUIHack.instance.secColor.rgb();
 	}
@@ -103,12 +127,15 @@ public class ClickGUIHack extends Hack{
 	public enum Theme{
 		CLIFF("Cliff", 12, 3, 2, 2, 1, 2, 4, false, 2),
 		NODUS("Nodus", 14, 2, 3, 0, 0, 10+4+2, 4, false, 2),
-		HEPHAESTUS("Hephaestus", 14, 0, 3, 0, 0, 10+4+2+2, 4, true, 4);
+		HEPHAESTUS("Hephaestus", 14, 0, 3, 0, 0, 10+4+2+2, 4, true, 4),
+		IRIDIUM("Iridium", 10, 2, 1, 0, 0, 11, 4, false, 1);
 		
 		public static final int HEPH_DESC_YADD = 10;
 		public static final int HEPH_OPT_XADD = 7;
 		public static final int HEPH_SLIDER_HEIGHT = 2;
 		public static final int HEPH_DISABLED_COLOR = 0x676767;
+		public static final int IRIDIUM_DISABLED_COLOR = 0x555555;
+		public static final int IRIDIUM_ENABLED_COLOR = 0xf7f7f7;
 		public int yspacing;
 		public int titlebasediff;
 		public int yaddtocenterText;
@@ -136,4 +163,20 @@ public class ClickGUIHack extends Hack{
 			return this.name;
 		}
 	}
+	
+	public static enum ShowFrame{
+		YES("Full"),
+		NOHEADER("NoHeader"),
+		TRANSPARENT("NoHeaderHalfTransparentBG"),
+		NO("NoHeaderNoBG");
+		
+		public final String name;
+		ShowFrame(String name) {
+			this.name = name;
+		}
+		public String toString() {
+			return this.name;
+		}
+	}
+
 }

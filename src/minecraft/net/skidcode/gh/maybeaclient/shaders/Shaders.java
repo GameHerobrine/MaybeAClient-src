@@ -4,29 +4,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
 
 public class Shaders {
-	/*public static int shaderprogs[] = new int[1];
-	public static final int S_NONE = 0;
-	public static int S_TEST = 0;
-	*/
+	//public static int shaderprogs[] = new int[1];
+	//public static final int S_NONE = 0;
+	//public static int S_TEST = 0;
+	
 	public static void init() {
 	//	System.out.println("Initializing shaders");
 	//	S_TEST = setupShader("test.vsh", "test.fsh");
 	}
-	/*
-	public static void destroy() {
+	
+	/*public static void destroy() {
 		destroyShader(S_TEST);
 	}
 	
@@ -34,6 +31,13 @@ public class Shaders {
 	public static void use(int prog) {
 		active = prog;
 		ARBShaderObjects.glUseProgramObjectARB(active);
+		if(active != S_NONE) {
+			int uniform = ARBShaderObjects.glGetUniformLocationARB(active, "timeMs");
+			float a = (float)(System.currentTimeMillis() % 1000) / 1000f;
+			ARBShaderObjects.glUniform1fARB(uniform, a);
+			uniform = ARBShaderObjects.glGetUniformLocationARB(active, "resolution");
+			ARBShaderObjects.glUniform2fARB(uniform, Client.mc.displayWidth, Client.mc.displayHeight);
+		}
 	}
 	
 	public static int setup(String path, int type) throws IOException {

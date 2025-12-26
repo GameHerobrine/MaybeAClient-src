@@ -27,38 +27,38 @@ public class BlockTorch extends Block {
     }
 
     public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-        if (var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
+        if (var1.func_28100_h(var2 - 1, var3, var4)) {
             return true;
-        } else if (var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
+        } else if (var1.func_28100_h(var2 + 1, var3, var4)) {
             return true;
-        } else if (var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
+        } else if (var1.func_28100_h(var2, var3, var4 - 1)) {
             return true;
-        } else if (var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
+        } else if (var1.func_28100_h(var2, var3, var4 + 1)) {
             return true;
         } else {
-            return var1.isBlockOpaqueCube(var2, var3 - 1, var4);
+            return var1.func_28100_h(var2, var3 - 1, var4);
         }
     }
 
     public void onBlockPlaced(World var1, int var2, int var3, int var4, int var5) {
         int var6 = var1.getBlockMetadata(var2, var3, var4);
-        if (var5 == 1 && var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+        if (var5 == 1 && var1.func_28100_h(var2, var3 - 1, var4)) {
             var6 = 5;
         }
 
-        if (var5 == 2 && var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
+        if (var5 == 2 && var1.func_28100_h(var2, var3, var4 + 1)) {
             var6 = 4;
         }
 
-        if (var5 == 3 && var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
+        if (var5 == 3 && var1.func_28100_h(var2, var3, var4 - 1)) {
             var6 = 3;
         }
 
-        if (var5 == 4 && var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
+        if (var5 == 4 && var1.func_28100_h(var2 + 1, var3, var4)) {
             var6 = 2;
         }
 
-        if (var5 == 5 && var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
+        if (var5 == 5 && var1.func_28100_h(var2 - 1, var3, var4)) {
             var6 = 1;
         }
 
@@ -74,15 +74,15 @@ public class BlockTorch extends Block {
     }
 
     public void onBlockAdded(World var1, int var2, int var3, int var4) {
-        if (var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
+        if (var1.func_28100_h(var2 - 1, var3, var4)) {
             var1.setBlockMetadataWithNotify(var2, var3, var4, 1);
-        } else if (var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
+        } else if (var1.func_28100_h(var2 + 1, var3, var4)) {
             var1.setBlockMetadataWithNotify(var2, var3, var4, 2);
-        } else if (var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
+        } else if (var1.func_28100_h(var2, var3, var4 - 1)) {
             var1.setBlockMetadataWithNotify(var2, var3, var4, 3);
-        } else if (var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
+        } else if (var1.func_28100_h(var2, var3, var4 + 1)) {
             var1.setBlockMetadataWithNotify(var2, var3, var4, 4);
-        } else if (var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
+        } else if (var1.func_28100_h(var2, var3 - 1, var4)) {
             var1.setBlockMetadataWithNotify(var2, var3, var4, 5);
         }
 
@@ -93,23 +93,23 @@ public class BlockTorch extends Block {
         if (this.dropTorchIfCantStay(var1, var2, var3, var4)) {
             int var6 = var1.getBlockMetadata(var2, var3, var4);
             boolean var7 = false;
-            if (!var1.isBlockOpaqueCube(var2 - 1, var3, var4) && var6 == 1) {
+            if (!var1.func_28100_h(var2 - 1, var3, var4) && var6 == 1) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2 + 1, var3, var4) && var6 == 2) {
+            if (!var1.func_28100_h(var2 + 1, var3, var4) && var6 == 2) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3, var4 - 1) && var6 == 3) {
+            if (!var1.func_28100_h(var2, var3, var4 - 1) && var6 == 3) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3, var4 + 1) && var6 == 4) {
+            if (!var1.func_28100_h(var2, var3, var4 + 1) && var6 == 4) {
                 var7 = true;
             }
 
-            if (!var1.isBlockOpaqueCube(var2, var3 - 1, var4) && var6 == 5) {
+            if (!var1.func_28100_h(var2, var3 - 1, var4) && var6 == 5) {
                 var7 = true;
             }
 
@@ -154,9 +154,9 @@ public class BlockTorch extends Block {
         int var6 = var1.getBlockMetadata(var2, var3, var4);
         Client.class.getClass();
         //XXX NoJitter fixes
-        double var7 = (double)(var2 + 0.5D);
-        double var9 = (double)(var3 + 0.7D);
-        double var11 = (double)(var4 + 0.5D);
+        double var7 = (double)((float)var2 + 0.5F);
+        double var9 = (double)((float)var3 + 0.7F);
+        double var11 = (double)((float)var4 + 0.5F);
         double var13 = 0.2199999988079071D;
         double var15 = 0.27000001072883606D;
         if (var6 == 1) {

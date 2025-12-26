@@ -14,7 +14,7 @@ public class BlockSoulSand extends Block {
 
     public void onEntityCollidedWithBlock(World var1, int var2, int var3, int var4, Entity var5) {
     	if(!AntiSlowdownHack.instance.status) {
-            var5.motionX *= 0.4D;
+    		var5.motionX *= 0.4D;
             var5.motionZ *= 0.4D;
     	}
     }

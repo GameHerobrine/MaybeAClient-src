@@ -17,7 +17,7 @@ import net.skidcode.gh.maybeaclient.Client;
 
 public class GuiSchematicaStats extends GuiScreen{
 	
-	class GuiBlockRequired extends GuiSlot{
+	public static class GuiBlockRequired extends GuiSlot{
 		public GuiSchematicaStats parent;
 		public GuiBlockRequired(GuiSchematicaStats gui) {
 			super(Client.mc, gui.width, gui.height, 20, gui.height - 32 + 4, 20);
@@ -79,7 +79,7 @@ public class GuiSchematicaStats extends GuiScreen{
 	        //GL11.glPopMatrix();
 			GL11.glDisable(GL11.GL_LIGHTING);
 	        GL11.glEnable(GL11.GL_DEPTH_TEST);
-			GuiIngame.itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, new ItemStack(i.id, 1, 0), x, y);
+			GuiIngame.itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, new ItemStack(i.id, 1, i.meta), x, y);
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			GL11.glDisable(GL11.GL_LIGHTING);
 			//RenderHelper.disableStandardItemLighting();

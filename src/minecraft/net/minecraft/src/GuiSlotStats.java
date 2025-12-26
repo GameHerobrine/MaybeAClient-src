@@ -15,7 +15,7 @@ abstract class GuiSlotStats extends GuiSlot {
     final GuiStats field_27269_g;
 
     protected GuiSlotStats(GuiStats var1) {
-        super(var1.mc, var1.width, var1.height, 32, var1.height - 64, 20);
+        super(GuiStats.func_27143_f(var1), var1.width, var1.height, 32, var1.height - 64, 20);
         this.field_27269_g = var1;
         this.field_27268_b = -1;
         this.field_27271_e = -1;
@@ -41,21 +41,21 @@ abstract class GuiSlotStats extends GuiSlot {
         }
 
         if (this.field_27268_b == 0) {
-            this.field_27269_g.func_27136_c(var1 + 115 - 18, var2 + 1, 0, 0);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + 115 - 18, var2 + 1, 0, 0);
         } else {
-            this.field_27269_g.func_27136_c(var1 + 115 - 18, var2 + 1, 0, 18);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + 115 - 18, var2 + 1, 0, 18);
         }
 
         if (this.field_27268_b == 1) {
-            this.field_27269_g.func_27136_c(var1 + 165 - 18, var2 + 1, 0, 0);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + 165 - 18, var2 + 1, 0, 0);
         } else {
-            this.field_27269_g.func_27136_c(var1 + 165 - 18, var2 + 1, 0, 18);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + 165 - 18, var2 + 1, 0, 18);
         }
 
         if (this.field_27268_b == 2) {
-            this.field_27269_g.func_27136_c(var1 + 215 - 18, var2 + 1, 0, 0);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + 215 - 18, var2 + 1, 0, 0);
         } else {
-            this.field_27269_g.func_27136_c(var1 + 215 - 18, var2 + 1, 0, 18);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + 215 - 18, var2 + 1, 0, 18);
         }
 
         if (this.field_27271_e != -1) {
@@ -71,7 +71,7 @@ abstract class GuiSlotStats extends GuiSlot {
                 var5 = 36;
             }
 
-            this.field_27269_g.func_27136_c(var1 + var4, var2 + 1, var5, 0);
+            GuiStats.func_27128_a(this.field_27269_g, var1 + var4, var2 + 1, var5, 0);
         }
 
     }
@@ -88,7 +88,7 @@ abstract class GuiSlotStats extends GuiSlot {
 
         if (this.field_27268_b >= 0) {
             this.func_27266_c(this.field_27268_b);
-            this.field_27269_g.mc.sndManager.func_337_a("random.click", 1.0F, 1.0F);
+            GuiStats.func_27149_g(this.field_27269_g).sndManager.playSoundFX("random.click", 1.0F, 1.0F);
         }
 
     }
@@ -106,11 +106,11 @@ abstract class GuiSlotStats extends GuiSlot {
     protected void func_27265_a(StatCrafting var1, int var2, int var3, boolean var4) {
         String var5;
         if (var1 != null) {
-            var5 = var1.func_27084_a(this.field_27269_g.field_27156_o.func_27184_a(var1));
-            this.field_27269_g.drawString(this.field_27269_g.fontRenderer, var5, var2 - this.field_27269_g.fontRenderer.getStringWidth(var5), var3 + 5, var4 ? 16777215 : 9474192);
+            var5 = var1.func_27084_a(GuiStats.func_27142_c(this.field_27269_g).func_27184_a(var1));
+            this.field_27269_g.drawString(GuiStats.func_27133_h(this.field_27269_g), var5, var2 - GuiStats.func_27137_i(this.field_27269_g).getStringWidth(var5), var3 + 5, var4 ? 16777215 : 9474192);
         } else {
             var5 = "-";
-            this.field_27269_g.drawString(this.field_27269_g.fontRenderer, var5, var2 - this.field_27269_g.fontRenderer.getStringWidth(var5), var3 + 5, var4 ? 16777215 : 9474192);
+            this.field_27269_g.drawString(GuiStats.func_27132_j(this.field_27269_g), var5, var2 - GuiStats.func_27134_k(this.field_27269_g).getStringWidth(var5), var3 + 5, var4 ? 16777215 : 9474192);
         }
 
     }
@@ -144,9 +144,9 @@ abstract class GuiSlotStats extends GuiSlot {
                 if (var5.length() > 0) {
                     int var6 = var1 + 12;
                     int var7 = var2 - 12;
-                    int var8 = this.field_27269_g.fontRenderer.getStringWidth(var5);
-                    this.field_27269_g.drawGradientRect(var6 - 3, var7 - 3, var6 + var8 + 3, var7 + 8 + 3, -1073741824, -1073741824);
-                    this.field_27269_g.fontRenderer.drawStringWithShadow(var5, var6, var7, -1);
+                    int var8 = GuiStats.func_27139_l(this.field_27269_g).getStringWidth(var5);
+                    GuiStats.func_27129_a(this.field_27269_g, var6 - 3, var7 - 3, var6 + var8 + 3, var7 + 8 + 3, -1073741824, -1073741824);
+                    GuiStats.func_27144_m(this.field_27269_g).drawStringWithShadow(var5, var6, var7, -1);
                 }
             }
 
@@ -160,9 +160,9 @@ abstract class GuiSlotStats extends GuiSlot {
             if (var5.length() > 0) {
                 int var6 = var2 + 12;
                 int var7 = var3 - 12;
-                int var8 = this.field_27269_g.fontRenderer.getStringWidth(var5);
-                this.field_27269_g.drawGradientRect(var6 - 3, var7 - 3, var6 + var8 + 3, var7 + 8 + 3, -1073741824, -1073741824);
-                this.field_27269_g.fontRenderer.drawStringWithShadow(var5, var6, var7, -1);
+                int var8 = GuiStats.func_27127_n(this.field_27269_g).getStringWidth(var5);
+                GuiStats.func_27135_b(this.field_27269_g, var6 - 3, var7 - 3, var6 + var8 + 3, var7 + 8 + 3, -1073741824, -1073741824);
+                GuiStats.func_27131_o(this.field_27269_g).drawStringWithShadow(var5, var6, var7, -1);
             }
 
         }

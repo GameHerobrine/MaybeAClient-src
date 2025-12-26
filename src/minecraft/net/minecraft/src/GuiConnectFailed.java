@@ -45,6 +45,7 @@ public class GuiConnectFailed extends GuiScreen {
             this.mc.displayGuiScreen(new GuiConnecting(this.mc, var3[0], var3.length > 1 ? GuiMultiplayer.getPort(var3[1], 25565) : 25565));
         }
     }
+
     public boolean renderDPS = false;
     public boolean canAutoReconnect = true;
     public String additionalToRender = "";
@@ -55,6 +56,7 @@ public class GuiConnectFailed extends GuiScreen {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRenderer, this.errorMessage, this.width / 2, this.height / 2 - 50, 16777215);
         this.drawCenteredString(this.fontRenderer, this.errorDetail, this.width / 2, this.height / 2 - 10, 16777215);
+        
         if(this.renderDPS || NoFallHack.instance.sentDisconnectPacket) {
         	additionalToRender = "(NoFall sent disconnect packet)";
         	

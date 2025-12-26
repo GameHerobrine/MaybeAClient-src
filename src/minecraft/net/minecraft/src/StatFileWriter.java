@@ -113,7 +113,7 @@ public class StatFileWriter {
                 if (var12 == null) {
                     System.out.println(var10 + " is not a valid stat");
                 } else {
-                    var3.append(StatList.func_27361_a(var10).field_25069_f).append(",");
+                    var3.append(StatList.func_27361_a(var10).statGuid).append(",");
                     var3.append(var11).append(",");
                     var1.put(var12, var11);
                 }
@@ -156,7 +156,7 @@ public class StatFileWriter {
             }
 
             var3.append("\r\n    {\"").append(var7.statId).append("\":").append(var2.get(var7));
-            var4.append(var7.field_25069_f).append(",");
+            var4.append(var7.statGuid).append(",");
             var4.append(var2.get(var7)).append(",");
         }
 
@@ -171,12 +171,12 @@ public class StatFileWriter {
         return var3.toString();
     }
 
-    public boolean func_27183_a(Achievement var1) {
+    public boolean hasAchievementUnlocked(Achievement var1) {
         return this.field_25102_a.containsKey(var1);
     }
 
     public boolean func_27181_b(Achievement var1) {
-        return var1.field_25076_c == null || this.func_27183_a(var1.field_25076_c);
+        return var1.parentAchievement == null || this.hasAchievementUnlocked(var1.parentAchievement);
     }
 
     public int func_27184_a(StatBase var1) {

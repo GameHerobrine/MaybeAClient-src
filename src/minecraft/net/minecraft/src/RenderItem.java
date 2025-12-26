@@ -1,9 +1,6 @@
 package net.minecraft.src;
 
-import java.util.ArrayList;
 import java.util.Random;
-
-import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 
 import net.skidcode.gh.maybeaclient.Client;
@@ -250,7 +247,6 @@ public class RenderItem extends Render {
             float var20 = 1.0F;
             float var21 = 0.5F;
             float var22 = 0.25F;
-
             if(EntityESPHack.instance.shouldRender(entity) && EntityESPHack.instance.getRenderingMode(entity).equalsIgnoreCase("Fill")) {
 				int r, g, b;
 				r = EntityESPHack.instance.itemColor.red;
@@ -367,25 +363,25 @@ public class RenderItem extends Render {
 					GL11.glPopMatrix();
 				}
 			}else {
-				for(int var23 = 0; var23 < var13; ++var23) {
-					GL11.glPushMatrix();
-					if (var23 > 0) {
-						float var24 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-						float var25 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-						float var26 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-						GL11.glTranslatef(var24, var25, var26);
-					}
+	            for(int var23 = 0; var23 < var13; ++var23) {
+	                GL11.glPushMatrix();
+	                if (var23 > 0) {
+	                    float var24 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
+	                    float var25 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
+	                    float var26 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
+	                    GL11.glTranslatef(var24, var25, var26);
+	                }
 	
-					GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-					tess.startDrawingQuads();
-					tess.setNormal(0.0F, 1.0F, 0.0F);
-					tess.addVertexWithUV((double)(0.0F - var21), (double)(0.0F - var22), 0.0D, (double)var16, (double)var19);
-					tess.addVertexWithUV((double)(var20 - var21), (double)(0.0F - var22), 0.0D, (double)var17, (double)var19);
-					tess.addVertexWithUV((double)(var20 - var21), (double)(1.0F - var22), 0.0D, (double)var17, (double)var18);
-					tess.addVertexWithUV((double)(0.0F - var21), (double)(1.0F - var22), 0.0D, (double)var16, (double)var18);
-					tess.draw();
-					GL11.glPopMatrix();
-				}
+	                GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+	                tess.startDrawingQuads();
+	                tess.setNormal(0.0F, 1.0F, 0.0F);
+	                tess.addVertexWithUV((double)(0.0F - var21), (double)(0.0F - var22), 0.0D, (double)var16, (double)var19);
+	                tess.addVertexWithUV((double)(var20 - var21), (double)(0.0F - var22), 0.0D, (double)var17, (double)var19);
+	                tess.addVertexWithUV((double)(var20 - var21), (double)(1.0F - var22), 0.0D, (double)var17, (double)var18);
+	                tess.addVertexWithUV((double)(0.0F - var21), (double)(1.0F - var22), 0.0D, (double)var16, (double)var18);
+	                tess.draw();
+	                GL11.glPopMatrix();
+	            }
 			}
         }
 
@@ -393,32 +389,33 @@ public class RenderItem extends Render {
         GL11.glPopMatrix();
     }
 
-    public void func_27003_a(FontRenderer var1, RenderEngine var2, int var3, int var4, int var5, int var6, int var7) {
-        if (var3 < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[var3].getRenderType())) {
+    public void drawItemIntoGui(FontRenderer var1, RenderEngine var2, int id, int var4, int var5, int x, int y) {
+        if (id < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[id].getRenderType())) {
             var2.bindTexture(var2.getTexture("/terrain.png"));
-            Block var12 = Block.blocksList[var3];
+            Block var12 = Block.blocksList[id];
             GL11.glPushMatrix();
-            GL11.glTranslatef((float)(var6 - 2), (float)(var7 + 3), -3.0F);
+            GL11.glTranslatef((float)(x - 2), (float)(y + 3), -3.0F);
             GL11.glScalef(10.0F, 10.0F, 10.0F);
             GL11.glTranslatef(1.0F, 0.5F, 8.0F);
+            GL11.glScalef(1.0F, 1.0F, -1.0F);
             GL11.glRotatef(210.0F, 1.0F, 0.0F, 0.0F);
             GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
             if (this.field_27004_a) {
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             }
 
-            GL11.glScalef(1.0F, 1.0F, 1.0F);
+            GL11.glRotatef(-90.0F, 0.0F, 1.0F, 0.0F);
             this.renderBlocks.renderBlockOnInventory(var12, var4);
             GL11.glPopMatrix();
         } else if (var5 >= 0) {
             GL11.glDisable(2896 /*GL_LIGHTING*/);
-            if (var3 < 256) {
+            if (id < 256) {
                 var2.bindTexture(var2.getTexture("/terrain.png"));
             } else {
                 var2.bindTexture(var2.getTexture("/gui/items.png"));
             }
 
-            int var8 = Item.itemsList[var3].func_27010_f(var4);
+            int var8 = Item.itemsList[id].getColorFromDamage(var4);
             float var9 = (float)(var8 >> 16 & 255) / 255.0F;
             float var10 = (float)(var8 >> 8 & 255) / 255.0F;
             float var11 = (float)(var8 & 255) / 255.0F;
@@ -426,17 +423,11 @@ public class RenderItem extends Render {
                 GL11.glColor4f(var9, var10, var11, 1.0F);
             }
 
-            this.renderTexturedQuad(var6, var7, var5 % 16 * 16, var5 / 16 * 16, 16, 16);
+            this.renderTexturedQuad(x, y, var5 % 16 * 16, var5 / 16 * 16, 16, 16);
             GL11.glEnable(2896 /*GL_LIGHTING*/);
         }
 
         GL11.glEnable(2884 /*GL_CULL_FACE*/);
-    }
-
-    public void renderItemIntoGUI(FontRenderer var1, RenderEngine var2, ItemStack var3, int var4, int var5) {
-        if (var3 != null) {
-            this.func_27003_a(var1, var2, var3.itemID, var3.getItemDamage(), var3.getIconIndex(), var4, var5);
-        }
     }
     
     public void renderItemForNametag(FontRenderer fr, RenderEngine eng, ItemStack stack, int x, int y) {
@@ -465,7 +456,7 @@ public class RenderItem extends Render {
                 	eng.bindTexture(eng.getTexture("/gui/items.png"));
                 }
 
-                int var8 = Item.itemsList[stack.itemID].func_27010_f(stack.getItemDamage());
+                int var8 = Item.itemsList[stack.itemID].getColorFromDamage(stack.getItemDamage());
                 float var9 = (float)(var8 >> 16 & 255) / 255.0F;
                 float var10 = (float)(var8 >> 8 & 255) / 255.0F;
                 float var11 = (float)(var8 & 255) / 255.0F;
@@ -507,8 +498,13 @@ public class RenderItem extends Render {
 
         }
     }
-    
-    
+
+    public void renderItemIntoGUI(FontRenderer var1, RenderEngine var2, ItemStack var3, int var4, int var5) {
+        if (var3 != null) {
+            this.drawItemIntoGui(var1, var2, var3.itemID, var3.getItemDamage(), var3.getIconIndex(), var4, var5);
+        }
+    }
+
     public void renderItemOverlayIntoGUI(FontRenderer var1, RenderEngine var2, ItemStack var3, int var4, int var5) {
         if (var3 != null) {
             if (var3.stackSize > 1 || (Client.FORCE_STACK_DRAW && var3.stackSize != 1)) {

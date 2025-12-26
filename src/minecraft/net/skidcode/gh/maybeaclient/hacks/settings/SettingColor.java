@@ -11,6 +11,7 @@ import net.minecraft.src.ScaledResolution;
 import net.minecraft.src.Tessellator;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
@@ -89,7 +90,7 @@ public class SettingColor extends Setting{
 		if(input.hasKey(this.name)) {
 			
 			if(Client.convertingVersion == 1) {
-				System.out.println("SettingColor: converting.(Hack name: "+this.hack.name+")");
+				System.out.println("SettingColor: converting.(Provider: "+this.hack+")");
 				byte[] bytes = input.getByteArray(this.name);
 				this.setValue(bytes[0] & 0xff, bytes[1] & 0xff, bytes[2] & 0xff);
 			}else {
@@ -110,7 +111,7 @@ public class SettingColor extends Setting{
 	}
 	
 	@Override
-	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
 		int txtColor = 0xffffff;
@@ -123,7 +124,12 @@ public class SettingColor extends Setting{
 				}
 			}
 		}
-		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+		
+
+		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+			txtColor = this.minimized ? Theme.IRIDIUM_DISABLED_COLOR : Theme.IRIDIUM_ENABLED_COLOR;
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + txtCenter, txtColor);
+		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + txtCenter, txtColor);
 			String e = this.minimized ? "+" : "-";
 			Client.mc.fontRenderer.drawStringWithShadow(e, xEnd - Theme.HEPH_OPT_XADD - Client.mc.fontRenderer.getStringWidth(e) + 1, y + txtCenter, txtColor);
@@ -143,11 +149,18 @@ public class SettingColor extends Setting{
 				}
 			}
 		}
+		
+		
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			Client.mc.fontRenderer.drawStringWithShadow("Mode", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*1, txtColor);
 			Client.mc.fontRenderer.drawStringWithShadow(this.getModeName(), xEnd - Theme.HEPH_OPT_XADD + 1 - Client.mc.fontRenderer.getStringWidth(this.getModeName()), y + txtCenter + ySpace*1, txtColor);
 		}else {
-			Client.mc.fontRenderer.drawString("Mode - "+this.getModeName(), x + 2 + 4, y + txtCenter + ySpace*1, txtColor);
+			if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+				txtColor = Theme.IRIDIUM_ENABLED_COLOR;
+				Client.mc.fontRenderer.drawStringWithShadow("Mode - "+this.getModeName(), x + 2 + 4, y + txtCenter + ySpace*1, txtColor);
+			}else {
+				Client.mc.fontRenderer.drawString("Mode - "+this.getModeName(), x + 2 + 4, y + txtCenter + ySpace*1, txtColor);
+			}
 		}
 		
 		
@@ -172,7 +185,11 @@ public class SettingColor extends Setting{
 					}
 				}
 			}
-			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			if(ClickGUIHack.theme() == Theme.IRIDIUM) {
+				Client.mc.fontRenderer.drawStringWithShadow("Red - "+this.red, x + 2 + 4, y + txtCenter + ySpace*2, Theme.IRIDIUM_ENABLED_COLOR);
+				Client.mc.fontRenderer.drawStringWithShadow("Green - "+this.green, x + 2 + 4, y + txtCenter + ySpace*3, Theme.IRIDIUM_ENABLED_COLOR);
+				Client.mc.fontRenderer.drawStringWithShadow("Blue - "+this.blue, x + 2 + 4, y + txtCenter + ySpace*4, Theme.IRIDIUM_ENABLED_COLOR);
+			}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				Client.mc.fontRenderer.drawStringWithShadow("Red", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*2, txtColor);
 				Client.mc.fontRenderer.drawStringWithShadow("Green", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*3, txtColor2);
 				Client.mc.fontRenderer.drawStringWithShadow("Blue", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*4, txtColor3);
@@ -186,7 +203,7 @@ public class SettingColor extends Setting{
 			}
 		}
 	}
-	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onDeselect(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		this.pressedOn = -1;
 	}
 	
@@ -232,7 +249,7 @@ public class SettingColor extends Setting{
 	
 	int pressedOn = -1;
 	@Override
-	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xMin += 5 + 2;
 			xMax -= 5;
@@ -286,7 +303,7 @@ public class SettingColor extends Setting{
 		}
 	}
 	
-	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xStart += 5 + 2;
 			xEnd -= 5;
@@ -297,23 +314,23 @@ public class SettingColor extends Setting{
 		float bgcolr = ClickGUIHack.r();
 		float bgcolg = ClickGUIHack.g();
 		float bgcolb = ClickGUIHack.b();
-		float bgcola = 1;
+		float bgcola = ClickGUIHack.theme() == Theme.IRIDIUM ? 0xaa/255f : 1f;
 		if(theme == Theme.NODUS) {
 			bgcolr = bgcolg = bgcolb = 0;
 			bgcola = 0x80/255f;
 		}
 		
-		if(!this.minimized && theme != Theme.HEPHAESTUS) tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+		if(!this.minimized && theme != Theme.HEPHAESTUS && theme != Theme.IRIDIUM) Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 		
 		int xmi = xEnd - ySpace2;
 		int xma = xEnd;
 		int ymi = yStart;
 		int yma = yStart + ySpace2;
 		if(theme == Theme.HEPHAESTUS) {
-			tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, yStart+3, xEnd - Theme.HEPH_OPT_XADD - 3, yStart + ySpace2 - 3, this.red / 255f, this.green / 255f, this.blue / 255f, 1);
-			tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD - 3, (double)yStart + ySpace2 - 3);
-		}else {
-			tab.renderFrameBackGround(xmi, ymi, xma, yma, this.red / 255f, this.green / 255f, this.blue / 255f, 1f);
+			Tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, yStart+3, xEnd - Theme.HEPH_OPT_XADD - 3, yStart + ySpace2 - 3, this.red / 255f, this.green / 255f, this.blue / 255f, 1);
+			Tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD - 3, (double)yStart + ySpace2 - 3);
+		}else if(theme != Theme.IRIDIUM){
+			Tab.renderFrameBackGround(xmi, ymi, xma, yma, this.red / 255f, this.green / 255f, this.blue / 255f, 1f);
 		}
 		
 		if(this.minimized) return;
@@ -323,9 +340,10 @@ public class SettingColor extends Setting{
 		int diff1 = xEnd - xStart;
 		float step = 255f/diff1;
 		
-		if(theme != Theme.HEPHAESTUS) tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+		if(theme != Theme.HEPHAESTUS && theme != Theme.IRIDIUM) Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 		yStart += ySpace;
 		
+		rendersliders:
 		if(this.guiMode == SettingColor.sliders) {
 			int value = this.red;
 			if(value > 255) value = 255;
@@ -334,10 +352,10 @@ public class SettingColor extends Setting{
 			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				int sliderYbegin = (yStart + ySpace2) - Theme.HEPH_SLIDER_HEIGHT;
 				int sliderYend = yStart + ySpace2;
-				tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
-				tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+				Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+				Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
 			}else {
-				tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 			}
 			yStart += ySpace;
 			
@@ -348,10 +366,10 @@ public class SettingColor extends Setting{
 			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				int sliderYbegin = (yStart + ySpace2) - Theme.HEPH_SLIDER_HEIGHT;
 				int sliderYend = yStart + ySpace2;
-				tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
-				tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+				Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+				Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
 			}else {
-				tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 			}
 			yStart += ySpace;
 			
@@ -362,10 +380,10 @@ public class SettingColor extends Setting{
 			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				int sliderYbegin = (yStart + ySpace2) - Theme.HEPH_SLIDER_HEIGHT;
 				int sliderYend = yStart + ySpace2;
-				tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
-				tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+				Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+				Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
 			}else {
-				tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 			}
 		}else {
         	Tessellator tes = Tessellator.instance;

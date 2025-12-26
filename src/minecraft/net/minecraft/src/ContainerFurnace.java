@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import net.skidcode.gh.maybeaclient.hacks.InventoryTweaksHack;
-
 public class ContainerFurnace extends Container {
     private TileEntityFurnace furnace;
     private int cookTime = 0;
@@ -49,48 +47,7 @@ public class ContainerFurnace extends Container {
         this.burnTime = this.furnace.furnaceBurnTime;
         this.itemBurnTime = this.furnace.currentItemBurnTime;
     }
-    @Override
-    public ItemStack func_27279_a(int i) {
-    	if(!InventoryTweaksHack.instance.status) return super.func_27279_a(i);
-    	ItemStack itemstack = null;
-        Slot slot = (Slot)slots.get(i);
-        if(slot != null && slot.getHasStack())
-        {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-            if(i == 2)
-            {
-            	invtweaks_func28125a(itemstack1, 3, 39, true);
-            } else
-            if(i >= 3 && i < 30)
-            {
-            	invtweaks_func28125a(itemstack1, 30, 39, false);
-            } else
-            if(i >= 30 && i < 39)
-            {
-            	invtweaks_func28125a(itemstack1, 3, 30, false);
-            } else
-            {
-            	invtweaks_func28125a(itemstack1, 3, 39, false);
-            }
-            if(itemstack1.stackSize == 0)
-            {
-                slot.putStack(null);
-            } else
-            {
-                slot.onSlotChanged();
-            }
-            if(itemstack1.stackSize != itemstack.stackSize)
-            {
-                slot.onPickupFromSlot(itemstack1);
-            } else
-            {
-                return null;
-            }
-        }
-        return itemstack;
-    }
-    
+
     public void func_20112_a(int var1, int var2) {
         if (var1 == 0) {
             this.furnace.furnaceCookTime = var2;
@@ -108,5 +65,37 @@ public class ContainerFurnace extends Container {
 
     public boolean isUsableByPlayer(EntityPlayer var1) {
         return this.furnace.canInteractWith(var1);
+    }
+
+    public ItemStack getStackInSlot(int var1) {
+        ItemStack var2 = null;
+        Slot var3 = (Slot)this.slots.get(var1);
+        if (var3 != null && var3.getHasStack()) {
+            ItemStack var4 = var3.getStack();
+            var2 = var4.copy();
+            if (var1 == 2) {
+                this.func_28125_a(var4, 3, 39, true);
+            } else if (var1 >= 3 && var1 < 30) {
+                this.func_28125_a(var4, 30, 39, false);
+            } else if (var1 >= 30 && var1 < 39) {
+                this.func_28125_a(var4, 3, 30, false);
+            } else {
+                this.func_28125_a(var4, 3, 39, false);
+            }
+
+            if (var4.stackSize == 0) {
+                var3.putStack((ItemStack)null);
+            } else {
+                var3.onSlotChanged();
+            }
+
+            if (var4.stackSize == var2.stackSize) {
+                return null;
+            }
+
+            var3.onPickupFromSlot(var4);
+        }
+
+        return var2;
     }
 }

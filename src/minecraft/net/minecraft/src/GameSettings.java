@@ -12,6 +12,7 @@ public class GameSettings {
     private static final String[] RENDER_DISTANCES = new String[]{"options.renderDistance.far", "options.renderDistance.normal", "options.renderDistance.short", "options.renderDistance.tiny"};
     private static final String[] DIFFICULTIES = new String[]{"options.difficulty.peaceful", "options.difficulty.easy", "options.difficulty.normal", "options.difficulty.hard"};
     private static final String[] GUISCALES = new String[]{"options.guiScale.auto", "options.guiScale.small", "options.guiScale.normal", "options.guiScale.large"};
+    private static final String[] LIMIT_FRAMERATES = new String[]{"performance.max", "performance.balanced", "performance.powersaver"};
     public float musicVolume = 1.0F;
     public float soundVolume = 1.0F;
     public float mouseSensitivity = 0.5F;
@@ -19,8 +20,8 @@ public class GameSettings {
     public int renderDistance = 0;
     public boolean viewBobbing = true;
     public boolean anaglyph = false;
-    public boolean field_27342_h = false;
-    public boolean limitFramerate = false;
+    public boolean advancedOpengl = false;
+    public int limitFramerate = 1;
     public boolean fancyGraphics = true;
     public boolean ambientOcclusion = true;
     public String skin = "Default";
@@ -132,7 +133,7 @@ public class GameSettings {
         }
 
         if (var1 == EnumOptions.ADVANCED_OPENGL) {
-            this.field_27342_h = !this.field_27342_h;
+            this.advancedOpengl = !this.advancedOpengl;
             this.mc.renderGlobal.loadRenderers();
         }
 
@@ -142,7 +143,7 @@ public class GameSettings {
         }
 
         if (var1 == EnumOptions.LIMIT_FRAMERATE) {
-            this.limitFramerate = !this.limitFramerate;
+            this.limitFramerate = (this.limitFramerate + var2 + 3) % 3;
         }
 
         if (var1 == EnumOptions.DIFFICULTY) {
@@ -181,10 +182,8 @@ public class GameSettings {
         case 3:
             return this.anaglyph;
         case 4:
-            return this.field_27342_h;
+            return this.advancedOpengl;
         case 5:
-            return this.limitFramerate;
-        case 6:
             return this.ambientOcclusion;
         default:
             return false;
@@ -214,6 +213,8 @@ public class GameSettings {
             return var3 + var2.translateKey(DIFFICULTIES[this.difficulty]);
         } else if (var1 == EnumOptions.GUI_SCALE) {
             return var3 + var2.translateKey(GUISCALES[this.guiScale]);
+        } else if (var1 == EnumOptions.LIMIT_FRAMERATE) {
+            return var3 + StatCollector.translateToLocal(LIMIT_FRAMERATES[this.limitFramerate]);
         } else if (var1 == EnumOptions.GRAPHICS) {
             return this.fancyGraphics ? var3 + var2.translateKey("options.graphics.fancy") : var3 + var2.translateKey("options.graphics.fast");
         } else {
@@ -231,78 +232,82 @@ public class GameSettings {
             String var2 = "";
 
             while((var2 = var1.readLine()) != null) {
-                String[] var3 = var2.split(":");
-                if (var3[0].equals("music")) {
-                    this.musicVolume = this.parseFloat(var3[1]);
-                }
-
-                if (var3[0].equals("sound")) {
-                    this.soundVolume = this.parseFloat(var3[1]);
-                }
-
-                if (var3[0].equals("mouseSensitivity")) {
-                    this.mouseSensitivity = this.parseFloat(var3[1]);
-                }
-
-                if (var3[0].equals("invertYMouse")) {
-                    this.invertMouse = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("viewDistance")) {
-                    this.renderDistance = Integer.parseInt(var3[1]);
-                }
-
-                if (var3[0].equals("guiScale")) {
-                    this.guiScale = Integer.parseInt(var3[1]);
-                }
-
-                if (var3[0].equals("bobView")) {
-                    this.viewBobbing = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("anaglyph3d")) {
-                    this.anaglyph = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("advancedOpengl")) {
-                    this.field_27342_h = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("limitFramerate")) {
-                    this.limitFramerate = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("difficulty")) {
-                    this.difficulty = Integer.parseInt(var3[1]);
-                }
-
-                if (var3[0].equals("fancyGraphics")) {
-                    this.fancyGraphics = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("ao")) {
-                    this.ambientOcclusion = var3[1].equals("true");
-                }
-
-                if (var3[0].equals("skin")) {
-                    this.skin = var3[1];
-                }
-
-                if (var3[0].equals("lastServer") && var3.length >= 2) {
-                    this.lastServer = var3[1];
-                }
-
-                for(int var4 = 0; var4 < this.keyBindings.length; ++var4) {
-                    if (var3[0].equals("key_" + this.keyBindings[var4].keyDescription)) {
-                        this.keyBindings[var4].keyCode = Integer.parseInt(var3[1]);
+                try {
+                    String[] var3 = var2.split(":");
+                    if (var3[0].equals("music")) {
+                        this.musicVolume = this.parseFloat(var3[1]);
                     }
+
+                    if (var3[0].equals("sound")) {
+                        this.soundVolume = this.parseFloat(var3[1]);
+                    }
+
+                    if (var3[0].equals("mouseSensitivity")) {
+                        this.mouseSensitivity = this.parseFloat(var3[1]);
+                    }
+
+                    if (var3[0].equals("invertYMouse")) {
+                        this.invertMouse = var3[1].equals("true");
+                    }
+
+                    if (var3[0].equals("viewDistance")) {
+                        this.renderDistance = Integer.parseInt(var3[1]);
+                    }
+
+                    if (var3[0].equals("guiScale")) {
+                        this.guiScale = Integer.parseInt(var3[1]);
+                    }
+
+                    if (var3[0].equals("bobView")) {
+                        this.viewBobbing = var3[1].equals("true");
+                    }
+
+                    if (var3[0].equals("anaglyph3d")) {
+                        this.anaglyph = var3[1].equals("true");
+                    }
+
+                    if (var3[0].equals("advancedOpengl")) {
+                        this.advancedOpengl = var3[1].equals("true");
+                    }
+
+                    if (var3[0].equals("fpsLimit")) {
+                        this.limitFramerate = Integer.parseInt(var3[1]);
+                    }
+
+                    if (var3[0].equals("difficulty")) {
+                        this.difficulty = Integer.parseInt(var3[1]);
+                    }
+
+                    if (var3[0].equals("fancyGraphics")) {
+                        this.fancyGraphics = var3[1].equals("true");
+                    }
+
+                    if (var3[0].equals("ao")) {
+                        this.ambientOcclusion = var3[1].equals("true");
+                    }
+
+                    if (var3[0].equals("skin")) {
+                        this.skin = var3[1];
+                    }
+
+                    if (var3[0].equals("lastServer") && var3.length >= 2) {
+                        this.lastServer = var3[1];
+                    }
+
+                    for(int var4 = 0; var4 < this.keyBindings.length; ++var4) {
+                        if (var3[0].equals("key_" + this.keyBindings[var4].keyDescription)) {
+                            this.keyBindings[var4].keyCode = Integer.parseInt(var3[1]);
+                        }
+                    }
+                } catch (Exception var5) {
+                    System.out.println("Skipping bad option: " + var2);
                 }
             }
 
             var1.close();
-        } catch (Exception var5) {
+        } catch (Exception var6) {
             System.out.println("Failed to load options");
-            var5.printStackTrace();
+            var6.printStackTrace();
         }
 
     }
@@ -326,8 +331,8 @@ public class GameSettings {
             var1.println("guiScale:" + this.guiScale);
             var1.println("bobView:" + this.viewBobbing);
             var1.println("anaglyph3d:" + this.anaglyph);
-            var1.println("advancedOpengl:" + this.field_27342_h);
-            var1.println("limitFramerate:" + this.limitFramerate);
+            var1.println("advancedOpengl:" + this.advancedOpengl);
+            var1.println("fpsLimit:" + this.limitFramerate);
             var1.println("difficulty:" + this.difficulty);
             var1.println("fancyGraphics:" + this.fancyGraphics);
             var1.println("ao:" + this.ambientOcclusion);

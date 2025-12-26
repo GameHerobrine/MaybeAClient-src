@@ -135,12 +135,13 @@ public class GuiSchematicSave extends GuiScreen {
 		this.btnEnable = new GuiButton(id++, this.width - 210, this.height - 30, 50, 20, this.settings.isRenderingGuide ? "Disable" : "Enable");
 		this.controlList.add(this.btnEnable);
 
-		this.tfFilename = new GuiTextField(this, this.fontRenderer, this.width - 155, this.height - 29, 100, 18, "");
+		
 
 		this.btnSave = new GuiButton(id++, this.width - 50, this.height - 30, 40, 20, "Save");
 		this.btnSave.enabled = this.settings.isRenderingGuide;
 		this.controlList.add(this.btnSave);
 
+		this.tfFilename = new GuiTextField(this, this.fontRenderer, this.width - 155, this.height - 29, 100, 18, "");
 		this.tfFilename.setMaxStringLength(20);
 		this.tfFilename.setText(this.filename);
 	}
