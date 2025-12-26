@@ -23,7 +23,10 @@ import net.skidcode.gh.maybeaclient.events.impl.EventWorldRenderPreFog;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingColor;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingEnum;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingMode;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumAlign;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumExpand;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
@@ -42,9 +45,9 @@ public class LastSeenSpotsHack extends Hack implements EventListener{
 			this.armor = player.inventory.armorInventory;
 		}
 	}
+	public SettingEnum<EnumAlign> alignment = new SettingEnum<>(this, "Alignment", EnumAlign.LEFT);
+	public SettingEnum<EnumExpand> expand = new SettingEnum<>(this, "Expand", EnumExpand.BOTTOM);
 	
-	public SettingMode alignment = new SettingMode(this, "Alignment", "Left", "Right");
-	public SettingMode expand = new SettingMode(this, "Expand", "Bottom", "Top");
 	public SettingBoolean render;
 	public SettingColor boxColor = new SettingColor(this, "Box Color", 255, 255, 0);
 	public SettingBoolean tracers;

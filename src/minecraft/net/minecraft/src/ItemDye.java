@@ -9,9 +9,8 @@ public class ItemDye extends Item {
         this.setMaxDamage(0);
     }
 
-    public int getIconIndex(ItemStack var1) {
-        int var2 = var1.getItemDamage();
-        return this.iconIndex + var2 % 8 * 16 + var2 / 8;
+    public int func_27009_a(int var1) {
+        return this.iconIndex + var1 % 8 * 16 + var1 / 8;
     }
 
     public String getItemNameIS(ItemStack var1) {

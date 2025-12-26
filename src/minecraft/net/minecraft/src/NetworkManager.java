@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -45,13 +47,14 @@ public class NetworkManager {
         this.netHandler = var3;
 
         try {
+            var1.setSoTimeout(30000);
             var1.setTrafficClass(24);
         } catch (SocketException var5) {
             System.err.println(var5.getMessage());
         }
 
-        this.socketInputStream = new DataInputStream(var1.getInputStream());
-        this.socketOutputStream = new DataOutputStream(var1.getOutputStream());
+        this.socketInputStream = new DataInputStream(new BufferedInputStream(var1.getInputStream()));
+        this.socketOutputStream = new DataOutputStream(new BufferedOutputStream(var1.getOutputStream()));
         this.readThread = new NetworkReaderThread(this, var2 + " read thread");
         this.writeThread = new NetworkWriterThread(this, var2 + " write thread");
         this.readThread.start();
@@ -63,7 +66,6 @@ public class NetworkManager {
         	EventPacketSend ev = new EventPacketSend(var1);
         	EventRegistry.handleEvent(ev);
         	if(ev.cancelled) return;
-        	//if(!(var1 instanceof Packet10Flying)) System.out.println(var1);
             synchronized(this.sendQueueLock) {
                 this.sendQueueByteLength += var1.getPacketSize() + 1;
                 if (var1.isChunkDataPacket) {
@@ -103,6 +105,8 @@ public class NetworkManager {
 
             if (var1) {
                 Thread.sleep(10L);
+            } else {
+                this.socketOutputStream.flush();
             }
         } catch (InterruptedException var8) {
         } catch (Exception var9) {
@@ -115,8 +119,7 @@ public class NetworkManager {
 
     private void readPacket() {
         try {
-            Packet var1 = Packet.readPacket(this.socketInputStream);
-            //if(!(var1 instanceof Packet30Entity) && !(var1 instanceof Packet28) && !(var1 instanceof Packet51MapChunk)) System.out.println(var1);
+            Packet var1 = Packet.readPacket(this.socketInputStream, this.netHandler.func_27247_c());
             if (var1 != null) {
                 this.readPackets.add(var1);
             } else {
@@ -184,8 +187,7 @@ public class NetworkManager {
             
             EventPacketReceive ev = new EventPacketReceive(var2);
         	EventRegistry.handleEvent(ev);
-            if(!ev.cancelled) var2.processPacket(this.netHandler);
-            
+        	if(!ev.cancelled) var2.processPacket(this.netHandler);
         }
 
         if (this.isTerminating && this.readPackets.isEmpty()) {

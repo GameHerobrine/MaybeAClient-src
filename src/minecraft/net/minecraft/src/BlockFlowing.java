@@ -2,7 +2,7 @@ package net.minecraft.src;
 
 import java.util.Random;
 
-public class BlockFlowing extends BlockFluids {
+public class BlockFlowing extends BlockFluid {
     int numAdjacentSources = 0;
     boolean[] isOptimalFlowDirection = new boolean[4];
     int[] flowCost = new int[4];
@@ -11,7 +11,7 @@ public class BlockFlowing extends BlockFluids {
         super(var1, var2);
     }
 
-    private void func_22034_j(World var1, int var2, int var3, int var4) {
+    private void func_27037_j(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockMetadata(var2, var3, var4);
         var1.setBlockAndMetadata(var2, var3, var4, this.blockID + 1, var5);
         var1.markBlocksDirty(var2, var3, var4, var2, var3, var4);
@@ -71,10 +71,10 @@ public class BlockFlowing extends BlockFluids {
                     var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
                 }
             } else if (var8) {
-                this.func_22034_j(var1, var2, var3, var4);
+                this.func_27037_j(var1, var2, var3, var4);
             }
         } else {
-            this.func_22034_j(var1, var2, var3, var4);
+            this.func_27037_j(var1, var2, var3, var4);
         }
 
         if (this.liquidCanDisplaceBlock(var1, var2, var3 - 1, var4)) {

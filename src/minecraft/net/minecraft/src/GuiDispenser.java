@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiDispenser extends GuiContainer {
     public GuiDispenser(InventoryPlayer var1, TileEntityDispenser var2) {
-        super(new CraftingInventoryDispenserCB(var1, var2));
+        super(new ContainerDispenser(var1, var2));
     }
 
     protected void drawGuiContainerForegroundLayer() {

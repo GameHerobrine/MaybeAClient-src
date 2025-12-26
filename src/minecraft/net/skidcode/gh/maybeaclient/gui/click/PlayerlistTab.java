@@ -1,11 +1,13 @@
 package net.skidcode.gh.maybeaclient.gui.click;
 
 import java.util.ArrayList;
+
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTBase;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.PlayerlistHack;
 
 public class PlayerlistTab extends Tab{
@@ -16,7 +18,7 @@ public class PlayerlistTab extends Tab{
 		super("Player List", 0, 12);
 		this.minimized = false;
 		this.xDefPos = this.xPos = 160;
-		this.yDefPos = this.yPos = 24 + 14 + 14 + 14 + 14 + 14 + 14;
+		this.yDefPos = this.yPos = 24 + 14*6;
 		instance = this;
 	}
 	public void renderIngame() {
@@ -26,48 +28,57 @@ public class PlayerlistTab extends Tab{
 		if(alignRight) {
 			int xStart = this.xPos;
 			int yStart = this.yPos;
-			
-			this.renderFrame(xStart, yStart, xStart + this.width, yStart + 12);
-			
-			Client.mc.fontRenderer.drawString(this.name, xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name), yStart + 2, 0xffffff);
+			this.renderNameBG();
+			this.renderNameAt(xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name) - ClickGUIHack.theme().headerXAdd, yStart); //XXX - 2 is needed
 		}else {
 			super.renderName();
 		}
 	}
 	
 	public void renderMinimized() {
-		this.height = 12;
+		this.height = ClickGUIHack.theme().yspacing;
 		this.renderName(PlayerlistHack.instance.alignment.currentMode.equalsIgnoreCase("Right"));
 	}
 	
 	boolean first = true;
 	boolean prevMinimized = this.minimized;
 	public void render() {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int prevSpace = ClickGUIHack.theme().titlebasediff;
+		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
 		
 		int savdWidth = this.width;
-		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 		
 		int savdHeight = this.height;
 		
 		EntityPlayer local = Client.mc.thePlayer;
 		ArrayList<String> players = new ArrayList<String>();
 		
-		int height = 14;
+		int height = ySpace + prevSpace;
 		int width = this.width;
-		for(String s : PlayerlistHack.detectedPlayers) {
-			players.add(s);
-			int w = Client.mc.fontRenderer.getStringWidth(s) + 2;
+		if(Client.mc.isMultiplayerWorld()) {
+			for(String s : PlayerlistHack.detectedPlayers) {
+				players.add(s);
+				int w = Client.mc.fontRenderer.getStringWidth(s) + 2;
+				if(w > width) width = w;
+				height += ySpace;
+			}
+		}else {
+			players.add(Client.mc.thePlayer.username);
+			int w = Client.mc.fontRenderer.getStringWidth(Client.mc.thePlayer.username) + 2;
 			if(w > width) width = w;
-			height += 12;
+			height += ySpace;
 		}
+		
 		
 		this.height = height;
 		this.width = width;
 		
 		boolean alignRight = PlayerlistHack.instance.alignment.currentMode.equalsIgnoreCase("Right");
 		boolean expandTop = PlayerlistHack.instance.expand.currentMode.equalsIgnoreCase("Top");
-		ScaledResolution scaledResolution = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
-
+		this.tabMinimize.alignRight = alignRight;
+		
 		if(!this.minimized) {
 			if(first) {
 				first = false;
@@ -92,7 +103,7 @@ public class PlayerlistTab extends Tab{
 		}
 		
 		if(this.minimized) {
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 			if(alignRight && savdWidth != this.width){
 				this.xPos -= (this.width - savdWidth);
 			}
@@ -102,16 +113,17 @@ public class PlayerlistTab extends Tab{
 		}
 		
 		if(players.size() > 0) {
-			this.renderFrame(this.xPos, this.yPos + 15, this.xPos + this.width, this.yPos + this.height);
-			int h = 15;
+			int txtCol = ClickGUIHack.normTextColor();
+			this.renderFrame(this.xPos, this.yPos + ySpace + prevSpace, this.xPos + this.width, this.yPos + this.height);
+			int h = ySpace + prevSpace;
 			for(String s : players) {
 				if(alignRight) {
-					Client.mc.fontRenderer.drawString(s, this.xPos + this.width - Client.mc.fontRenderer.getStringWidth(s), this.yPos + h + 2, 0xffffff);
+					Client.mc.fontRenderer.drawString(s, this.xPos + this.width - Client.mc.fontRenderer.getStringWidth(s), this.yPos + h + txtCenter, txtCol);
 				}else {
-					Client.mc.fontRenderer.drawString(s, this.xPos + 2, this.yPos + h + 2, 0xffffff);
+					Client.mc.fontRenderer.drawString(s, this.xPos + 2, this.yPos + h + txtCenter, txtCol);
 				}
 				
-				h += 12;
+				h += ySpace;
 			}
 		}
 		

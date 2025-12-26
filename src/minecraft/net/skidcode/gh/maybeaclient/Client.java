@@ -1,30 +1,33 @@
 package net.skidcode.gh.maybeaclient;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
+import java.awt.image.ImageObserver;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.imageio.ImageIO;
 
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.GuiScreen;
 import net.minecraft.src.NBTBase;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagInt;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.NBTTagString;
-import net.minecraft.src.ScaledResolution;
+import net.minecraft.src.RenderManager;
 import net.skidcode.gh.maybeaclient.console.*;
 import net.skidcode.gh.maybeaclient.gui.altman.AccountInfo;
 import net.skidcode.gh.maybeaclient.gui.altman.GuiAccManager;
@@ -36,8 +39,8 @@ import net.skidcode.gh.maybeaclient.gui.server.GuiServerSelector;
 import net.skidcode.gh.maybeaclient.gui.server.ServerInfo;
 import net.skidcode.gh.maybeaclient.hacks.*;
 import net.skidcode.gh.maybeaclient.hacks.settings.Setting;
+import net.skidcode.gh.maybeaclient.shaders.Shaders;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
-import net.skidcode.gh.maybeaclient.utils.DrawCall;
 import net.skidcode.gh.maybeaclient.utils.TextureUtils;
 
 public class Client {
@@ -50,9 +53,9 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "1.9";
+	public static final String clientVersion = "2.7";
 	
-	public static final int saveVersion = 3; 
+	public static final int saveVersion = 3;
 	/*
 	 * Save format 2(1.3):
 	 *  * SettingColor saves the data as CompoundTag instead of ByteArray
@@ -250,6 +253,10 @@ public class Client {
 				}else if(hack.name.equalsIgnoreCase(NoClientSideDestroyHack.instance.name) && modules.hasKey("noclientsidedestroy")) {
 					NBTTagCompound hacc = modules.getCompoundTag("noclientsidedestroy");
 					overrideHackInfo(hack, hacc);
+				}else if(hack.name.equalsIgnoreCase(ThirdPersonTweaksHack.instance.name) && modules.hasKey("noclipthirdperson")){
+					NBTTagCompound hacc = modules.getCompoundTag("noclipthirdperson");
+					overrideHackInfo(hack, hacc);
+					ThirdPersonTweaksHack.instance.noclip.setValue(true);
 				}else {
 					System.out.println("Information about "+hack.name+" was not found");
 				}
@@ -483,7 +490,8 @@ public class Client {
 		
 		
 		ClickGUIHack.instance.status = false;
-		generateOutlinedTextures();
+		//generateOutlinedTextures();
+		new MovePacketHook();
 	}
 	
 	public static void writeCurrentAccounts(){
@@ -565,38 +573,77 @@ public class Client {
 		write2.setCompoundTag("", write);
 		write2.writeTagContents(new DataOutputStream(new FileOutputStream(f)));
 	}
+	public static HashMap<String, BufferedImage> path2bufImg = new HashMap<>();
 	
-	public static BufferedImage outlinedItemsTexture;
-	public static BufferedImage outlinedTerrainTexture;
+	public static BufferedImage rescale(BufferedImage img, int width) {
+		if(img.getWidth() == width) return img;
+		int height = (img.getHeight() * width) / img.getWidth();
+		BufferedImage newImage = new BufferedImage(width, height, 2);
+		Graphics2D graphics2D = newImage.createGraphics();
+		graphics2D.drawImage(img, 0, 0, width, height, (ImageObserver) null);
+		return newImage;
+	}
+	public static BufferedImage getRescaledResource(String src, int size) throws IOException {
+		if(Client.path2bufImg.containsKey(src)) {
+			return Client.path2bufImg.get(src);
+		}
+		
+		InputStream res = Client.mc.texturePackList.selectedTexturePack.func_6481_a(src);
+		if(res == null) return null;
+		
+		
+		Client.path2bufImg.put(src, rescale(ImageIO.read(res), size));
+		return Client.path2bufImg.get(src);
+	}
+	public static BufferedImage getResource(String src) throws IOException {
+		if(Client.path2bufImg.containsKey(src)) {
+			return Client.path2bufImg.get(src);
+		}
+		InputStream res = Client.mc.texturePackList.selectedTexturePack.func_6481_a(src);
+		if(res == null) return null;
+		
+		
+		Client.path2bufImg.put(src, ImageIO.read(res));
+		return Client.path2bufImg.get(src);
+	}
+	
+	public static boolean textureExists(String src) {
+		return Client.mc.texturePackList.selectedTexturePack.func_6481_a(src) != null;
+	}
 	
 	public static byte[] itemsTextureSides;
 	public static byte[] terrainTextureSides;
 	
 	
-	public static void generateOutlinedTextures() throws IOException {
-		try {
-			outlinedItemsTexture = TextureUtils.generateOutlinedTexture(ImageIO.read(Minecraft.class.getResource("/gui/items.png")));
-			outlinedTerrainTexture = TextureUtils.generateOutlinedTexture(ImageIO.read(Minecraft.class.getResource("/terrain.png")));
-			itemsTextureSides = TextureUtils.getOutliningSides(ImageIO.read(Minecraft.class.getResource("/gui/items.png")));
-			terrainTextureSides = TextureUtils.getOutliningSides(ImageIO.read(Minecraft.class.getResource("/terrain.png")));
-		}catch(java.lang.IllegalArgumentException e) {
-			e.printStackTrace();
-		}
-		
-	}
+	public static final boolean FORCE_STACK_DRAW = true;
+	public static final boolean BETTER_CHAT_CONTROLS = true;
 	
 	public static final int STENCIL_REF_ELDRAW = 123;
+	public static final int STENCIL_REF_TBDRAW = STENCIL_REF_ELDRAW+1;
+	
+	/**Future?
+	 * Better Schematica placement controls
+	 * Resizeable tabs? (currently has some problems with scrolling + bad multimc uses applets)
+	 * PacketRecorder
+	 * Custom font support
+	 * BlockNotifier (notify if some block is close to the player)
+	 * Better AutoTunnel, Diagonal AutoTunnel?
+	 * Bred, Uware, CatHack, Iridium Themes
+	 * AutoMiner
+	 * TabManager - hide/show tabs from clickgui, add new module tabs
+	*/
 	
 	/**
-	* 1.9
-	* - Added HideChat
-	* - Added Schematica Stats
-	* - Added AutoBlockPlace into Schematica
-	* - Added PlayerList
-	* - Added LastSeenSpots
-	* - Fixed Schematica GUIs opening incorrectly when ClickGUI scale is not same as game
-	* - Fixed text in Schematica control GUI 
-	*/
+	 * 2.7
+	 * Added AutoBoneMeal
+	 * Added ResetAllSettings button to every module 
+	 * Tweaked Step
+	 * Max Tunnel Width Left/Right slider value was increased from 2 to 5
+	 * Added ability to use mouse buttons as module keybindings
+	 * Small changes to Cliff theme
+	 * Improved schematica performance
+	 */
+	
 	static {
 		//1.0
 		registerHack(new FlyHack());
@@ -663,7 +710,7 @@ public class Client {
 		registerHack(new NoRenderHack());
 		//1.8
 		registerHack(new AutoScreenshotCopyHack());
-		registerHack(new NoclipThirdPersonHack());
+		registerHack(new ThirdPersonTweaksHack());
 		registerHack(new FastPortalHack());
 		registerHack(new AutoFishHack());
 		registerHack(new ChestCheckerHack());
@@ -672,18 +719,57 @@ public class Client {
 		registerHack(new HideChatHack());
 		registerHack(new PlayerlistHack());
 		registerHack(new LastSeenSpotsHack());
-		//x.x
-		//TODO registerHack(new DogOwnerHack());
+		//2.0
+		registerHack(new CustomHandPositionHack());
+		registerHack(new DogOwnerHack());
+		//2.2
+		registerHack(new TunnelESPHack());
+		registerHack(new NoPortalSoundsHack());
+		registerHack(new TooltipsHack());
+		registerHack(new InventoryTweaksHack());
+		//2.2.1
+		registerHack(new LowHopSpeedHack());
+		registerHack(new AFKDisconnectHack());
+		//2.3
+		registerHack(new CharSelectorHack());
+		registerHack(new AimBotHack());
+		registerHack(new TrajectoriesHack());
+		//2.4
+		registerHack(new SwastikaBuilderHack());
+		registerHack(new PacketMineHack());
+		registerHack(new AutoSignHack());
+		registerHack(new OnToggleMessageHack());
+		registerHack(new AutoSaplingHack());
+		registerHack(new ClimbGappedLadderHack());
+		registerHack(new BlockDestroyerHack());
+		registerHack(new CustomSkyHack());
+		//2.5
+		registerHack(new ChunkBordersHack());
+		registerHack(new SlimeChunkRadarHack());
+		registerHack(new GreeterHack());
+		registerHack(new UnsafeLightLevelsHack());
+		//2.6
+		registerHack(new ZoomHack());
+		//2.6.2
+		registerHack(new AutoBoneMealHack());
+		
+		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {
+			public Hack init() {
+				this.addSetting(new net.skidcode.gh.maybeaclient.hacks.settings.SettingChooser(this, "ColorSettingVithVeryVeryVeryVeryLongName", new String[] {"Ae", "Clef"}, new boolean[] {false, false}));
+				return this;
+			}
+		}.init());*/
 		
 		//1.0
-		registerCommand(new CommandModule());
+		registerCommand(new CommandModule()); 
 		registerCommand(new CommandHelp());
 		registerCommand(new CommandSlot9());
 		//1.1
 		registerCommand(new CommandAlias());
 		//1.2
 		registerCommand(new CommandTab());
-		
+		//2.1
+		registerCommand(new CommandTeleport());
 		
 		try {
 			postClientLoad();
@@ -691,19 +777,40 @@ public class Client {
 			throw new RuntimeException(e);
 		}
 	}
-	public static ArrayList<DrawCall> drawCallsTerrain[] = new ArrayList[256];
-	public static ArrayList<DrawCall> drawCallsItems[] = new ArrayList[256];
+	
+	public static int outlinesDisplayLists = 0;
+	public static int blockDisplayLists = -1;
+	public static int itemDisplayLists = -1;
+	
+	public static boolean initializedDisplayLists = false;
 	public static int itemsTexSize = 16;
 	public static int terrainTexSize = 16;
-	public static boolean notJarMod = false;
-	public static void initTextures() {
-		for(int i = 0; i < 256; ++i) {
-			drawCallsTerrain[i] = new ArrayList<DrawCall>();
-			drawCallsItems[i] = new ArrayList<DrawCall>();
+	public static boolean debug = false;
+	public static void deleteDisplayLists() {
+		if(initializedDisplayLists) {
+			System.out.println("Deleting outline displaylists");
+			initializedDisplayLists = false;
+			GL11.glDeleteLists(outlinesDisplayLists, 256 + 256);
+			blockDisplayLists = itemDisplayLists = -1;
 		}
+	}
+	
+	public static void initTextures() {
+		Shaders.init();
+		
+		System.out.println("Intializing outlined textures");
+		long time = System.currentTimeMillis();
+		if(!initializedDisplayLists) {
+			System.out.println("Creating new outline display lists");
+			initializedDisplayLists = true;
+			outlinesDisplayLists = GL11.glGenLists(256 + 256); //block sprite count, item sprite count
+			blockDisplayLists = outlinesDisplayLists;
+			itemDisplayLists = outlinesDisplayLists + 256;
+		}
+		
 		try {
-			itemsTextureSides = TextureUtils.getOutliningSides(ImageIO.read(mc.texturePackList.selectedTexturePack.func_6481_a("/gui/items.png")));
-			terrainTextureSides = TextureUtils.getOutliningSides(ImageIO.read(mc.texturePackList.selectedTexturePack.func_6481_a("/terrain.png")));
+			itemsTextureSides = TextureUtils.getOutliningSides(getResource("/gui/items.png"));
+			terrainTextureSides = TextureUtils.getOutliningSides(getResource("/terrain.png"));
 			itemsTexSize = (int) Math.sqrt(itemsTextureSides.length) / 16;
 			terrainTexSize = (int) Math.sqrt(terrainTextureSides.length) / 16;
 			
@@ -712,21 +819,23 @@ public class Client {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Done initializing. Took "+(System.currentTimeMillis()-time)+"ms");
 	}
 	public static void bakeSides(byte[] sides) {
     	int tsize = 16;
-    	ArrayList<DrawCall> calls[] = null;
+    	int callsbase = 0;
     	if(sides == terrainTextureSides) {
     		tsize = terrainTexSize;
-    		calls = drawCallsTerrain;
+    		callsbase = blockDisplayLists;
     	}else {
     		tsize = itemsTexSize;
-    		calls = drawCallsItems;
+    		callsbase = itemDisplayLists;
     	}
+    	double px = 1d/(double)tsize;
     	
     	for(int gx = 0; gx < 16; ++gx) {
 			for(int gy = 0; gy < 16; ++gy) {
-				ArrayList<DrawCall> dcalls = calls[gx + gy*16];
+				GL11.glNewList(callsbase + (gx + gy*16), GL11.GL_COMPILE);
 				for(int x = gx*tsize; x < gx*tsize+tsize; ++x) {
 					boolean begin = false;
 					int beginX = 0;
@@ -743,14 +852,14 @@ public class Client {
 							}
 						}else {
 							if(begin) {
-								dcalls.add(new DrawCall(1, beginX, beginY, x%tsize, y%tsize));
+								TextureUtils.line(1, beginX, beginY, x%tsize, y%tsize, px);
 								begin = false;
 							}
 						}
 					}
 					
 					if(begin) {
-						dcalls.add(new DrawCall(1, beginX, beginY, x%tsize, tsize));
+						TextureUtils.line(1, beginX, beginY, x%tsize, tsize, px);
 						begin = false;
 					}
 					
@@ -765,14 +874,14 @@ public class Client {
 							}
 						}else {
 							if(begin) {
-								dcalls.add(new DrawCall(2, beginX, beginY, x%tsize, y%tsize));
+								TextureUtils.line(2, beginX, beginY, x%tsize, y%tsize, px);
 								begin = false;
 							}
 						}
 					}
 					
 					if(begin) {
-						dcalls.add(new DrawCall(2, beginX, beginY, x%tsize, tsize));
+						TextureUtils.line(2, beginX, beginY, x%tsize, tsize, px);
 						begin = false;
 					}
 				}
@@ -791,13 +900,13 @@ public class Client {
 							}
 						}else {
 							if(begin) {
-								dcalls.add(new DrawCall(4, beginX, beginY, x%tsize, y%tsize));
+								TextureUtils.line(4, beginX, beginY, x%tsize, y%tsize, px);
 								begin = false;
 							}
 						}
 					}
 					if(begin) {
-						dcalls.add(new DrawCall(4, beginX, beginY, tsize, y%tsize));
+						TextureUtils.line(4, beginX, beginY, tsize, y%tsize, px);
 						begin = false;
 					}
 					
@@ -811,33 +920,56 @@ public class Client {
 							}
 						}else {
 							if(begin) {
-								dcalls.add(new DrawCall(8, beginX, beginY, x%tsize, y%tsize));
+								TextureUtils.line(8, beginX, beginY, x%tsize, y%tsize, px);
 								begin = false;
 							}
 						}
 					}
 					
 					if(begin) {
-						dcalls.add(new DrawCall(8, beginX, beginY, tsize, y%tsize));
+						TextureUtils.line(8, beginX, beginY, tsize, y%tsize, px);
 						begin = false;
 					}
 				}
+				GL11.glEndList();
 			}
 		}
     }
 	
 	public static void onKeyPress(int keycode, boolean pressed) {
-		if(keycode == 0){
-			System.out.println("Tried activating 0 keycode(NONE) somehow??");
-			return;
-		}
+		if(keycode == 0) return;
 		
 		if(pressed) {
+			if(RenderManager.instance.livingPlayer == null) return;
+			
 			for(Hack h : Client.hacksByName.values()) {
 				if(h.keybinding.value == keycode){
-					h.toggle();
+					h.toggleByKeybind();
 				}
 			}
+		}else if(!pressed && keycode == ZoomHack.instance.keybinding.value && ZoomHack.instance.status) {
+			ZoomHack.onStopHolding();
 		}
 	}
+
+	public static String getKeyName(int value) {
+		if(value < 0) return Mouse.getButtonName((-value)-1);
+		return Keyboard.getKeyName(value);
+	}
+
+	public static int getKeycodeForMouseButton(int key) {
+		if(key < 0) return 0;
+		if(Mouse.getButtonName(key) == null) return 0;
+		
+		return -(key+1); //0 - 15 -> -1 - -16
+	}
+	public static Hack disconnectCausedBy = null;
+	public static boolean renderEdgeLines = false;
+	public static void forceDisconnect(Hack h) {
+		if(disconnectCausedBy == null) {
+			mc.theWorld.sendQuittingDisconnectingPacket();
+			disconnectCausedBy = h;
+		}
+	}
+
 }

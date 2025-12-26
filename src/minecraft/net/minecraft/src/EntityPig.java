@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntityPig extends EntityAnimals {
+public class EntityPig extends EntityAnimal {
     public EntityPig(World var1) {
         super(var1);
         this.texture = "/mob/pig.png";
@@ -43,7 +43,7 @@ public class EntityPig extends EntityAnimals {
     }
 
     protected int getDropItemId() {
-        return Item.porkRaw.shiftedIndex;
+        return this.fire > 0 ? Item.porkCooked.shiftedIndex : Item.porkRaw.shiftedIndex;
     }
 
     public boolean getSaddled() {
@@ -55,6 +55,21 @@ public class EntityPig extends EntityAnimals {
             this.dataWatcher.updateObject(16, (byte)1);
         } else {
             this.dataWatcher.updateObject(16, (byte)0);
+        }
+
+    }
+
+    public void func_27014_a(EntityLightningBolt var1) {
+        EntityPigZombie var2 = new EntityPigZombie(this.worldObj);
+        var2.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
+        this.worldObj.entityJoinedWorld(var2);
+        this.setEntityDead();
+    }
+
+    protected void fall(float var1) {
+        super.fall(var1);
+        if (var1 > 5.0F && this.riddenByEntity instanceof EntityPlayer) {
+            ((EntityPlayer)this.riddenByEntity).func_27026_a(AchievementList.field_27375_u);
         }
 
     }

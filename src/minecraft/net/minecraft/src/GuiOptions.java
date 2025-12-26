@@ -14,22 +14,20 @@ public class GuiOptions extends GuiScreen {
     public void initGui() {
         StringTranslate var1 = StringTranslate.getInstance();
         this.screenTitle = var1.translateKey("options.title");
-        int var2 = 0;
         EnumOptions[] var3 = field_22135_k;
         int var4 = var3.length;
 
         for(int var5 = 0; var5 < var4; ++var5) {
             EnumOptions var6 = var3[var5];
             if (!var6.getEnumFloat()) {
-                this.controlList.add(new GuiSmallButton(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160, this.height / 6 + 24 * (var2 >> 1), var6, this.options.getKeyBinding(var6)));
+                this.controlList.add(new GuiSmallButton(var6.returnEnumOrdinal(), this.width / 2 - 155 + var5 % 2 * 160, this.height / 6 + 24 * (var5 >> 1), var6, this.options.getKeyBinding(var6)));
             } else {
-                this.controlList.add(new GuiSlider(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160, this.height / 6 + 24 * (var2 >> 1), var6, this.options.getKeyBinding(var6), this.options.getOptionFloatValue(var6)));
+                this.controlList.add(new GuiSlider(var6.returnEnumOrdinal(), this.width / 2 - 155 + var5 % 2 * 160, this.height / 6 + 24 * (var5 >> 1), var6, this.options.getKeyBinding(var6), this.options.getOptionFloatValue(var6)));
             }
-
-            ++var2;
         }
 
-        this.controlList.add(new GuiButton(101, this.width / 2 - 100, this.height / 6 + 96 + 12, var1.translateKey("options.video")));
+        this.controlList.add(new GuiSmallButton(101, this.width / 2 - 155, this.height / 6 + 96 + 12, var1.translateKey("options.video")));
+        this.controlList.add(new GuiSmallButton(102, this.width / 2 - 155 + 160, this.height / 6 + 96 + 12, "Texture Packs"));
         this.controlList.add(new GuiButton(100, this.width / 2 - 100, this.height / 6 + 120 + 12, var1.translateKey("options.controls")));
         this.controlList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, var1.translateKey("gui.done")));
     }
@@ -45,7 +43,10 @@ public class GuiOptions extends GuiScreen {
                 this.mc.gameSettings.saveOptions();
                 this.mc.displayGuiScreen(new GuiVideoSettings(this, this.options));
             }
-
+            if(var1.id == 102) {
+            	this.mc.gameSettings.saveOptions();
+            	this.mc.displayGuiScreen(new GuiTexturePacks(this, false));
+            }
             if (var1.id == 100) {
                 this.mc.gameSettings.saveOptions();
                 this.mc.displayGuiScreen(new GuiControls(this, this.options));

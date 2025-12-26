@@ -3,9 +3,6 @@ package net.minecraft.src;
 import java.io.IOException;
 import java.util.Properties;
 
-import net.minecraft.client.Minecraft;
-import net.skidcode.gh.maybeaclient.Client;
-
 public class StringTranslate {
     private static StringTranslate instance = new StringTranslate();
     private Properties translateTable = new Properties();
@@ -16,9 +13,6 @@ public class StringTranslate {
             this.translateTable.load(StringTranslate.class.getResourceAsStream("/lang/stats_US.lang"));
         } catch (IOException var2) {
             var2.printStackTrace();
-        } catch(java.lang.NullPointerException e) {
-        	e.printStackTrace();
-        	System.out.println("Missing lang files?");
         }
 
     }

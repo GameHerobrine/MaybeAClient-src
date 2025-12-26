@@ -6,6 +6,9 @@ import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.AFKDisconnectHack;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -14,12 +17,17 @@ public class GuiScreen extends Gui {
     protected Minecraft mc;
     public int width;
     public int height;
-    protected List<GuiButton> controlList = new ArrayList<GuiButton>();
+    protected List controlList = new ArrayList();
     public boolean field_948_f = false;
     protected FontRenderer fontRenderer;
-    public XGuiUmmm field_25091_h;
-    private GuiButton selectedButton = null;
-
+    public GuiParticle field_25091_h;
+    protected GuiButton selectedButton = null;
+    
+    //XXX very needed fix
+    public GuiScreen() {
+    	mc = Client.mc;
+    }
+    
     public void drawScreen(int var1, int var2, float var3) {
         for(int var4 = 0; var4 < this.controlList.size(); ++var4) {
             GuiButton var5 = (GuiButton)this.controlList.get(var4);
@@ -27,12 +35,7 @@ public class GuiScreen extends Gui {
         }
 
     }
-    
-    public GuiScreen() {
-    	this.mc = Minecraft.theMinecraft;
-    }
-    
-   
+
     protected void keyTyped(char var1, int var2) {
         if (var2 == 1) {
             this.mc.displayGuiScreen((GuiScreen)null);
@@ -68,8 +71,8 @@ public class GuiScreen extends Gui {
 
     }
 
-    protected void mouseMovedOrUp(int var1, int var2, int click) {
-        if (this.selectedButton != null && click == 0) {
+    protected void mouseMovedOrUp(int var1, int var2, int var3) {
+        if (this.selectedButton != null && var3 == 0) {
             this.selectedButton.mouseReleased(var1, var2);
             this.selectedButton = null;
         }
@@ -80,7 +83,7 @@ public class GuiScreen extends Gui {
     }
 
     public void setWorldAndResolution(Minecraft var1, int var2, int var3) {
-        this.field_25091_h = new XGuiUmmm(var1);
+        this.field_25091_h = new GuiParticle(var1);
         this.mc = var1;
         this.fontRenderer = var1.fontRenderer;
         this.width = var2;
@@ -94,13 +97,15 @@ public class GuiScreen extends Gui {
 
     public void handleInput() {
         while(Mouse.next()) {
+        	AFKDisconnectHack.stopAFKing();
             this.handleMouseInput();
         }
 
         while(Keyboard.next()) {
+        	AFKDisconnectHack.stopAFKing();
             this.handleKeyboardInput();
         }
-
+        AFKDisconnectHack.startAFKing();
     }
 
     public void handleMouseInput() {
@@ -120,7 +125,7 @@ public class GuiScreen extends Gui {
 
     public void handleKeyboardInput() {
         if (Keyboard.getEventKeyState()) {
-            if (Keyboard.getEventKey() == 87) {
+            if (Keyboard.getEventKey() == Keyboard.KEY_F11) {
                 this.mc.toggleFullscreen();
                 return;
             }
@@ -170,5 +175,8 @@ public class GuiScreen extends Gui {
     }
 
     public void deleteWorld(boolean var1, int var2) {
+    }
+
+    public void func_27108_j() {
     }
 }

@@ -12,7 +12,8 @@ public class BlockSnow extends Block {
     }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-        return null;
+        int var5 = var1.getBlockMetadata(var2, var3, var4) & 7;
+        return var5 >= 3 ? AxisAlignedBB.getBoundingBoxFromPool((double)var2 + this.minX, (double)var3 + this.minY, (double)var4 + this.minZ, (double)var2 + this.maxX, (double)((float)var3 + 0.5F), (double)var4 + this.maxZ) : null;
     }
 
     public boolean isOpaqueCube() {
@@ -21,6 +22,12 @@ public class BlockSnow extends Block {
 
     public boolean renderAsNormalBlock() {
         return false;
+    }
+
+    public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
+        int var5 = var1.getBlockMetadata(var2, var3, var4) & 7;
+        float var6 = (float)(2 * (1 + var5)) / 16.0F;
+        this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, var6, 1.0F);
     }
 
     public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
@@ -75,11 +82,7 @@ public class BlockSnow extends Block {
     	if(XRayHack.INSTANCE.status && !XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
     		return XRayHack.INSTANCE.blockChooser.blocks[this.blockID];
     	}
-        Material var6 = var1.getBlockMaterial(var2, var3, var4);
-        if (var5 == 1) {
-            return true;
-        } else {
-            return var6 == this.blockMaterial ? false : super.shouldSideBeRendered(var1, var2, var3, var4, var5);
-        }
+    	
+    	return var5 == 1 ? true : super.shouldSideBeRendered(var1, var2, var3, var4, var5);
     }
 }

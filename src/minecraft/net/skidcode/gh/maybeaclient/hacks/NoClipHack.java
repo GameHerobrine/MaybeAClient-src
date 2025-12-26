@@ -9,7 +9,7 @@ public class NoClipHack extends Hack{
 	public static NoClipHack instance;
 	
 	public NoClipHack() {
-		super("NoClip", "allows player to move through blocks", Keyboard.KEY_NONE, Category.MOVEMENT);
+		super("NoClip", "Allows player to move through blocks", Keyboard.KEY_NONE, Category.MOVEMENT);
 		instance = this;
 	}
 

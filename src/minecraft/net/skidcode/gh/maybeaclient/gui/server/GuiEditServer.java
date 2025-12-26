@@ -1,5 +1,7 @@
 package net.skidcode.gh.maybeaclient.gui.server;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiConnecting;
 import net.minecraft.src.GuiMultiplayer;
@@ -24,12 +26,13 @@ public class GuiEditServer extends GuiScreen{
 
 	public void initGui() {
 		super.initGui();
+		Keyboard.enableRepeatEvents(true);
 		this.controlList.clear();
 		
-		this.serverName = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 + 40, 200, 20, this.info == null ? "" : this.info.name);
+		this.serverName = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 4 + 40, 200, 20, this.info == null ? "" : this.info.name);
         this.serverName.setMaxStringLength(32);
 		
-		this.serverIp = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 + 74, 200, 20, this.info == null ? "" : (this.info.ip+":"+this.info.port));
+		this.serverIp = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 4 + 74, 200, 20, this.info == null ? "" : (this.info.ip+":"+this.info.port));
         this.serverName.isFocused = true;
         this.serverIp.setMaxStringLength(32);
         
@@ -37,7 +40,10 @@ public class GuiEditServer extends GuiScreen{
         this.done.enabled = this.serverIp.getText().length() > 0;
         this.controlList.add(new GuiSmallButton(2, this.width / 2 - 50 - 52, this.height/4 - 10 + 50 + 20 + 14 + 24, 100, 20, "Cancel"));
 	}
-	
+	@Override
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
+	}
 	protected void keyTyped(char var1, int var2) {
         this.serverIp.textboxKeyTyped(var1, var2);
         this.serverName.textboxKeyTyped(var1, var2);

@@ -7,7 +7,7 @@ public class MovementInput {
     public boolean jump = false;
     public boolean sneak = false;
 
-    public void updatePlayerMoveState(EntityPlayer var1) {
+    public void updatePlayerMoveState(EntityLiving var1) {
     }
 
     public void resetKeyState() {

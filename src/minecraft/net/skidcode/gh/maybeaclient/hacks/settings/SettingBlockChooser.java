@@ -8,15 +8,26 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 
 public class SettingBlockChooser extends Setting{
 	public boolean blocks[];
 	public int ids[];
-	public static final int colsMax = 13;
-	public int width, height;
+	//public int width, height;
 	
 	public boolean minimized = false;
+	public int blockCount = 0;
+	
+	public int getMaxColoumns(int xStart, int xEnd) {
+		if(ClickGUIHack.theme().verticalSettings) {
+			int a = (xEnd - xStart)/18;
+			if(a < 7) return 7;
+			return a;
+		}
+		return 13;
+	}
 	
 	public SettingBlockChooser(Hack hack, String name, int... ids) {
 		super(hack, name);
@@ -28,24 +39,10 @@ public class SettingBlockChooser extends Setting{
 		int drawn = 0;
 		int hei = 0;
 		int wid = 0;
-		while(id < 256) {
-			Block b = Block.blocksList[id];
-			if(b != null) {
-				wid = drawn*18;
-				++drawn;
-			}
-			if(wid > this.width) this.width = wid;
-			
-			if(drawn >= colsMax) {
-				drawn = 0;
-				wid = 0;
-				hei += 18;
-			}
-			++id;
-		}
-		this.width += 18;
-		this.height = hei+18;
+		while(id < 256) if(Block.blocksList[id++] != null) ++blockCount;
 	}
+	
+	
 	
 	public void blockChanged(int id) {
 		
@@ -80,8 +77,21 @@ public class SettingBlockChooser extends Setting{
 	@Override
 	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(this.minimized) return;
-		tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
-		yStart += 12;
+		
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int yReduce = ClickGUIHack.theme().settingYreduce;
+		
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+		}else if(ClickGUIHack.theme() != Theme.HEPHAESTUS) {
+			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+		}
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xStart += 5;
+			xEnd -= 5;
+		}
+		
+		yStart += ySpace;
 		GL11.glPushMatrix();
 		int id = 1;
 		int drawn = 0;
@@ -94,11 +104,13 @@ public class SettingBlockChooser extends Setting{
 				if(this.blocks[id]) {
 					int xb = xStart + drawn*18;
 					int yb = yStart + yOff;
-					tab.renderFrameBackGround(xb, yb, xb+16, yb+16, 0, 0xaa / 255f, 0xaa / 255f, 1f);
+					if(ClickGUIHack.theme() == Theme.NODUS) tab.renderFrameBackGround(xb, yb, xb+16, yb+16, 0, 0, 0, 0x80/255f);
+					else tab.renderFrameBackGround(xb, yb, xb+16, yb+16, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+					
 				}
 				++drawn;
 			}
-			if(drawn >= colsMax) {
+			if(drawn >= getMaxColoumns(xStart, xEnd)) {
 				drawn = 0;
 				yOff += 18;
 			}
@@ -115,18 +127,21 @@ public class SettingBlockChooser extends Setting{
 		this.minPressd = false;
 	}
 	@Override
-	public void onPressedInside(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-		
-		if(mouseY > yMin && mouseY < (yMin+12) && mouseX > xMin && mouseY < xMax) {
+	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		if(mouseY >= yMin && mouseY < (yMin+ySpace) && mouseX > xMin && mouseX < xMax) {
 			if(!this.minPressd) {
 				this.minimized = !this.minimized;
 				this.minPressd = true;
 			}
 			return;
 		}
-		
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xMin += 5;
+			xMax -= 5;
+		}
 		xMin += 2;
-		yMin += 2 + 12;
+		yMin += 2 + ySpace;
 		
 		int col = (mouseX-xMin) / 18;
 		int row = (mouseY-yMin) / 18;
@@ -148,7 +163,7 @@ public class SettingBlockChooser extends Setting{
 					}
 					++drawn;
 				}
-				if(drawn >= colsMax) {
+				if(drawn >= getMaxColoumns(xMin, xMax)) {
 					drawn = 0;
 					++yOff;
 				}
@@ -157,10 +172,34 @@ public class SettingBlockChooser extends Setting{
 		}
 	}
 	@Override
-	public void renderText(int x, int y) {
-		Client.mc.fontRenderer.drawString(this.name, x + 2, y + 2, 0xffffff);
+	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int txtColor = 0xffffff;
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			txtColor = ClickGUIHack.instance.themeColor.rgb();
+			if(this.mouseHovering) {
+				if(hmouseY >= y && hmouseY <= (y+ySpace) && hmouseX >= x && hmouseX <= xEnd) {
+					txtColor = ClickGUIHack.instance.secColor.rgb();
+					this.mouseHovering = false;
+				}
+			}
+		}
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, 0xffffff);
+			String e = this.minimized ? "+" : "-";
+			Client.mc.fontRenderer.drawStringWithShadow(e, xEnd - Client.mc.fontRenderer.getStringWidth(e) + 1 - Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, 0xffffff);
+		}else {
+			Client.mc.fontRenderer.drawString(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}
+		
 		if(this.minimized) return;
-		y += 12;
+		
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			x += 5;
+			xEnd -= 5;
+		}
+		
+		y += ySpace;
 		GL11.glPushMatrix();
 		int id = 1;
 		int drawn = 0;
@@ -173,7 +212,7 @@ public class SettingBlockChooser extends Setting{
 				GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, new ItemStack(b), x + drawn*18, y + yOff);
 				++drawn;
 			}
-			if(drawn >= colsMax) {
+			if(drawn >= getMaxColoumns(x, xEnd)) {
 				drawn = 0;
 				yOff += 18;
 			}
@@ -205,11 +244,15 @@ public class SettingBlockChooser extends Setting{
 	}
 	
 	public int getSettingWidth() {
-		return this.width;
+		return getMaxColoumns(0, 0) * 18 + (ClickGUIHack.theme() == Theme.HEPHAESTUS ? Theme.HEPH_OPT_XADD : 0);
 	}
 	
-	public int getSettingHeight() {
-		if(this.minimized) return 12;
-		return this.height + 12;
+	@Override
+	public int getSettingHeight(Tab tab) {
+		if(this.minimized) return ClickGUIHack.theme().yspacing;
+		if(ClickGUIHack.theme().verticalSettings) {
+			return ((int)Math.ceil((double)this.blockCount / getMaxColoumns(tab.xPos, tab.xPos + tab.width)))*18 + ClickGUIHack.theme().yspacing;
+		}
+		return ((int)Math.ceil((double)this.blockCount / getMaxColoumns(0, 0)))*18 + ClickGUIHack.theme().yspacing;
 	}
 }

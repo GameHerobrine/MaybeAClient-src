@@ -19,7 +19,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
     private double[] gravelNoise = new double[256];
     private double[] stoneNoise = new double[256];
     private MapGenBase field_902_u = new MapGenCaves();
-    private MobSpawnerBase[] biomesForGeneration;
+    private BiomeGenBase[] biomesForGeneration;
     double[] field_4185_d;
     double[] field_4184_e;
     double[] field_4183_f;
@@ -41,7 +41,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
         this.mobSpawnerNoise = new NoiseGeneratorOctaves(this.rand, 8);
     }
 
-    public void generateTerrain(int var1, int var2, byte[] var3, MobSpawnerBase[] var4, double[] var5) {
+    public void generateTerrain(int var1, int var2, byte[] var3, BiomeGenBase[] var4, double[] var5) {
         byte var6 = 4;
         byte var7 = 64;
         int var8 = var6 + 1;
@@ -111,7 +111,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 
     }
 
-    public void replaceBlocksForBiome(int var1, int var2, byte[] var3, MobSpawnerBase[] var4) {
+    public void replaceBlocksForBiome(int var1, int var2, byte[] var3, BiomeGenBase[] var4) {
         byte var5 = 64;
         double var6 = 0.03125D;
         this.sandNoise = this.field_909_n.generateNoiseOctaves(this.sandNoise, (double)(var1 * 16), (double)(var2 * 16), 0.0D, 16, 16, 1, var6, var6, 1.0D);
@@ -120,7 +120,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 
         for(int var8 = 0; var8 < 16; ++var8) {
             for(int var9 = 0; var9 < 16; ++var9) {
-                MobSpawnerBase var10 = var4[var8 + var9 * 16];
+                BiomeGenBase var10 = var4[var8 + var9 * 16];
                 boolean var11 = this.sandNoise[var8 + var9 * 16] + this.rand.nextDouble() * 0.2D > 0.0D;
                 boolean var12 = this.gravelNoise[var8 + var9 * 16] + this.rand.nextDouble() * 0.2D > 3.0D;
                 int var13 = (int)(this.stoneNoise[var8 + var9 * 16] / 3.0D + 3.0D + this.rand.nextDouble() * 0.25D);
@@ -312,7 +312,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
         BlockSand.fallInstantly = true;
         int var4 = var2 * 16;
         int var5 = var3 * 16;
-        MobSpawnerBase var6 = this.worldObj.getWorldChunkManager().func_4073_a(var4 + 16, var5 + 16);
+        BiomeGenBase var6 = this.worldObj.getWorldChunkManager().func_4073_a(var4 + 16, var5 + 16);
         this.rand.setSeed(this.worldObj.getRandomSeed());
         long var7 = this.rand.nextLong() / 2L * 2L + 1L;
         long var9 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -415,31 +415,31 @@ public class ChunkProviderGenerate implements IChunkProvider {
             ++var14;
         }
 
-        if (var6 == MobSpawnerBase.forest) {
+        if (var6 == BiomeGenBase.forest) {
             var14 += var13 + 5;
         }
 
-        if (var6 == MobSpawnerBase.rainforest) {
+        if (var6 == BiomeGenBase.rainforest) {
             var14 += var13 + 5;
         }
 
-        if (var6 == MobSpawnerBase.seasonalForest) {
+        if (var6 == BiomeGenBase.seasonalForest) {
             var14 += var13 + 2;
         }
 
-        if (var6 == MobSpawnerBase.taiga) {
+        if (var6 == BiomeGenBase.taiga) {
             var14 += var13 + 5;
         }
 
-        if (var6 == MobSpawnerBase.desert) {
+        if (var6 == BiomeGenBase.desert) {
             var14 -= 20;
         }
 
-        if (var6 == MobSpawnerBase.tundra) {
+        if (var6 == BiomeGenBase.tundra) {
             var14 -= 20;
         }
 
-        if (var6 == MobSpawnerBase.plains) {
+        if (var6 == BiomeGenBase.plains) {
             var14 -= 20;
         }
 
@@ -496,7 +496,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
         }
 
         var15 = 0;
-        if (var6 == MobSpawnerBase.desert) {
+        if (var6 == BiomeGenBase.desert) {
             var15 += 10;
         }
 

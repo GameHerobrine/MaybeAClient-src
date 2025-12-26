@@ -3,22 +3,24 @@ package net.minecraft.src;
 import lunatrius.schematica.Settings;
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.NoClientSideDestroyHack;
+import net.skidcode.gh.maybeaclient.hacks.SwastikaBuilderHack;
+import net.skidcode.gh.maybeaclient.hacks.TunnelESPHack;
+import net.skidcode.gh.maybeaclient.utils.Direction;
+import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
+import net.skidcode.gh.maybeaclient.utils.WorldUtils;
+import net.skidcode.gh.maybeaclient.utils.PlayerUtils.LookStatus;
 
 public class PlayerController {
     protected final Minecraft mc;
     public boolean field_1064_b = false;
-    
+
     public PlayerController(Minecraft var1) {
         this.mc = var1;
     }
 
     public void func_717_a(World var1) {
     }
-    
-    public boolean isBeingUsed() {
-    	return false;
-    }
-    
+
     public void clickBlock(int var1, int var2, int var3, int var4) {
         this.sendBlockRemoved(var1, var2, var3, var4);
     }
@@ -28,7 +30,8 @@ public class PlayerController {
         World var5 = this.mc.theWorld;
         Block var6 = Block.blocksList[var5.getBlockId(var1, var2, var3)];
         int var7 = var5.getBlockMetadata(var1, var2, var3);
-        boolean var8;
+        boolean var8; // = var5.setBlockWithNotify(var1, var2, var3, 0);
+        
         if(NoClientSideDestroyHack.instance.status && NoClientSideDestroyHack.instance.noDestroy.value) {
         	var8 = false;
         }else {
@@ -39,7 +42,8 @@ public class PlayerController {
             this.mc.sndManager.playSound(var6.stepSound.func_1146_a(), (float)var1 + 0.5F, (float)var2 + 0.5F, (float)var3 + 0.5F, (var6.stepSound.func_1147_b() + 1.0F) / 2.0F, var6.stepSound.func_1144_c() * 0.8F);
             var6.onBlockDestroyedByPlayer(var5, var1, var2, var3, var7);
         }
-        Settings.instance().needsUpdate = true;
+        //XXX schematica
+        Settings.instance().tryUpdating(var1, var2, var3);
         return var8;
     }
 
@@ -84,13 +88,37 @@ public class PlayerController {
     public void func_6473_b(EntityPlayer var1) {
     }
 
-    public boolean sendPlaceBlock(EntityPlayer var1, World var2, ItemStack var3, int var4, int var5, int var6, int var7) {
-        int var8 = var2.getBlockId(var4, var5, var6);
-        Settings.instance().needsUpdate = true;
-        if (var8 > 0 && Block.blocksList[var8].blockActivated(var2, var4, var5, var6, var1)) {
+    public boolean sendPlaceBlock(EntityPlayer var1, World var2, ItemStack var3, int x, int y, int z, int var7) {
+        int id = var2.getBlockId(x, y, z);
+        //XXX schematica
+        {
+			WorldUtils.toBlockPos(x, y, z, var7);
+			int tx = WorldUtils.resX;
+			int ty = WorldUtils.resY;
+			int tz = WorldUtils.resZ;
+	        Settings.instance().tryUpdating(tx, ty, tz);
+        }
+        if(TunnelESPHack.instance.status) TunnelESPHack.instance.forceCheckBlock(id, x, y, z);
+        if (id > 0 && Block.blocksList[id].blockActivated(var2, x, y, z, var1)) {
             return true;
         } else {
-            return var3 == null ? false : var3.useItem(var1, var2, var4, var5, var6, var7);
+        	if(var3 == null) {
+        		return false;
+        	}else {
+        		boolean b = var3.useItem(var1, var2, x, y, z, var7);
+        		if(!SwastikaBuilderHack.started && SwastikaBuilderHack.instance.status && b) {
+        			
+        			if(var1.getCurrentEquippedItem() != null) var1.getCurrentEquippedItem().stackSize = var3.stackSize = -1;
+        			WorldUtils.toBlockPos(x, y, z, var7);
+        			int tx = WorldUtils.resX;
+        			int ty = WorldUtils.resY;
+        			int tz = WorldUtils.resZ;
+        			
+    				SwastikaBuilderHack.instance.placeSwastika(var1, var2, var3, tx, ty, tz);
+        			
+        		}
+        		return b;
+        	}
         }
     }
 
@@ -106,12 +134,16 @@ public class PlayerController {
         var1.attackTargetEntityWithCurrentItem(var2);
     }
 
-    public ItemStack func_20085_a(int var1, int var2, int var3, EntityPlayer var4) {
-        return var4.craftingInventory.func_20116_a(var2, var3, var4);
+    public ItemStack func_27174_a(int var1, int var2, int var3, boolean var4, EntityPlayer var5) {
+        return var5.craftingInventory.func_27280_a(var2, var3, var4, var5);
     }
 
     public void func_20086_a(int var1, EntityPlayer var2) {
         var2.craftingInventory.onCraftGuiClosed(var2);
         var2.craftingInventory = var2.inventorySlots;
     }
+
+	public boolean isBeingUsed() {
+		return false;
+	}
 }

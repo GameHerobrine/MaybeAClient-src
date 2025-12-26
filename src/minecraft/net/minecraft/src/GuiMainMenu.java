@@ -10,9 +10,11 @@ import java.util.Random;
 import org.lwjgl.opengl.GL11;
 
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.gui.GuiCharSelector;
 import net.skidcode.gh.maybeaclient.gui.server.GuiServerSelector;
 import net.skidcode.gh.maybeaclient.hacks.FreecamHack;
 import net.skidcode.gh.maybeaclient.hacks.WorldDLHack;
+import net.skidcode.gh.maybeaclient.shaders.Shaders;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class GuiMainMenu extends GuiScreen {
@@ -34,12 +36,15 @@ public class GuiMainMenu extends GuiScreen {
                     var1.add(var3);
                 }
             }
-
+            var1.add("Evil and malicious Bee4Bee!");
+            if(Client.debug) ;
+            
             this.splashText = (String)var1.get(rand.nextInt(var1.size()));
         } catch (Exception var4) {
         }
-    }
 
+    }
+    
     public void updateScreen() {
         ++this.updateCounter;
     }
@@ -71,7 +76,7 @@ public class GuiMainMenu extends GuiScreen {
             this.controlList.add(new GuiButton(0, this.width / 2 - 100, var4 + 72 + 12, 98, 20, var2.translateKey("menu.options")));
             this.controlList.add(new GuiButton(4, this.width / 2 + 2, var4 + 72 + 12, 98, 20, var2.translateKey("menu.quit")));
         }
-
+        
         if (this.mc.session == null) {
             this.field_25096_l.enabled = false;
         }
@@ -89,7 +94,7 @@ public class GuiMainMenu extends GuiScreen {
 
         if (var1.id == 2) {
         	this.mc.displayGuiScreen(new GuiServerSelector(this));
-            //this.mc.displayGuiScreen(new GuiMultiplayer(this));
+        	//this.mc.displayGuiScreen(new GuiMultiplayer(this));
         }
 
         if (var1.id == 3) {
@@ -99,7 +104,6 @@ public class GuiMainMenu extends GuiScreen {
         if (var1.id == 4) {
             this.mc.shutdown();
         }
-
     }
 
     public void drawScreen(int var1, int var2, float var3) {
@@ -122,12 +126,13 @@ public class GuiMainMenu extends GuiScreen {
         GL11.glScalef(var8, var8, var8);
         this.drawCenteredString(this.fontRenderer, this.splashText, 0, -8, 16776960);
         GL11.glPopMatrix();
-        this.drawString(this.fontRenderer, "Minecraft Beta 1.4_01", 2, 2, 5263440);
+        this.drawString(this.fontRenderer, "Minecraft Beta 1.5_01", 2, 2, 5263440);
         this.drawString(this.fontRenderer, ChatColor.LIGHTCYAN+Client.clientName+" "+ChatColor.GOLD+Client.clientVersion, 2, 14, 5263440);
         
         String var9 = "Copyright Mojang AB. Do not distribute.";
         this.drawString(this.fontRenderer, ChatColor.DARKGRAY+"Made by GameHerobrine.", 2, this.height - 10, 16777215);
         this.drawString(this.fontRenderer, var9, this.width - this.fontRenderer.getStringWidth(var9) - 2, this.height - 10, 16777215);
+
         super.drawScreen(var1, var2, var3);
     }
 }

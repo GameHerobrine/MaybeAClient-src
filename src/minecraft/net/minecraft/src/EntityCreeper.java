@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntityCreeper extends EntityMobs {
+public class EntityCreeper extends EntityMob {
     int timeSinceIgnited;
     int lastActiveTime;
 
@@ -12,14 +12,20 @@ public class EntityCreeper extends EntityMobs {
     protected void entityInit() {
         super.entityInit();
         this.dataWatcher.addObject(16, (byte)-1);
+        this.dataWatcher.addObject(17, (byte)0);
     }
 
     public void writeEntityToNBT(NBTTagCompound var1) {
         super.writeEntityToNBT(var1);
+        if (this.dataWatcher.getWatchableObjectByte(17) == 1) {
+            var1.setBoolean("powered", true);
+        }
+
     }
 
     public void readEntityFromNBT(NBTTagCompound var1) {
         super.readEntityFromNBT(var1);
+        this.dataWatcher.updateObject(17, (byte)(var1.getBoolean("powered") ? 1 : 0));
     }
 
     public void onUpdate() {
@@ -69,7 +75,12 @@ public class EntityCreeper extends EntityMobs {
             this.func_21090_e(1);
             ++this.timeSinceIgnited;
             if (this.timeSinceIgnited >= 30) {
-                this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 3.0F);
+                if (this.func_27022_s()) {
+                    this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 6.0F);
+                } else {
+                    this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 3.0F);
+                }
+
                 this.setEntityDead();
             }
 
@@ -82,6 +93,10 @@ public class EntityCreeper extends EntityMobs {
             }
         }
 
+    }
+
+    public boolean func_27022_s() {
+        return this.dataWatcher.getWatchableObjectByte(17) == 1;
     }
 
     public float setCreeperFlashTime(float var1) {
@@ -98,5 +113,10 @@ public class EntityCreeper extends EntityMobs {
 
     private void func_21090_e(int var1) {
         this.dataWatcher.updateObject(16, (byte)var1);
+    }
+
+    public void func_27014_a(EntityLightningBolt var1) {
+        super.func_27014_a(var1);
+        this.dataWatcher.updateObject(17, (byte)1);
     }
 }

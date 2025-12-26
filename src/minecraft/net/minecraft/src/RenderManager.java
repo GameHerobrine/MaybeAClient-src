@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
-import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
+import net.skidcode.gh.maybeaclient.hacks.ThirdPersonTweaksHack;
 
 public class RenderManager {
     private Map entityRenderMap = new HashMap();
@@ -22,9 +22,9 @@ public class RenderManager {
     public float playerViewY;
     public float playerViewX;
     public GameSettings options;
-    public double renderPositionX;
-    public double renderPositionY;
-    public double renderPositionZ;
+    public double field_1222_l;
+    public double field_1221_m;
+    public double field_1220_n;
 
     private RenderManager() {
         this.entityRenderMap.put(EntitySpider.class, new RenderSpider());
@@ -38,15 +38,15 @@ public class RenderManager {
         this.entityRenderMap.put(EntityZombie.class, new RenderBiped(new ModelZombie(), 0.5F));
         this.entityRenderMap.put(EntitySlime.class, new RenderSlime(new ModelSlime(16), new ModelSlime(0), 0.25F));
         this.entityRenderMap.put(EntityPlayer.class, new RenderPlayer());
-        this.entityRenderMap.put(EntityZombieSimple.class, new RenderZombieSimple(new ModelZombie(), 0.5F, 6.0F));
+        this.entityRenderMap.put(EntityGiantZombie.class, new RenderGiantZombie(new ModelZombie(), 0.5F, 6.0F));
         this.entityRenderMap.put(EntityGhast.class, new RenderGhast());
         this.entityRenderMap.put(EntitySquid.class, new RenderSquid(new ModelSquid(), 0.7F));
         this.entityRenderMap.put(EntityLiving.class, new RenderLiving(new ModelBiped(), 0.5F));
         this.entityRenderMap.put(Entity.class, new RenderEntity());
         this.entityRenderMap.put(EntityPainting.class, new RenderPainting());
         this.entityRenderMap.put(EntityArrow.class, new RenderArrow());
-        this.entityRenderMap.put(EntitySnowball.class, new RenderSnowball(Item.snowball.getIconIndex((ItemStack)null)));
-        this.entityRenderMap.put(EntityEgg.class, new RenderSnowball(Item.egg.getIconIndex((ItemStack)null)));
+        this.entityRenderMap.put(EntitySnowball.class, new RenderSnowball(Item.snowball.func_27009_a(0)));
+        this.entityRenderMap.put(EntityEgg.class, new RenderSnowball(Item.egg.func_27009_a(0)));
         this.entityRenderMap.put(EntityFireball.class, new RenderFireball());
         this.entityRenderMap.put(EntityItem.class, new RenderItem());
         this.entityRenderMap.put(EntityTNTPrimed.class, new RenderTNTPrimed());
@@ -54,6 +54,7 @@ public class RenderManager {
         this.entityRenderMap.put(EntityMinecart.class, new RenderMinecart());
         this.entityRenderMap.put(EntityBoat.class, new RenderBoat());
         this.entityRenderMap.put(EntityFish.class, new RenderFish());
+        this.entityRenderMap.put(EntityLightningBolt.class, new RenderLightningBolt());
         Iterator var1 = this.entityRenderMap.values().iterator();
 
         while(var1.hasNext()) {
@@ -85,9 +86,14 @@ public class RenderManager {
         this.fontRenderer = var3;
         this.playerViewY = var4.prevRotationYaw + (var4.rotationYaw - var4.prevRotationYaw) * var6;
         this.playerViewX = var4.prevRotationPitch + (var4.rotationPitch - var4.prevRotationPitch) * var6;
-        this.renderPositionX = var4.lastTickPosX + (var4.posX - var4.lastTickPosX) * (double)var6;
-        this.renderPositionY = var4.lastTickPosY + (var4.posY - var4.lastTickPosY) * (double)var6;
-        this.renderPositionZ = var4.lastTickPosZ + (var4.posZ - var4.lastTickPosZ) * (double)var6;
+        
+        if(ThirdPersonTweaksHack.instance.frontViewEnabled()) {
+        	this.playerViewY += 180.0F;
+        }
+        
+        this.field_1222_l = var4.lastTickPosX + (var4.posX - var4.lastTickPosX) * (double)var6;
+        this.field_1221_m = var4.lastTickPosY + (var4.posY - var4.lastTickPosY) * (double)var6;
+        this.field_1220_n = var4.lastTickPosZ + (var4.posZ - var4.lastTickPosZ) * (double)var6;
     }
 
     public void renderEntity(Entity var1, float var2) {
@@ -101,8 +107,12 @@ public class RenderManager {
     }
 
     public void renderEntityWithPosYaw(Entity var1, double var2, double var4, double var6, float var8, float var9) {
+    	
+    	if(this.renderEngine == null) return;
     	if(var1 instanceof EntityItem && NoRenderHack.instance.status && NoRenderHack.instance.itemEntities.value) return;
-        Render var10 = this.getEntityRenderObject(var1);
+    	
+    	
+    	Render var10 = this.getEntityRenderObject(var1);
         if (var10 != null) {
             var10.doRender(var1, var2, var4, var6, var8, var9);
             var10.doRenderShadowAndFire(var1, var2, var4, var6, var8, var9);
@@ -115,9 +125,9 @@ public class RenderManager {
     }
 
     public double func_851_a(double var1, double var3, double var5) {
-        double var7 = var1 - this.renderPositionX;
-        double var9 = var3 - this.renderPositionY;
-        double var11 = var5 - this.renderPositionZ;
+        double var7 = var1 - this.field_1222_l;
+        double var9 = var3 - this.field_1221_m;
+        double var11 = var5 - this.field_1220_n;
         return var7 * var7 + var9 * var9 + var11 * var11;
     }
 

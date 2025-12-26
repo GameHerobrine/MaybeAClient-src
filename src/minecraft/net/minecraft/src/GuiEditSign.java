@@ -3,9 +3,11 @@ package net.minecraft.src;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import net.skidcode.gh.maybeaclient.gui.GuiCharSelector;
+
 public class GuiEditSign extends GuiScreen {
     protected String screenTitle = "Edit sign message:";
-    private TileEntitySign entitySign;
+    public TileEntitySign entitySign;
     private int updateCounter;
     private int editLine = 0;
     private static final String allowedCharacters;
@@ -18,30 +20,47 @@ public class GuiEditSign extends GuiScreen {
         this.controlList.clear();
         Keyboard.enableRepeatEvents(true);
         this.controlList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120, "Done"));
+        this.controlList.add(new GuiCharSelector(10, 0, 0));
     }
 
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(false);
         if (this.mc.theWorld.multiplayerWorld) {
-            this.mc.getSendQueue().addToSendQueue(new Packet130(this.entitySign.xCoord, this.entitySign.yCoord, this.entitySign.zCoord, this.entitySign.signText));
+            this.mc.getSendQueue().addToSendQueue(new Packet130UpdateSign(this.entitySign.xCoord, this.entitySign.yCoord, this.entitySign.zCoord, this.entitySign.signText));
         }
-
     }
 
     public void updateScreen() {
         ++this.updateCounter;
     }
 
+    public void addChar(char var1) {
+        StringBuilder var10000 = new StringBuilder();
+        String[] var10002 = this.entitySign.signText;
+        int var10004 = this.editLine;
+        var10002[var10004] = var10000.append(var10002[var10004]).append(var1).toString();
+    }
+    
     protected void actionPerformed(GuiButton var1) {
+    	if(var1 instanceof GuiCharSelector) {
+    		GuiCharSelector sel = (GuiCharSelector) var1;
+    		
+    		if (allowedCharacters.indexOf(sel.selectedChar) >= 0 && this.entitySign.signText[this.editLine].length() < 15) {
+                this.addChar(sel.selectedChar);
+            }
+    	}
         if (var1.enabled) {
             if (var1.id == 0) {
-                this.entitySign.x_();
-                this.mc.displayGuiScreen((GuiScreen)null);
+                this.entitySign.y_();
+                this.displayScreen();
             }
-
         }
     }
 
+    public void displayScreen() {
+    	this.mc.displayGuiScreen((GuiScreen)null);
+    }
+    
     protected void keyTyped(char var1, int var2) {
         if (var2 == 200) {
             this.editLine = this.editLine - 1 & 3;
@@ -56,10 +75,7 @@ public class GuiEditSign extends GuiScreen {
         }
 
         if (allowedCharacters.indexOf(var1) >= 0 && this.entitySign.signText[this.editLine].length() < 15) {
-            StringBuilder var10000 = new StringBuilder();
-            String[] var10002 = this.entitySign.signText;
-            int var10004 = this.editLine;
-            var10002[var10004] = var10000.append(var10002[var10004]).append(var1).toString();
+        	this.addChar(var1);
         }
 
     }
@@ -107,6 +123,6 @@ public class GuiEditSign extends GuiScreen {
     }
 
     static {
-        allowedCharacters = FontAllowedCharacters.allowedCharacters;
+        allowedCharacters = ChatAllowedCharacters.allowedCharacters;
     }
 }

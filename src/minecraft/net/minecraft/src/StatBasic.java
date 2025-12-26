@@ -1,21 +1,17 @@
 package net.minecraft.src;
 
-public class StatBasic {
-    public final int field_25071_d;
-    public final String field_25070_e;
-    public String field_25069_f;
+public class StatBasic extends StatBase {
+    public StatBasic(int var1, String var2, IStatType var3) {
+        super(var1, var2, var3);
+    }
 
     public StatBasic(int var1, String var2) {
-        this.field_25071_d = var1;
-        this.field_25070_e = var2;
+        super(var1, var2);
     }
 
-    public StatBasic func_25068_c() {
-        StatList.func_25152_a(this);
+    public StatBase func_25068_c() {
+        super.func_25068_c();
+        StatList.field_25187_b.add(this);
         return this;
-    }
-
-    public boolean func_25067_a() {
-        return false;
     }
 }

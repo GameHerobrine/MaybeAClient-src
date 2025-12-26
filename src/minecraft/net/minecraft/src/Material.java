@@ -19,7 +19,7 @@ public class Material {
     public static final Material tnt = (new Material()).setBurning();
     public static final Material field_4262_q = new Material();
     public static final Material ice = new Material();
-    public static final Material snow = new MaterialLogic();
+    public static final Material snow = (new MaterialLogic()).func_27284_f();
     public static final Material builtSnow = new Material();
     public static final Material cactus = new Material();
     public static final Material clay = new Material();
@@ -27,6 +27,7 @@ public class Material {
     public static final Material portal = new Material();
     public static final Material cakeMaterial = new Material();
     private boolean canBurn;
+    private boolean field_27285_A;
 
     public boolean getIsLiquid() {
         return false;
@@ -51,5 +52,14 @@ public class Material {
 
     public boolean getBurning() {
         return this.canBurn;
+    }
+
+    public Material func_27284_f() {
+        this.field_27285_A = true;
+        return this;
+    }
+
+    public boolean func_27283_g() {
+        return this.field_27285_A;
     }
 }

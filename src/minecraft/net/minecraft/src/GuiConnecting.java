@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.LastSeenSpotsHack;
 import net.skidcode.gh.maybeaclient.hacks.PlayerlistHack;
 
@@ -60,8 +61,6 @@ public class GuiConnecting extends GuiScreen {
 
         super.drawScreen(var1, var2, var3);
     }
-    
-    
 
     // $FF: synthetic method
     static NetClientHandler setNetClientHandler(GuiConnecting var0, NetClientHandler var1) {

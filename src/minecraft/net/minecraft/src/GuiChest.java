@@ -8,7 +8,7 @@ public class GuiChest extends GuiContainer {
     private int inventoryRows = 0;
 
     public GuiChest(IInventory var1, IInventory var2) {
-        super(new CraftingInventoryChestCB(var1, var2));
+        super(new ContainerChest(var1, var2));
         this.upperChestInventory = var1;
         this.lowerChestInventory = var2;
         this.field_948_f = false;

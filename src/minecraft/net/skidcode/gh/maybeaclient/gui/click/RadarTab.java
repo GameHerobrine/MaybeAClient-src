@@ -8,8 +8,10 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.KeybindingsHack;
 import net.skidcode.gh.maybeaclient.hacks.RadarHack;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumAlign;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class RadarTab extends Tab{
@@ -27,33 +29,34 @@ public class RadarTab extends Tab{
 		if(alignRight) {
 			int xStart = this.xPos;
 			int yStart = this.yPos;
-			
-			this.renderFrame(xStart, yStart, xStart + this.width, yStart + 12);
-			
-			Client.mc.fontRenderer.drawString(this.name, xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name), yStart + 2, 0xffffff);
+			this.renderNameBG();
+			this.renderNameAt(xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name) - ClickGUIHack.theme().headerXAdd, yStart); //XXX - 2 is needed
 		}else {
 			super.renderName();
 		}
 	}
 	
 	public void renderMinimized() {
-		this.height = 12;
-		this.renderName(RadarHack.instance.alignment.currentMode.equalsIgnoreCase("Right"));
+		this.height = ClickGUIHack.theme().yspacing;
+		this.renderName(this.isAlignedRight(RadarHack.instance.staticPositon.getValue(), RadarHack.instance.alignment.getValue()));
 	}
 	
 	boolean first = true;
 	boolean prevMinimized = this.minimized;
 	public void render() {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int prevSpace = ClickGUIHack.theme().titlebasediff;
+		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
 		
 		int savdWidth = this.width;
-		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 		
 		int savdHeight = this.height;
 		
 		EntityPlayer local = Client.mc.thePlayer;
 		HashMap<Integer, String> players = new HashMap<>();
 		
-		int height = 14;
+		int height = ySpace + prevSpace;
 		int width = this.width;
 		boolean showCoords = RadarHack.instance.showXYZ.value;
 		
@@ -61,45 +64,23 @@ public class RadarTab extends Tab{
 			EntityPlayer player = (EntityPlayer) o;
 			if(player.entityId != local.entityId || Client.mc.currentScreen instanceof ClickGUI) {
 				String d = String.format("%.2f", player.getDistance(local.posX, local.posY, local.posZ));
-				String dist = player.username+" ["+ChatColor.LIGHTCYAN+d+ChatColor.WHITE+"]";
+				String hlcol = ChatColor.custom(ClickGUIHack.highlightedTextColor());
+				String dist = player.username+" ["+hlcol+d+ChatColor.EXP_RESET+"]";
 				if(showCoords) {
-					dist += " XYZ: "+ String.format("%s%.2f %.2f %.2f", ChatColor.LIGHTCYAN, player.posX, player.posY, player.posZ);
+					dist += " XYZ: "+ String.format("%s%.2f %.2f %.2f", hlcol, player.posX, player.posY, player.posZ);
 				}
 				players.put(player.entityId, dist);
 				int w = Client.mc.fontRenderer.getStringWidth(dist) + 2;
 				if(w > width) width = w;
-				height += 12;
+				height += ySpace;
 			}
 		}
 		
 		this.height = height;
 		this.width = width;
 		
-		boolean alignRight = RadarHack.instance.alignment.currentMode.equalsIgnoreCase("Right");
-		boolean expandTop = RadarHack.instance.expand.currentMode.equalsIgnoreCase("Top");
-		ScaledResolution scaledResolution = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
-		
-		if(RadarHack.instance.staticPositon.currentMode.equalsIgnoreCase("Bottom Right")) {
-			 alignRight = true;
-			 expandTop = true;
-			 this.xPos = scaledResolution.getScaledWidth() - this.width;
-			 this.yPos = scaledResolution.getScaledHeight() - this.height;
-		}else if(RadarHack.instance.staticPositon.currentMode.equalsIgnoreCase("Bottom Left")) {
-			 alignRight = false;
-			 expandTop = true;
-			 this.xPos = 0;
-			 this.yPos = scaledResolution.getScaledHeight() - this.height;
-		}else if(RadarHack.instance.staticPositon.currentMode.equalsIgnoreCase("Top Right")) {
-			 alignRight = true;
-			 expandTop = false;
-			 this.xPos = scaledResolution.getScaledWidth() - this.width;
-			 this.yPos = 0;
-		}else if(RadarHack.instance.staticPositon.currentMode.equalsIgnoreCase("Top Left")) {
-			 alignRight = false;
-			 expandTop = false;
-			 this.xPos = 0;
-			 this.yPos = 0;	 
-		}
+		boolean alignRight = this.isAlignedRight(RadarHack.instance.staticPositon.getValue(), RadarHack.instance.alignment.getValue());
+		boolean expandTop = this.setPosition(RadarHack.instance.staticPositon.getValue(), RadarHack.instance.alignment.getValue(), RadarHack.instance.expand.getValue());
 		
 		if(!this.minimized) {
 			if(first) {
@@ -125,7 +106,7 @@ public class RadarTab extends Tab{
 		}
 		
 		if(this.minimized) {
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 			if(alignRight && savdWidth != this.width){
 				this.xPos -= (this.width - savdWidth);
 			}
@@ -135,30 +116,27 @@ public class RadarTab extends Tab{
 		}
 		
 		if(players.size() > 0) {
-			this.renderFrame(this.xPos, this.yPos + 15, this.xPos + this.width, this.yPos + this.height);
-			int h = 15;
+			this.renderFrame(this.xPos, this.yPos + ySpace + prevSpace, this.xPos + this.width, this.yPos + this.height);
+			int h = ySpace + prevSpace;
+			int txtCol = ClickGUIHack.normTextColor();
 			for(String s : players.values()) {
 				if(alignRight) {
-					Client.mc.fontRenderer.drawString(s, this.xPos + this.width - Client.mc.fontRenderer.getStringWidth(s), this.yPos + h + 2, 0xffffff);
+					Client.mc.fontRenderer.drawString(s, this.xPos + this.width - Client.mc.fontRenderer.getStringWidth(s), this.yPos + h + txtCenter, txtCol);
 				}else {
-					Client.mc.fontRenderer.drawString(s, this.xPos + 2, this.yPos + h + 2, 0xffffff);
+					Client.mc.fontRenderer.drawString(s, this.xPos + 2, this.yPos + h + txtCenter, txtCol);
 				}
 				
-				h += 12;
+				h += ySpace;
 			}
 		}
 		
 		this.renderName(alignRight);
 		prevMinimized = this.minimized;
-		//String d = String.format("%.2f", player.getDistance(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ));
-		//String s = ChatColor.LIGHTCYAN+"["+d+"] "+ChatColor.GOLD+player.username+ChatColor.LIGHTCYAN+" XYZ: "+ChatColor.GOLD+String.format("%.2f %.2f %.2f", player.posX, player.posY, player.posZ);
-		
-		
 	}
 	
 	public void writeToNBT(NBTTagCompound tag) {
 		NBTTagCompound comp = (NBTTagCompound) NBTBase.createTagOfType((byte) 10);
-		comp.setInteger("xPos", RadarHack.instance.alignment.currentMode.equalsIgnoreCase("Right") ? this.xPos + this.width : this.xPos);
+		comp.setInteger("xPos", RadarHack.instance.alignment.getValue() == EnumAlign.RIGHT ? this.xPos + this.width : this.xPos);
 		comp.setInteger("yPos", this.yPos);
 		comp.setBoolean("Minimized", this.minimized);
 		tag.setCompoundTag("Position", comp);

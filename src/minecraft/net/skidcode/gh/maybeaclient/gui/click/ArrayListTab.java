@@ -6,11 +6,13 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.ArrayListHack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.KeybindingsHack;
-import net.skidcode.gh.maybeaclient.hacks.ArrayListHack;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack.SorterAZ;
 import net.skidcode.gh.maybeaclient.hacks.ArrayListHack.SorterZA;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class ArrayListTab extends Tab{
@@ -36,30 +38,40 @@ public class ArrayListTab extends Tab{
 		if(alignRight) {
 			int xStart = this.xPos;
 			int yStart = this.yPos;
-			
-			this.renderFrame(xStart, yStart, xStart + this.width, yStart + 12);
-			
-			Client.mc.fontRenderer.drawString(this.name, xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name), yStart + 2, 0xffffff);
+			this.renderNameBG();
+			this.renderNameAt(xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name) - ClickGUIHack.theme().headerXAdd, yStart); //XXX - 2 is needed
 		}else {
 			super.renderName();
 		}
 	}
 	
+	@Override
 	public void renderMinimized() {
-		this.height = 12;
-		this.renderName(ArrayListHack.instance.alignment.currentMode.equalsIgnoreCase("Right"));
+		this.height = ClickGUIHack.theme().yspacing;
+		this.renderName(this.isAlignedRight(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue()));
 	}
 	
 	public void render() {
+		Client.debug = true;
 		ArrayList<String> enabled = new ArrayList<>();
 		int savdHeight = this.height;
 		int savdWidth = this.width;
 		int totalHeight = 0;
-		int totalWidth = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+		int titleSize = Client.mc.fontRenderer.getStringWidth(this.name);
+		int totalWidth = titleSize + ClickGUIHack.theme().titleXadd;
 		for(Hack h : Client.hacksByName.values()) {
 			if(h.status) {
-				totalHeight += 12;
+				totalHeight += ClickGUIHack.theme().yspacing;
+				String ccolor = ChatColor.custom(ClickGUIHack.highlightedTextColor());
+				String prefix = h.getPrefix().replace(ChatColor.BLACK.toString(), ccolor).replace(ChatColor.WHITE.toString(), ChatColor.EXP_RESET.toString());
 				String name = h.getNameForArrayList();
+				if(!prefix.equals("")) {
+					name += "[";
+					name += ccolor;
+					name += prefix;
+					name += ChatColor.EXP_RESET;
+					name += "]";
+				}
 				int size = Client.mc.fontRenderer.getStringWidth(name) + 2;
 				if(totalWidth < size) {
 					totalWidth = size;
@@ -69,32 +81,10 @@ public class ArrayListTab extends Tab{
 		}
 		this.width = totalWidth;
 		this.height = totalHeight + 14;
-		if(this.minimized) this.height = 12;
+		if(this.minimized) this.height = ClickGUIHack.theme().yspacing;
 		
-		boolean alignRight = ArrayListHack.instance.alignment.currentMode.equalsIgnoreCase("Right");
-		boolean expandTop = ArrayListHack.instance.expand.currentMode.equalsIgnoreCase("Top");
-		ScaledResolution scaledResolution = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
-		if(ArrayListHack.instance.staticPositon.currentMode.equalsIgnoreCase("Bottom Right")) {
-			 alignRight = true;
-			 expandTop = true;
-			 this.xPos = scaledResolution.getScaledWidth() - this.width;
-			 this.yPos = scaledResolution.getScaledHeight() - this.height;
-		}else if(ArrayListHack.instance.staticPositon.currentMode.equalsIgnoreCase("Bottom Left")) {
-			 alignRight = false;
-			 expandTop = true;
-			 this.xPos = 0;
-			 this.yPos = scaledResolution.getScaledHeight() - this.height;
-		}else if(ArrayListHack.instance.staticPositon.currentMode.equalsIgnoreCase("Top Right")) {
-			 alignRight = true;
-			 expandTop = false;
-			 this.xPos = scaledResolution.getScaledWidth() - this.width;
-			 this.yPos = 0;
-		}else if(ArrayListHack.instance.staticPositon.currentMode.equalsIgnoreCase("Top Left")) {
-			 alignRight = false;
-			 expandTop = false;
-			 this.xPos = 0;
-			 this.yPos = 0;
-		}
+		boolean expandTop = this.setPosition(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue(), ArrayListHack.instance.expand.getValue());
+		boolean alignRight = this.isAlignedRight(ArrayListHack.instance.staticPositon.getValue(), ArrayListHack.instance.alignment.getValue());
 		
 		if(!this.minimized) {
 			if(first) {
@@ -121,13 +111,13 @@ public class ArrayListTab extends Tab{
 		}
 		
 		this.renderName(alignRight);
+		this.renderFrame(
+			this.xPos, this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff, 
+			this.xPos + totalWidth, this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff + totalHeight + this.yOffset
+		);
 		
-		this.renderFrame(this.xPos, this.yPos + 15, this.xPos + totalWidth, this.yPos + 15 + totalHeight + this.yOffset);
-		//GL11.glStencilFunc(GL11.GL_EQUAL, 1, 0xFF);
-		//GL11.glStencilMask(0x00);
 		if(ArrayListHack.instance.sortMode.currentMode.equalsIgnoreCase("Ascending")) enabled.sort(SorterAZ.inst);
 		else if(ArrayListHack.instance.sortMode.currentMode.equalsIgnoreCase("Descending"))  enabled.sort(SorterZA.inst);
-		//GL11.glTranslated(0.0f, yOffset, 0);
 		for(int i = 0; i < enabled.size(); ++i) {
 			String s = enabled.get(i);
 			int rendX, rendY;
@@ -137,27 +127,15 @@ public class ArrayListTab extends Tab{
 				rendX = this.xPos + 2;
 			}
 			
-			rendY = this.yPos+i*12 + 15 + 2;
+			rendY = this.yPos+i*ClickGUIHack.theme().yspacing + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff + 2;
 			
-			Client.mc.fontRenderer.drawString(s, rendX, rendY, 0xffffff);
+			Client.mc.fontRenderer.drawString(s, rendX, rendY, ClickGUIHack.normTextColor());
 		}
-		//GL11.glTranslated(0.0f, -yOffset, 0);
-		
-		//GL11.glStencilMask(0xFF);
-		//GL11.glStencilFunc(GL11.GL_ALWAYS, 1, 0xFF);
-		//GL11.glDisable(GL11.GL_STENCIL_TEST);
+		Client.debug = false;
 	}
 	
 	@Override
 	public void wheelMoved(int wheel, int x, int y) {
-		//int maxy = this.yPos + this.height + this.yOffset;
-		//ScaledResolution sr = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
-		//if(maxy > sr.getScaledHeight()) {
-		//	 yOffset += Math.signum(wheel)*12;
-		//	 if(yOffset > 0) yOffset = 0;
-		//}else if(yOffset != 0 && wheel > 0){
-		//	yOffset += Math.signum(wheel)*12;
-		//	if(yOffset > 0) yOffset = 0;
-		//}
+
 	}
 }

@@ -1,5 +1,7 @@
 package net.skidcode.gh.maybeaclient.gui.altman;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSmallButton;
@@ -36,6 +38,10 @@ public class GuiEditPassword extends GuiScreen{
 			this.orig = pinf.mode;
 		}
 		
+	}
+	@Override
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
 	}
 	protected void actionPerformed(GuiButton b) {
 		if (b.enabled) {
@@ -90,15 +96,15 @@ public class GuiEditPassword extends GuiScreen{
 	public void initGui() {
 		super.initGui();
 		this.controlList.clear();
-		
-		this.serverIPField = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72, 200, 20, "");
+		Keyboard.enableRepeatEvents(true);
+		this.serverIPField = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72, 200, 20, "");
 		this.serverIPField.setMaxStringLength(32);
 		this.serverIPField.isFocused = true;
 		
 		
-		this.password = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72 + 36, 200, 20, "");
-		this.prompt = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72 + 36*2, 200, 20, "");
-		this.command = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72 + 36*3, 200, 20, "");
+		this.password = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72 + 36, 200, 20, "");
+		this.prompt = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72 + 36*2, 200, 20, "");
+		this.command = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 2 - 72 + 36*3, 200, 20, "");
 		
 		if(this.passInfo != null) {
 			this.serverIPField.setText(this.passInfo.serverIP);

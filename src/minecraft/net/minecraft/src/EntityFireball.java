@@ -140,7 +140,7 @@ public class EntityFireball extends Entity {
         this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
         float var17 = 0.95F;
-        if (this.handleWaterMovement()) {
+        if (this.func_27013_ag()) {
             for(int var18 = 0; var18 < 4; ++var18) {
                 float var19 = 0.25F;
                 this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var19, this.posY - this.motionY * (double)var19, this.posZ - this.motionZ * (double)var19, this.motionX, this.motionY, this.motionZ);

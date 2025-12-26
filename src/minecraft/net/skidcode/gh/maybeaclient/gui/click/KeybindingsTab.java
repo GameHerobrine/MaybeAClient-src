@@ -1,8 +1,10 @@
 package net.skidcode.gh.maybeaclient.gui.click;
 
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.KeybindingsHack;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumStaticPos;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class KeybindingsTab extends Tab{
@@ -21,38 +23,42 @@ public class KeybindingsTab extends Tab{
 		if(alignRight) {
 			int xStart = this.xPos;
 			int yStart = this.yPos;
-			
-			this.renderFrame(xStart, yStart, xStart + this.width, yStart + 12);
-			
-			Client.mc.fontRenderer.drawString(this.name, xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name), yStart + 2, 0xffffff);
+			this.renderNameBG();
+			this.renderNameAt(xStart + this.width - Client.mc.fontRenderer.getStringWidth(this.name) - ClickGUIHack.theme().headerXAdd, yStart); //XXX - 2 is needed
 		}else {
 			super.renderName();
 		}
 	}
 	
 	public void renderMinimized() {
-		this.height = 12;
-		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
-		this.renderName(KeybindingsHack.instance.alignment.currentMode.equalsIgnoreCase("Right"));
+		this.height = ClickGUIHack.theme().yspacing;
+		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
+		this.renderName(this.isAlignedRight(EnumStaticPos.DISABLED, KeybindingsHack.instance.alignment.getValue()));
 	}
 	
 	boolean first = true;
 	public void render() {
-		int height = 14;
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int prevSpace = ClickGUIHack.theme().titlebasediff;
+		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
+		
+		int height = ySpace + prevSpace;
 		int savdHeight = this.height;
 		int savdWidth = this.width;
-		int width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+		int width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 		boolean hasBinds = false;
 		for(Hack h : Client.hacksByName.values()) {
         	if(h.keybinding.value != 0) {
-        		height += 12;
-        		int w = Client.mc.fontRenderer.getStringWidth("["+ChatColor.LIGHTCYAN+h.keybinding.valueToString()+ChatColor.WHITE+"] "+h.name) + 2;
+        		height += ySpace;
+        		int w = Client.mc.fontRenderer.getStringWidth("["+ChatColor.custom(ClickGUIHack.highlightedTextColor())+h.keybinding.valueToString()+ChatColor.EXP_RESET+"] "+h.name) + 2;
         		if(w > width) width = w;
         		hasBinds = true;
         	}
 		}
-		boolean alignRight = KeybindingsHack.instance.alignment.currentMode.equalsIgnoreCase("Right");
-		boolean expandTop = KeybindingsHack.instance.expand.currentMode.equalsIgnoreCase("Top");
+		
+		boolean expandTop = this.setPosition(EnumStaticPos.DISABLED, KeybindingsHack.instance.alignment.getValue(), KeybindingsHack.instance.expand.getValue());
+		boolean alignRight = this.isAlignedRight(EnumStaticPos.DISABLED, KeybindingsHack.instance.alignment.getValue());
+		this.tabMinimize.alignRight = alignRight;
 		this.height = height;
 		this.width = width;
 		
@@ -76,7 +82,7 @@ public class KeybindingsTab extends Tab{
 		}
 		
 		if(this.minimized) {
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 			if(alignRight && savdWidth != this.width){
 				this.xPos -= (this.width - savdWidth);
 			}
@@ -87,17 +93,18 @@ public class KeybindingsTab extends Tab{
 		this.renderName(alignRight);
 		if(!hasBinds) return;
 		
-		this.renderFrame(this.xPos, this.yPos + 12 + 3, this.xPos + this.width, this.yPos + this.height);
+		this.renderFrame(this.xPos, this.yPos + ySpace + prevSpace, this.xPos + this.width, this.yPos + this.height);
 		
 		int i = 1;
+		int tcolor = ClickGUIHack.normTextColor();
         for(Hack h : Client.hacksByName.values()) {
         	if(h.keybinding.value != 0) {
-        		String s = "["+ChatColor.LIGHTCYAN+h.keybinding.valueToString()+ChatColor.WHITE+"] "+h.name;
+        		String s = "["+ChatColor.custom(ClickGUIHack.highlightedTextColor())+h.keybinding.valueToString()+ChatColor.EXP_RESET+"] "+h.name;
         		
         		if(alignRight) {
-        			Client.mc.fontRenderer.drawString(s, this.xPos + this.width - Client.mc.fontRenderer.getStringWidth(s), this.yPos + i*12 + 3 + 2, 0xffffff);
+        			Client.mc.fontRenderer.drawString(s, this.xPos + this.width - Client.mc.fontRenderer.getStringWidth(s), this.yPos + i*ySpace + prevSpace + txtCenter, tcolor);
         		}else {
-        			Client.mc.fontRenderer.drawString(s, this.xPos + 2, this.yPos + i*12 + 3 + 2, 0xffffff);
+        			Client.mc.fontRenderer.drawString(s, this.xPos + 2, this.yPos + i*ySpace + prevSpace + txtCenter, tcolor);
         		}
 	        	++i;
         	}

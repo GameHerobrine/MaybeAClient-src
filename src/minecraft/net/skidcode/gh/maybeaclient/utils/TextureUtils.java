@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.opengl.GL11;
+
 public class TextureUtils {
 	
 	public static int getAlpha(BufferedImage tex, int x, int y) {
@@ -15,42 +17,22 @@ public class TextureUtils {
 		return (tex.getRGB(x, y) >> 24) & 0xff;
 	}
 	
-	public static BufferedImage generateOutlinedTexture(BufferedImage tex) throws IOException {
-		BufferedImage out = new BufferedImage(tex.getWidth(), tex.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-		for(int tx = 0; tx < tex.getWidth(); tx += 16) {
-			for(int ty = 0; ty < tex.getHeight(); ty += 16) {
-				int txmi = tx;
-				int txma = tx+15;
-				int tymi = ty;
-				int tyma = ty+15;
-				for(int y = tymi; y < tyma; ++y) {
-					boolean hp = false;
-					for(int x = txmi; x < txma; ++x) {
-						int a = getAlpha(tex, x, y);
-						
-						if(hp) {
-							if(y != tyma && getAlpha(tex, x, y+1) == 0) hp = false;
-							if(y != tymi && getAlpha(tex, x, y-1) == 0) hp = false;
-							
-							if(x != txma && getAlpha(tex, x+1, y) == 0) hp = false;
-							if(x != txmi && getAlpha(tex, x-1, y) == 0) hp = false;
-							
-						}
-						
-						if(hp && x == txma) hp = false;
-						if(hp || a == 0) {
-							out.setRGB(x, y, 0x00000000);
-						}else {
-							out.setRGB(x, y, 0xffffffff);
-							hp = true;
-						}
-					}
-				}
-				
-			}
+	public static void line(int side, int xStart, int yStart, int xEnd, int yEnd, double px) {
+		if(side == 2) {
+			xStart += 1;
+			xEnd += 1;
 		}
-		return out;
+		if(side == 8) {
+			yStart += 1;
+			yEnd += 1;
+		}
+		double bX = -0.5 + (xStart * px);
+		double bY = 0.75 - (yStart * px);
+		double eX = -0.5 + (xEnd * px);
+		double eY = 0.75 - (yEnd * px);
+
+		GL11.glVertex3d(bX, bY, 0);
+		GL11.glVertex3d(eX, eY, 0);
 	}
 
 	public static byte[] getOutliningSides(BufferedImage tex) {

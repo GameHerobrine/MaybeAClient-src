@@ -125,7 +125,7 @@ public class MapGenCavesHell extends MapGenBase {
                                     double var48 = ((double)var47 + 0.5D - var6) / var29;
                                     if (var48 > -0.7D && var56 * var56 + var48 * var48 + var44 * var44 < 1.0D) {
                                         byte var50 = var3[var46];
-                                        if (var50 == Block.bloodStone.blockID || var50 == Block.dirt.blockID || var50 == Block.grass.blockID) {
+                                        if (var50 == Block.netherrack.blockID || var50 == Block.dirt.blockID || var50 == Block.grass.blockID) {
                                             var3[var46] = 0;
                                         }
                                     }

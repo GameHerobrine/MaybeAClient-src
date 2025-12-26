@@ -202,4 +202,8 @@ public class BlockDoor extends Block {
             return var1.isBlockOpaqueCube(var2, var3 - 1, var4) && super.canPlaceBlockAt(var1, var2, var3, var4) && super.canPlaceBlockAt(var1, var2, var3 + 1, var4);
         }
     }
+
+    public static boolean func_27047_e(int var0) {
+        return (var0 & 4) != 0;
+    }
 }

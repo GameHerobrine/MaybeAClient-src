@@ -41,18 +41,10 @@ public class AutoEatHack extends Hack implements EventListener{
 	}
 	
 	@Override
-	public String getNameForArrayList() {
-		if(this.mode.currentMode.equalsIgnoreCase("Simple")) {
-			String s = "[";
-			s += ChatColor.LIGHTCYAN;
-			s += this.health.getValue();
-			s += ChatColor.WHITE;
-			s += "]";
-			return this.name + s;
-		}
-		return this.name;
+	public String getPrefix() {
+		if(this.mode.currentMode.equalsIgnoreCase("Simple")) return ""+this.health.getValue();
+		return super.getPrefix();
 	}
-	
 	public void handleEvent(Event e) {
         if (e instanceof EventPlayerUpdatePre) {
         	++ticksPassed;

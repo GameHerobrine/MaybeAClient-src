@@ -4,16 +4,15 @@ import java.util.List;
 import java.util.Random;
 
 import net.skidcode.gh.maybeaclient.Client;
-import net.skidcode.gh.maybeaclient.hacks.AutoTunnelHack;
+import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.hacks.CameraLockHack;
 import net.skidcode.gh.maybeaclient.hacks.FreecamHack;
 import net.skidcode.gh.maybeaclient.hacks.NoClipHack;
 import net.skidcode.gh.maybeaclient.hacks.NoPushHack;
 import net.skidcode.gh.maybeaclient.hacks.SafeWalkHack;
-import net.skidcode.gh.maybeaclient.hacks.StepHack;
 
 public abstract class Entity {
-    private static int nextEntityID = 0;
+	public static int nextEntityID = 0;
     public int entityId;
     public double renderDistanceWeight;
     public boolean preventEntitySpawning;
@@ -39,6 +38,7 @@ public abstract class Entity {
     public boolean isCollidedVertically;
     public boolean isCollided;
     public boolean beenAttacked;
+    public boolean field_27016_ba;
     public boolean field_9293_aM;
     public boolean isDead;
     public float yOffset;
@@ -55,7 +55,6 @@ public abstract class Entity {
     public float stepHeight;
     public boolean noClip;
     public float entityCollisionReduction;
-    public boolean field_9313_bc;
     protected Random rand;
     public int ticksExisted;
     public int fireResistance;
@@ -78,7 +77,10 @@ public abstract class Entity {
     public int serverPosX;
     public int serverPosY;
     public int serverPosZ;
-
+    
+    
+    public int ff_delay = 0;
+    
     public Entity(World var1) {
         this.entityId = nextEntityID++;
         this.renderDistanceWeight = 1.0D;
@@ -100,7 +102,6 @@ public abstract class Entity {
         this.stepHeight = 0.0F;
         this.noClip = false;
         this.entityCollisionReduction = 0.0F;
-        this.field_9313_bc = false;
         this.rand = new Random();
         this.ticksExisted = 0;
         this.fireResistance = 1;
@@ -163,8 +164,8 @@ public abstract class Entity {
     }
 
     protected void setRotation(float var1, float var2) {
-        this.rotationYaw = var1;
-        this.rotationPitch = var2;
+        this.rotationYaw = var1 % 360.0F;
+        this.rotationPitch = var2 % 360.0F;
     }
 
     public void setPosition(double var1, double var3, double var5) {
@@ -179,8 +180,17 @@ public abstract class Entity {
     public void func_346_d(float var1, float var2) {
     	
     	if(CameraLockHack.instance.status) {
+    		
+    		CameraLockHack.LockMode yawlock = CameraLockHack.instance.lockYaw();
+    		
     		if(CameraLockHack.instance.lockPitch.value) var2 = 0;
-    		if(CameraLockHack.instance.lockYaw.value) var1 = 0;
+    		if(yawlock == CameraLockHack.LockMode.STATIC) var1 = 0;
+    		else if(yawlock == CameraLockHack.LockMode.SNAP) {
+    			double ff = var1 * 0.15;
+    			CameraLockHack.instance.addYaw(ff);
+    			
+    			var1 = 0;
+    		}
     	}
     	
         float var3 = this.rotationPitch;
@@ -200,10 +210,14 @@ public abstract class Entity {
     }
 
     public void onUpdate() {
+    	if(this.ff_delay > 0) --this.ff_delay;
         this.onEntityUpdate();
     }
 
     public void onEntityUpdate() {
+    	boolean interact = true;
+    	if(this instanceof EntityArrow && ((EntityArrow) this).spawnedByTrajectories) interact = false;
+    	
         if (this.ridingEntity != null && this.ridingEntity.isDead) {
             this.ridingEntity = null;
         }
@@ -221,23 +235,25 @@ public abstract class Entity {
                 if (var1 > 1.0F) {
                     var1 = 1.0F;
                 }
-
-                this.worldObj.playSoundAtEntity(this, "random.splash", var1, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
+                
+                if(interact) this.worldObj.playSoundAtEntity(this, "random.splash", var1, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
                 float var2 = (float)MathHelper.floor_double(this.boundingBox.minY);
 
                 int var3;
                 float var4;
                 float var5;
-                for(var3 = 0; (float)var3 < 1.0F + this.width * 20.0F; ++var3) {
-                    var4 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                    var5 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                    this.worldObj.spawnParticle("bubble", this.posX + (double)var4, (double)(var2 + 1.0F), this.posZ + (double)var5, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
-                }
+                if(interact) {
+                	for(var3 = 0; (float)var3 < 1.0F + this.width * 20.0F; ++var3) {
+                        var4 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
+                        var5 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
+                        this.worldObj.spawnParticle("bubble", this.posX + (double)var4, (double)(var2 + 1.0F), this.posZ + (double)var5, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
+                    }
 
-                for(var3 = 0; (float)var3 < 1.0F + this.width * 20.0F; ++var3) {
-                    var4 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                    var5 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                    this.worldObj.spawnParticle("splash", this.posX + (double)var4, (double)(var2 + 1.0F), this.posZ + (double)var5, this.motionX, this.motionY, this.motionZ);
+                    for(var3 = 0; (float)var3 < 1.0F + this.width * 20.0F; ++var3) {
+                        var4 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
+                        var5 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
+                        this.worldObj.spawnParticle("splash", this.posX + (double)var4, (double)(var2 + 1.0F), this.posZ + (double)var5, this.motionX, this.motionY, this.motionZ);
+                    }
                 }
             }
 
@@ -258,7 +274,7 @@ public abstract class Entity {
                 }
             } else {
                 if (this.fire % 20 == 0) {
-                    this.attackEntityFrom((Entity)null, 1);
+                	if(interact) this.attackEntityFrom((Entity)null, 1);
                 }
 
                 --this.fire;
@@ -312,13 +328,23 @@ public abstract class Entity {
         } else {
             double var7 = this.posX;
             double var9 = this.posZ;
+            if (this.field_27016_ba) {
+                this.field_27016_ba = false;
+                var1 *= 0.25D;
+                var3 *= 0.05000000074505806D;
+                var5 *= 0.25D;
+                this.motionX = 0.0D;
+                this.motionY = 0.0D;
+                this.motionZ = 0.0D;
+            }
+
             double var11 = var1;
             double var13 = var3;
             double var15 = var5;
             AxisAlignedBB var17 = this.boundingBox.copy();
             boolean var18 = this.onGround && (this.isSneaking() || SafeWalkHack.instance.status);
             if (var18) {
-            	BlockFluids.forceNullBB = true;
+            	BlockFluid.forceNullBB = true;
                 double var19;
                 for(var19 = 0.05D; var1 != 0.0D && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox.getOffsetBoundingBox(var1, -1.0D, 0.0D)).size() == 0; var11 = var1) {
                     if (var1 < var19 && var1 >= -var19) {
@@ -339,10 +365,9 @@ public abstract class Entity {
                         var5 += var19;
                     }
                 }
-                
-                BlockFluids.forceNullBB = false;
+                BlockFluid.forceNullBB = false;
             }
-
+            if(this != Client.mc.thePlayer) BlockFluid.forceNullBB = true;
             List var35 = this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox.addCoord(var1, var3, var5));
 
             for(int var20 = 0; var20 < var35.size(); ++var20) {
@@ -428,13 +453,14 @@ public abstract class Entity {
                     var1 = 0.0D;
                 }
 
-                //CLIENT: fixed too high step
+                Client.class.getClass(); //step hack tweaks
                 var3 = -stepHeight;
                 for(int k3 = 0; k3 < var35.size(); k3++)
                 {
-                	var3 = ((AxisAlignedBB)var35.get(k3)).calculateYOffset(boundingBox, var3);
+                    var3 = ((AxisAlignedBB)var35.get(k3)).calculateYOffset(boundingBox, var3);
                 }
-                boundingBox.offset(0.0D, var3, 0.0D);
+                boundingBox.offset(0.0D,  var3, 0.0D);
+                
                 
                 if (var37 * var37 + var25 * var25 >= var1 * var1 + var5 * var5) {
                     var1 = var37;
@@ -451,9 +477,11 @@ public abstract class Entity {
             this.posZ = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2.0D;
             this.isCollidedHorizontally = var11 != var1 || var15 != var5;
             this.isCollidedVertically = var13 != var3;
+            boolean prevOnGround = this.onGround;
             this.onGround = var13 != var3 && var13 < 0.0D;
             this.isCollided = this.isCollidedHorizontally || this.isCollidedVertically;
             this.updateFallState(var3, this.onGround);
+            
             if (var11 != var1) {
                 this.motionX = 0.0D;
             }
@@ -511,7 +539,7 @@ public abstract class Entity {
             }
 
             this.ySize *= 0.4F;
-            boolean var39 = this.handleWaterMovement();
+            boolean var39 = this.func_27012_af();
             if (this.worldObj.isBoundingBoxBurning(this.boundingBox)) {
                 this.dealFireDamage(1);
                 if (!var39) {
@@ -528,7 +556,7 @@ public abstract class Entity {
                 this.worldObj.playSoundAtEntity(this, "random.fizz", 0.7F, 1.6F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
                 this.fire = -this.fireResistance;
             }
-
+            BlockFluid.forceNullBB = false;
         }
     }
 
@@ -562,6 +590,14 @@ public abstract class Entity {
     protected void fall(float var1) {
     }
 
+    public boolean func_27012_af() {
+        return this.inWater || this.worldObj.func_27167_r(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
+    }
+
+    public boolean func_27013_ag() {
+        return this.inWater;
+    }
+
     public boolean handleWaterMovement() {
         return this.worldObj.handleMaterialAcceleration(this.boundingBox.expand(0.0D, -0.4000000059604645D, 0.0D), Material.water, this);
     }
@@ -573,7 +609,7 @@ public abstract class Entity {
         int var6 = MathHelper.floor_double(this.posZ);
         int var7 = this.worldObj.getBlockId(var4, var5, var6);
         if (var7 != 0 && Block.blocksList[var7].blockMaterial == var1) {
-            float var8 = BlockFluids.getPercentAir(this.worldObj.getBlockMetadata(var4, var5, var6)) - 0.11111111F;
+            float var8 = BlockFluid.getPercentAir(this.worldObj.getBlockMetadata(var4, var5, var6)) - 0.11111111F;
             float var9 = (float)(var5 + 1) - var8;
             return var2 < (double)var9;
         } else {
@@ -589,20 +625,20 @@ public abstract class Entity {
         return this.worldObj.isMaterialInBB(this.boundingBox.expand(-0.10000000149011612D, -0.4000000059604645D, -0.10000000149011612D), Material.lava);
     }
 
-    public void moveFlying(float strafe, float forward, float var3) {
-        float var4 = MathHelper.sqrt_float(strafe * strafe + forward * forward);
+    public void moveFlying(float var1, float var2, float var3) {
+        float var4 = MathHelper.sqrt_float(var1 * var1 + var2 * var2);
         if (var4 >= 0.01F) {
             if (var4 < 1.0F) {
                 var4 = 1.0F;
             }
 
             var4 = var3 / var4;
-            strafe *= var4;
-            forward *= var4;
+            var1 *= var4;
+            var2 *= var4;
             float var5 = MathHelper.sin(this.rotationYaw * 3.1415927F / 180.0F);
             float var6 = MathHelper.cos(this.rotationYaw * 3.1415927F / 180.0F);
-            this.motionX += (double)(strafe * var6 - forward * var5);
-            this.motionZ += (double)(forward * var6 + strafe * var5);
+            this.motionX += (double)(var1 * var6 - var2 * var5);
+            this.motionZ += (double)(var2 * var6 + var1 * var5);
         }
     }
 
@@ -622,13 +658,6 @@ public abstract class Entity {
         this.prevPosX = this.posX = var1;
         this.prevPosY = this.posY = var3;
         this.prevPosZ = this.posZ = var5;
-        
-        //XXX: Fix for redering non-loaded entities
-        this.lastTickPosX = this.posX;
-        this.lastTickPosY = this.posY;
-        this.lastTickPosZ = this.posZ;
-        
-        
         this.prevRotationYaw = this.rotationYaw = var7;
         this.prevRotationPitch = this.rotationPitch = var8;
         this.ySize = 0.0F;
@@ -687,7 +716,6 @@ public abstract class Entity {
 
     public void applyEntityCollision(Entity var1) {
     	if(NoPushHack.instance.status) return;
-    	
         if (var1.riddenByEntity != this && var1.ridingEntity != this) {
             double var2 = var1.posX - this.posX;
             double var4 = var1.posZ - this.posZ;
@@ -1035,5 +1063,17 @@ public abstract class Entity {
             this.dataWatcher.updateObject(0, (byte)(var3 & ~(1 << var1)));
         }
 
+    }
+
+    public void func_27014_a(EntityLightningBolt var1) {
+        this.dealFireDamage(5);
+        ++this.fire;
+        if (this.fire == 0) {
+            this.fire = 300;
+        }
+
+    }
+
+    public void func_27015_a(EntityLiving var1) {
     }
 }

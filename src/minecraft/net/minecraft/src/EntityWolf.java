@@ -3,7 +3,7 @@ package net.minecraft.src;
 import java.util.Iterator;
 import java.util.List;
 
-public class EntityWolf extends EntityAnimals {
+public class EntityWolf extends EntityAnimal {
     private boolean looksWithInterest = false;
     private float field_25048_b;
     private float field_25054_c;
@@ -71,7 +71,7 @@ public class EntityWolf extends EntityAnimals {
         if (this.isWolfAngry()) {
             return "mob.wolf.growl";
         } else if (this.rand.nextInt(3) == 0) {
-            return this.isWolfTamed() && this.health < 10 ? "mob.wolf.whine" : "mob.wolf.panting";
+            return this.isWolfTamed() && this.dataWatcher.func_25115_b(18) < 10 ? "mob.wolf.whine" : "mob.wolf.panting";
         } else {
             return "mob.wolf.bark";
         }
@@ -95,14 +95,14 @@ public class EntityWolf extends EntityAnimals {
 
     protected void updatePlayerActionState() {
         super.updatePlayerActionState();
-        if (!this.hasAttacked && !this.hasPath() && this.isWolfTamed()) {
+        if (!this.hasAttacked && !this.hasPath() && this.isWolfTamed() && this.ridingEntity == null) {
             EntityPlayer var3 = this.worldObj.getPlayerEntityByName(this.getWolfOwner());
             if (var3 != null) {
                 float var2 = var3.getDistanceToEntity(this);
                 if (var2 > 5.0F) {
                     this.getPathOrWalkableBlock(var3, var2);
                 }
-            } else if (!this.handleWaterMovement()) {
+            } else if (!this.func_27013_ag()) {
                 this.setWolfSitting(true);
             }
         } else if (this.playerToAttack == null && !this.hasPath() && !this.isWolfTamed() && this.worldObj.rand.nextInt(100) == 0) {
@@ -112,7 +112,7 @@ public class EntityWolf extends EntityAnimals {
             }
         }
 
-        if (this.handleWaterMovement()) {
+        if (this.func_27013_ag()) {
             this.setWolfSitting(false);
         }
 
@@ -140,7 +140,7 @@ public class EntityWolf extends EntityAnimals {
             }
         }
 
-        if (!this.field_9343_G && this.field_25053_f && !this.field_25052_g && !this.hasPath()) {
+        if (!this.field_9343_G && this.field_25053_f && !this.field_25052_g && !this.hasPath() && this.onGround) {
             this.field_25052_g = true;
             this.timeWolfIsShaking = 0.0F;
             this.field_25050_i = 0.0F;
@@ -162,7 +162,7 @@ public class EntityWolf extends EntityAnimals {
             this.numTicksToChaseTarget = 10;
         }
 
-        if (this.handleWaterMovement()) {
+        if (this.func_27012_af()) {
             this.field_25053_f = true;
             this.field_25052_g = false;
             this.timeWolfIsShaking = 0.0F;
@@ -247,7 +247,7 @@ public class EntityWolf extends EntityAnimals {
 
     }
 
-    protected boolean func_25028_d_() {
+    protected boolean setCanWalk() {
         return this.isWolfSitting() || this.field_25052_g;
     }
 
@@ -266,8 +266,8 @@ public class EntityWolf extends EntityAnimals {
                     this.playerToAttack = (Entity)var1;
                 }
 
-                if (var1 instanceof EntityArrow && ((EntityArrow)var1).archer != null) {
-                    var1 = ((EntityArrow)var1).archer;
+                if (var1 instanceof EntityArrow && ((EntityArrow)var1).owner != null) {
+                    var1 = ((EntityArrow)var1).owner;
                 }
 
                 if (var1 instanceof EntityLiving) {

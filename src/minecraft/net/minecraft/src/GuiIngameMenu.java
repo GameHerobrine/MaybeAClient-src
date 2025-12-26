@@ -9,13 +9,16 @@ public class GuiIngameMenu extends GuiScreen {
     public void initGui() {
         this.updateCounter2 = 0;
         this.controlList.clear();
-        this.controlList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 48, "Save and quit to title"));
+        byte var1 = -16;
+        this.controlList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + var1, "Save and quit to title"));
         if (this.mc.isMultiplayerWorld()) {
             ((GuiButton)this.controlList.get(0)).displayString = "Disconnect";
         }
 
-        this.controlList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24, "Back to game"));
-        this.controlList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96, "Options..."));
+        this.controlList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + var1, "Back to game"));
+        this.controlList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + var1, "Options..."));
+        this.controlList.add(new GuiButton(5, this.width / 2 - 100, this.height / 4 + 48 + var1, 98, 20, StatCollector.translateToLocal("gui.achievements")));
+        this.controlList.add(new GuiButton(6, this.width / 2 + 2, this.height / 4 + 48 + var1, 98, 20, StatCollector.translateToLocal("gui.stats")));
     }
 
     protected void actionPerformed(GuiButton var1) {
@@ -37,6 +40,14 @@ public class GuiIngameMenu extends GuiScreen {
         if (var1.id == 4) {
             this.mc.displayGuiScreen((GuiScreen)null);
             this.mc.setIngameFocus();
+        }
+
+        if (var1.id == 5) {
+            this.mc.displayGuiScreen(new GuiAchievements(this.mc.field_25001_G));
+        }
+
+        if (var1.id == 6) {
+            this.mc.displayGuiScreen(new GuiStats(this, this.mc.field_25001_G));
         }
 
     }

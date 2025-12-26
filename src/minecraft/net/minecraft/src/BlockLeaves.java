@@ -36,7 +36,7 @@ public class BlockLeaves extends BlockLeavesBase {
                         int var10 = var1.getBlockId(var2 + var7, var3 + var8, var4 + var9);
                         if (var10 == Block.leaves.blockID) {
                             int var11 = var1.getBlockMetadata(var2 + var7, var3 + var8, var4 + var9);
-                            var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, var11 | 4);
+                            var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, var11 | 8);
                         }
                     }
                 }
@@ -48,7 +48,7 @@ public class BlockLeaves extends BlockLeavesBase {
     public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
         if (!var1.multiplayerWorld) {
             int var6 = var1.getBlockMetadata(var2, var3, var4);
-            if ((var6 & 4) != 0) {
+            if ((var6 & 8) != 0) {
                 byte var7 = 4;
                 int var8 = var7 + 1;
                 byte var9 = 32;
@@ -130,7 +130,7 @@ public class BlockLeaves extends BlockLeavesBase {
 
                 var12 = this.adjacentTreeBlocks[var11 * var10 + var11 * var9 + var11];
                 if (var12 >= 0) {
-                    var1.setBlockMetadataWithNotify(var2, var3, var4, var6 & -5);
+                    var1.setBlockMetadataWithNotify(var2, var3, var4, var6 & -9);
                 } else {
                     this.removeLeaves(var1, var2, var3, var4);
                 }
@@ -145,11 +145,15 @@ public class BlockLeaves extends BlockLeavesBase {
     }
 
     public int quantityDropped(Random var1) {
-        return var1.nextInt(16) == 0 ? 1 : 0;
+        return var1.nextInt(20) == 0 ? 1 : 0;
     }
 
     public int idDropped(int var1, Random var2) {
         return Block.sapling.blockID;
+    }
+
+    protected int damageDropped(int var1) {
+        return var1 & 3;
     }
 
     public boolean isOpaqueCube() {

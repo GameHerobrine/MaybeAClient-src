@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntitySlime extends EntityLiving implements IMobs {
+public class EntitySlime extends EntityLiving implements IMob {
     public float field_768_a;
     public float field_767_b;
     private int slimeJumpDelay = 0;
@@ -66,6 +66,7 @@ public class EntitySlime extends EntityLiving implements IMobs {
     }
 
     protected void updatePlayerActionState() {
+        this.func_27021_X();
         EntityPlayer var1 = this.worldObj.getClosestPlayerToEntity(this, 16.0D);
         if (var1 != null) {
             this.faceEntity(var1, 10.0F, 20.0F);

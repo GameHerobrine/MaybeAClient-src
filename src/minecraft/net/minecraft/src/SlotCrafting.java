@@ -15,9 +15,22 @@ public class SlotCrafting extends Slot {
     }
 
     public void onPickupFromSlot(ItemStack var1) {
-        this.field_25015_e.addStat(StatList.field_25158_z[var1.itemID], 1);
         if (var1.itemID == Block.workbench.blockID) {
             this.field_25015_e.addStat(AchievementList.field_25197_d, 1);
+        } else if (var1.itemID == Item.pickaxeWood.shiftedIndex) {
+            this.field_25015_e.addStat(AchievementList.field_27387_i, 1);
+        } else if (var1.itemID == Block.stoneOvenIdle.blockID) {
+            this.field_25015_e.addStat(AchievementList.field_27386_j, 1);
+        } else if (var1.itemID == Item.hoeWood.shiftedIndex) {
+            this.field_25015_e.addStat(AchievementList.field_27384_l, 1);
+        } else if (var1.itemID == Item.bread.shiftedIndex) {
+            this.field_25015_e.addStat(AchievementList.field_27383_m, 1);
+        } else if (var1.itemID == Item.cake.shiftedIndex) {
+            this.field_25015_e.addStat(AchievementList.field_27382_n, 1);
+        } else if (var1.itemID == Item.pickaxeStone.shiftedIndex) {
+            this.field_25015_e.addStat(AchievementList.field_27381_o, 1);
+        } else if (var1.itemID == Item.swordWood.shiftedIndex) {
+            this.field_25015_e.addStat(AchievementList.field_27378_r, 1);
         }
 
         for(int var2 = 0; var2 < this.craftMatrix.getSizeInventory(); ++var2) {

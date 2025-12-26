@@ -111,7 +111,7 @@ public class SaveConverterMcRegion extends SaveFormatOld {
 
                 for(int var19 = 0; var19 < var18; ++var19) {
                     File var20 = var17[var19];
-                    var2.add(new FileMatcher(var20));
+                    var2.add(new ChunkFile(var20));
                 }
             }
         }
@@ -124,7 +124,7 @@ public class SaveConverterMcRegion extends SaveFormatOld {
         Iterator var7 = var2.iterator();
 
         while(var7.hasNext()) {
-            FileMatcher var8 = (FileMatcher)var7.next();
+            ChunkFile var8 = (ChunkFile)var7.next();
             int var9 = var8.func_22323_b();
             int var10 = var8.func_22321_c();
             RegionFile var11 = RegionFileCache.func_22193_a(var1, var9, var10);

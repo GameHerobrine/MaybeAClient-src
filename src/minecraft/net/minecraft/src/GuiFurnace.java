@@ -6,7 +6,7 @@ public class GuiFurnace extends GuiContainer {
     private TileEntityFurnace furnaceInventory;
 
     public GuiFurnace(InventoryPlayer var1, TileEntityFurnace var2) {
-        super(new CraftingInventoryFurnaceCB(var1, var2));
+        super(new ContainerFurnace(var1, var2));
         this.furnaceInventory = var2;
     }
 

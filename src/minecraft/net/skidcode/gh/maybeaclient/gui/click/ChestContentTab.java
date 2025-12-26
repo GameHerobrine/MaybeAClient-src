@@ -10,6 +10,7 @@ import net.minecraft.src.RenderHelper;
 import net.minecraft.src.RenderManager;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.ChestCheckerHack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.ClientNameHack;
 import net.skidcode.gh.maybeaclient.hacks.InventoryViewHack;
 
@@ -42,24 +43,30 @@ public class ChestContentTab extends Tab{
 		}
 		
 		if(this.minimized) {
-			this.height = 12;
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+			this.height = ClickGUIHack.theme().yspacing;
+			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 			super.render();
 			return;
 		}
 		
 		if(contents == null) {
 			this.width = 18*9 + 2;
-			this.height = (int) (18*3 + 15);
+			this.height = (int) (18*3 + (ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff));
 			super.render();
-			this.renderFrame((int)this.xPos, (int)this.yPos + 12 + 3, (int)this.xPos + this.width, (int)this.yPos + this.height);
+			this.renderFrame(
+				(int)this.xPos, (int)this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff, 
+				(int)this.xPos + this.width, (int)this.yPos + this.height
+			);
 			return;
 		}
 		
 		super.render();
 		this.width = 18*9 + 2;
-		this.height = (int) (18*Math.ceil(contents.length/9) + 15);
-		this.renderFrame((int)this.xPos, (int)this.yPos + 12 + 3, (int)this.xPos + this.width, (int)this.yPos + this.height);
+		this.height = (int) (18*Math.ceil(contents.length/9) + (ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff));
+		this.renderFrame(
+			(int)this.xPos, (int)this.yPos + ClickGUIHack.theme().yspacing + ClickGUIHack.theme().titlebasediff, 
+			(int)this.xPos + this.width, (int)this.yPos + this.height
+		);
 		GL11.glPushMatrix();
 		RenderHelper.enableStandardItemLighting();
 		GL11.glColor4f(1, 1, 1, 1);

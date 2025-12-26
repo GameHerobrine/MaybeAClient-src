@@ -3,7 +3,9 @@ package net.skidcode.gh.maybeaclient.hacks.settings;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 
 public class SettingDouble extends Setting{
 	
@@ -47,12 +49,45 @@ public class SettingDouble extends Setting{
 		}
 	}
 
-	public void renderText(int x, int y) {
-		Client.mc.fontRenderer.drawString(this.name + " - " + String.format("%.2f", this.getValue()), x + 2, y + 2, 0xffffff);
+	public String getValueAsString() {
+		int def = 100;
+		String fmt = "%.2f";
+		if(this.step != 0) {
+			if((int)(this.step*def) == 0) {
+				def = 1000;
+				fmt = "%.3f";
+				if((int)(this.step*def) == 0) {
+					fmt = "%.4f";
+					def = 10000;
+				}
+			}
+		}
+		
+		return String.format(fmt, this.getValue());
+	}
+	
+	@Override
+	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+		int txtColor = 0xffffff;
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			txtColor = ClickGUIHack.instance.themeColor.rgb();
+			if(this.mouseHovering) {
+				txtColor = ClickGUIHack.instance.secColor.rgb();
+			}
+		}
+		String value = this.getValueAsString();
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(value, xEnd - Theme.HEPH_OPT_XADD + 1 - Client.mc.fontRenderer.getStringWidth(value), y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}else {
+			Client.mc.fontRenderer.drawString(this.name + " - " + value, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}
+		
+		this.mouseHovering = false;
 	}
 	
 	public int getSettingWidth() {
-		int w1 = Client.mc.fontRenderer.getStringWidth(this.name+" - "+String.format("%.2f", this.getValue())) + 5;
+		int w1 = Client.mc.fontRenderer.getStringWidth(this.name+" - "+this.getValueAsString()) + 5;
 		if(this.fixedStep) {
 			double w2 = (this.maxGUI - this.minGUI)/this.step;
 			if(w1 > w2) return w1;
@@ -61,23 +96,32 @@ public class SettingDouble extends Setting{
 			return w1;
 		}
 	}
-	
-	public void onPressedInside(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	@Override
+	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xMin += 5;
+			xMax -= 5;
+		}
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;
 		double step = (this.maxGUI - this.minGUI)/sizeX;
-		double value = (double)Math.round(this.minGUI*100 + mouseOff*step*100)/100;
+		double value = (double)Math.round(this.minGUI*100000 + mouseOff*step*100000)/100000;
 		if(this.fixedStep) {
-			long valueI = Math.round(value*100);
-			long stepI = Math.round(this.step*100);
+			long valueI = Math.round(value*100000);
+			long stepI = Math.round(this.step*100000);
 			long mod = valueI % stepI;
-			value = (double)(valueI-mod)/100;
+			value = (double)(valueI-mod)/100000;
 		}
+		
 		if(value > this.maxGUI) value = this.maxGUI;
 		if(value < this.minGUI) value = this.minGUI;
 		this.setValue(value);
 	}
 	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xStart += 5;
+			xEnd -= 5;
+		}
 		int diff1 = xEnd - xStart;
 		double diff2 = (this.maxGUI - this.minGUI)/diff1;
 		
@@ -86,19 +130,32 @@ public class SettingDouble extends Setting{
 		if(val < this.minGUI) val = this.minGUI;
 		
 		int diff3 = (int) Math.round(val/diff2 - this.minGUI/diff2);
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			int sliderYbegin = yEnd - Theme.HEPH_SLIDER_HEIGHT;
+			int sliderYend = yEnd;
+			tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+			tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1);
+		}else if(ClickGUIHack.theme() == Theme.NODUS) {
+			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, 0, 0, 0, 0x80/255f);
+		}else {
+			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+		}
 		
-		tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, 0, 0xaa / 255f, 0xaa / 255f, 1f);
 	}
 	public void onMouseMoved(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xMin += 5;
+			xMax -= 5;
+		}
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;
 		double step = (this.maxGUI - this.minGUI)/sizeX;
-		double value = (double)Math.round(this.minGUI*100 + mouseOff*step*100)/100;
+		double value = (double)Math.round(this.minGUI*100000 + mouseOff*step*100000)/100000;
 		if(this.fixedStep) {
-			long valueI = Math.round(value*100);
-			long stepI = Math.round(this.step*100);
+			long valueI = Math.round(value*100000);
+			long stepI = Math.round(this.step*100000);
 			long mod = valueI % stepI;
-			value = (double)(valueI-mod)/100;
+			value = (double)(valueI-mod)/100000;
 		}
 		if(value > this.maxGUI) value = this.maxGUI;
 		if(value < this.minGUI) value = this.minGUI;

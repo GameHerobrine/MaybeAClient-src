@@ -86,22 +86,22 @@ public class BlockCrops extends BlockFlower {
         return 6;
     }
 
-    public void onBlockDestroyedByPlayer(World var1, int var2, int var3, int var4, int var5) {
-        super.onBlockDestroyedByPlayer(var1, var2, var3, var4, var5);
+    public void dropBlockAsItemWithChance(World var1, int var2, int var3, int var4, int var5, float var6) {
+        super.dropBlockAsItemWithChance(var1, var2, var3, var4, var5, var6);
         if (!var1.multiplayerWorld) {
-            for(int var6 = 0; var6 < 3; ++var6) {
+            for(int var7 = 0; var7 < 3; ++var7) {
                 if (var1.rand.nextInt(15) <= var5) {
-                    float var7 = 0.7F;
-                    float var8 = var1.rand.nextFloat() * var7 + (1.0F - var7) * 0.5F;
-                    float var9 = var1.rand.nextFloat() * var7 + (1.0F - var7) * 0.5F;
-                    float var10 = var1.rand.nextFloat() * var7 + (1.0F - var7) * 0.5F;
-                    EntityItem var11 = new EntityItem(var1, (double)((float)var2 + var8), (double)((float)var3 + var9), (double)((float)var4 + var10), new ItemStack(Item.seeds));
-                    var11.delayBeforeCanPickup = 10;
-                    var1.entityJoinedWorld(var11);
+                    float var8 = 0.7F;
+                    float var9 = var1.rand.nextFloat() * var8 + (1.0F - var8) * 0.5F;
+                    float var10 = var1.rand.nextFloat() * var8 + (1.0F - var8) * 0.5F;
+                    float var11 = var1.rand.nextFloat() * var8 + (1.0F - var8) * 0.5F;
+                    EntityItem var12 = new EntityItem(var1, (double)((float)var2 + var9), (double)((float)var3 + var10), (double)((float)var4 + var11), new ItemStack(Item.seeds));
+                    var12.delayBeforeCanPickup = 10;
+                    var1.entityJoinedWorld(var12);
                 }
             }
-        }
 
+        }
     }
 
     public int idDropped(int var1, Random var2) {

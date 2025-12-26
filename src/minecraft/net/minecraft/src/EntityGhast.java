@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntityGhast extends EntityFlying implements IMobs {
+public class EntityGhast extends EntityFlying implements IMob {
     public int courseChangeCooldown = 0;
     public double waypointX;
     public double waypointY;
@@ -22,6 +22,7 @@ public class EntityGhast extends EntityFlying implements IMobs {
             this.setEntityDead();
         }
 
+        this.func_27021_X();
         this.prevAttackCounter = this.attackCounter;
         double var1 = this.waypointX - this.posX;
         double var3 = this.waypointY - this.posY;
@@ -35,7 +36,7 @@ public class EntityGhast extends EntityFlying implements IMobs {
 
         if (this.courseChangeCooldown-- <= 0) {
             this.courseChangeCooldown += this.rand.nextInt(5) + 2;
-            if (this.isCourseTraversable(this.waypointX, this.waypointY, this.waypointZ, var7)) {
+            if (this.func_27023_a(this.waypointX, this.waypointY, this.waypointZ, var7)) {
                 this.motionX += var1 / var7 * 0.1D;
                 this.motionY += var3 / var7 * 0.1D;
                 this.motionZ += var5 / var7 * 0.1D;
@@ -93,7 +94,7 @@ public class EntityGhast extends EntityFlying implements IMobs {
         this.texture = this.attackCounter > 10 ? "/mob/ghast_fire.png" : "/mob/ghast.png";
     }
 
-    private boolean isCourseTraversable(double var1, double var3, double var5, double var7) {
+    private boolean func_27023_a(double var1, double var3, double var5, double var7) {
         double var9 = (this.waypointX - this.posX) / var7;
         double var11 = (this.waypointY - this.posY) / var7;
         double var13 = (this.waypointZ - this.posZ) / var7;

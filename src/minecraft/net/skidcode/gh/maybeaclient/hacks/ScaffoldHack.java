@@ -141,7 +141,7 @@ public class ScaffoldHack extends Hack implements EventListener{
 			if(forward == 0 && strafe == 0) forward = 1;
 			float rotYaw = mc.thePlayer.rotationYaw;
 			
-			if(AutoTunnelHack.instance.status && AutoTunnelHack.instance.autoWalk.value) {
+			if(AutoTunnelHack.autoWalking()) {
 				rotYaw = AutoTunnelHack.instance.getDirection().yaw;
 	    	}
 			

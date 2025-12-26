@@ -1,10 +1,10 @@
 package net.minecraft.src;
 
-import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
-import net.skidcode.gh.maybeaclient.gui.click.PlayerViewTab;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.NameTagsHack;
 
 public abstract class Render {
@@ -15,73 +15,12 @@ public abstract class Render {
     protected float field_194_c = 1.0F;
 
     public abstract void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9);
-    
-    public void renderLivingLabel(Entity var1, String var2, double var3, double var5, double var7, int var9) {
-		float var10 = var1.getDistanceToEntity(this.renderManager.livingPlayer);
-		if (var10 <= (float)var9 || NameTagsHack.instance.status) {
-			FontRenderer fontRenderer = this.getFontRendererFromRenderManager();
-			float var12 = 1.6F;
-			float var13 = 0.016666668F * var12;
-		   
-			if(NameTagsHack.instance.status) {
-				float scale = NameTagsHack.instance.scale.value;
-				var13 *= scale * 0.1f * var10;
-				
-				if(0.016666668F * var12 > var13) var13 = 0.016666668F * var12;
-			}
-			GL11.glPushMatrix();
-			if(NameTagsHack.instance.status) GL11.glDisable(GL11.GL_FOG);
-			GL11.glTranslated(var3, var5 + 2.3d, var7);
-			GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-			GL11.glScalef(-var13, -var13, var13);
-			GL11.glDisable(2896 /*GL_LIGHTING*/);
-			GL11.glDepthMask(false);
-			GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
-			GL11.glEnable(3042 /*GL_BLEND*/);
-			GL11.glBlendFunc(770, 771);
-			Tessellator var14 = Tessellator.instance;
-			byte var15 = 0;
-			if (var2.equals("deadmau5")) {
-				var15 = -10;
-			}
 
-			GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
-			var14.startDrawingQuads();
-			int var16 = fontRenderer.getStringWidth(var2) / 2;
-			var14.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
-			var14.addVertex((double)(-var16 - 1), (double)(-1 + var15), 0.0D);
-			var14.addVertex((double)(-var16 - 1), (double)(8 + var15), 0.0D);
-			var14.addVertex((double)(var16 + 1), (double)(8 + var15), 0.0D);
-			var14.addVertex((double)(var16 + 1), (double)(-1 + var15), 0.0D);
-			var14.draw();
-			GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
-			fontRenderer.drawString(var2, -fontRenderer.getStringWidth(var2) / 2, var15, 553648127);
-			if(!NameTagsHack.instance.status) {
-				GL11.glEnable(2929 /*GL_DEPTH_TEST*/);
-			}
-			GL11.glDepthMask(true);
-			fontRenderer.drawString(var2, -fontRenderer.getStringWidth(var2) / 2, var15, -1);
-			GL11.glEnable(2896 /*GL_LIGHTING*/);
-			GL11.glDisable(3042 /*GL_BLEND*/);
-			if(NameTagsHack.instance.status) GL11.glEnable(GL11.GL_FOG);
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			if(NameTagsHack.instance.status) GL11.glEnable(2929 /*GL_DEPTH_TEST*/);
-			GL11.glPopMatrix();
-		}
-	}
     protected void loadTexture(String var1) {
         RenderEngine var2 = this.renderManager.renderEngine;
-        if(var2 != null)
         var2.bindTexture(var2.getTexture(var1));
     }
-    
-    protected void loadTexture(String key, BufferedImage img) {
-        RenderEngine var2 = this.renderManager.renderEngine;
-        var2.bindTexture(var2.putTexture(key, img));
-    }
-    
+
     protected boolean loadDownloadableImageTexture(String var1, String var2) {
         RenderEngine var3 = this.renderManager.renderEngine;
         int var4 = var3.getTextureForDownloadableImage(var1, var2);
@@ -132,7 +71,93 @@ public abstract class Render {
         GL11.glPopMatrix();
         GL11.glEnable(2896 /*GL_LIGHTING*/);
     }
-
+    
+    protected void renderLivingLabel(Entity var1, String var2, double var3, double var5, double var7, int var9) {
+        float var10 = var1.getDistanceToEntity(this.renderManager.livingPlayer);
+        if (var10 <= (float)var9 || NameTagsHack.instance.status) {
+            FontRenderer var11 = this.getFontRendererFromRenderManager();
+            float var12 = 1.6F;
+            float var13 = 0.016666668F * var12;
+            
+            if(NameTagsHack.instance.status) {
+				float scale = NameTagsHack.instance.scale.value;
+				var13 *= scale * 0.1f * var10;
+				
+				if(0.016666668F * var12 > var13) var13 = 0.016666668F * var12;
+			}
+            boolean renderArmor = false;
+            boolean renderItem = false;
+            if(NameTagsHack.instance.status) {
+            	renderArmor = NameTagsHack.instance.showArmor.value;
+            	renderItem = NameTagsHack.instance.showHeldItem.value;
+            }
+            int yoffset = var1 instanceof EntityPlayer && (renderArmor || renderItem) ? 16 : 0;
+            GL11.glPushMatrix();
+            if(NameTagsHack.instance.status) GL11.glDisable(GL11.GL_FOG);
+            GL11.glTranslatef((float)var3 + 0.0F, (float)var5 + 2.3F, (float)var7);
+            GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+            GL11.glScalef(-var13, -var13, var13);
+            GL11.glDisable(2896 /*GL_LIGHTING*/);
+            GL11.glDepthMask(false);
+            GL11.glDisable(2929 /*GL_DEPTH_TEST*/);
+            GL11.glEnable(3042 /*GL_BLEND*/);
+            GL11.glBlendFunc(770, 771);
+            Tessellator var14 = Tessellator.instance;
+            byte var15 = 0;
+            if (var2.equals("deadmau5")) {
+                var15 = -10;
+            }
+            var15 -= yoffset;
+            
+            GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
+            var14.startDrawingQuads();
+            int var16 = var11.getStringWidth(var2) / 2;
+            var14.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
+            var14.addVertex((double)(-var16 - 1), (double)(-1 + var15), 0.0D);
+            var14.addVertex((double)(-var16 - 1), (double)(8 + var15), 0.0D);
+            var14.addVertex((double)(var16 + 1), (double)(8 + var15), 0.0D);
+            var14.addVertex((double)(var16 + 1), (double)(-1 + var15), 0.0D);
+            var14.draw();
+            GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
+            var11.drawString(var2, -var11.getStringWidth(var2) / 2, var15, 553648127);
+            
+            if(var1 instanceof EntityPlayer) {
+            	EntityPlayer ep = (EntityPlayer) var1;
+	            ArrayList<ItemStack> toRender = new ArrayList<>();
+	            if(renderItem) toRender.add(ep.inventory.getCurrentItem());
+	            for(int i = ep.inventory.armorInventory.length; renderArmor && --i >= 0;) {
+	            	ItemStack st = ep.inventory.armorInventory[i];
+	            	toRender.add(st);
+	            }
+	            
+	            
+	            int xStart = -(toRender.size()*16 / 2);
+	            GL11.glPushMatrix();
+	            for(int i = 0; i < toRender.size(); ++i) {
+	            	ItemStack is = toRender.get(i);
+	            	GuiIngame.itemRenderer.renderItemForNametag(Client.mc.fontRenderer, Client.mc.renderEngine, is, xStart, var15+8);
+	            	GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, is, xStart, var15+8);
+	            	xStart += 16;
+	            	GL11.glDisable(GL11.GL_LIGHTING);
+	            	GL11.glDisable(GL11.GL_DEPTH_TEST);
+	            }
+	            GL11.glPopMatrix();
+            }
+           
+            if(!NameTagsHack.instance.status) GL11.glEnable(2929 /*GL_DEPTH_TEST*/);
+            GL11.glDepthMask(true);
+            var11.drawString(var2, -var11.getStringWidth(var2) / 2, var15, -1);
+            GL11.glEnable(2896 /*GL_LIGHTING*/);
+            GL11.glDisable(3042 /*GL_BLEND*/);
+            if(NameTagsHack.instance.status) GL11.glEnable(GL11.GL_FOG);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            if(NameTagsHack.instance.status) GL11.glEnable(2929 /*GL_DEPTH_TEST*/);
+            GL11.glPopMatrix();
+        }
+    }
+    
     private void renderShadow(Entity var1, double var2, double var4, double var6, float var8, float var9) {
         GL11.glEnable(3042 /*GL_BLEND*/);
         GL11.glBlendFunc(770, 771);
@@ -280,8 +305,6 @@ public abstract class Render {
     }
 
     public void doRenderShadowAndFire(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-    	if(this.renderManager == null || this.renderManager.options == null) return;
-    	
         if (this.renderManager.options.fancyGraphics && this.shadowSize > 0.0F) {
             double var10 = this.renderManager.func_851_a(var1.posX, var1.posY, var1.posZ);
             float var12 = (float)((1.0D - var10 / 256.0D) * (double)this.field_194_c);

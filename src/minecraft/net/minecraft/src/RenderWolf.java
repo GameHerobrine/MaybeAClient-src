@@ -1,18 +1,21 @@
 package net.minecraft.src;
 
+import net.skidcode.gh.maybeaclient.hacks.DogOwnerHack;
+
 public class RenderWolf extends RenderLiving {
     public RenderWolf(ModelBase var1, float var2) {
         super(var1, var2);
     }
 
-    public void func_25005_a(EntityWolf var1, double var2, double var4, double var6, float var8, float var9) {
-        super.doRenderLiving(var1, var2, var4, var6, var8, var9);
-        
+    public void func_25005_a(EntityWolf e, double x, double y, double z, float var8, float var9) {
+        if(DogOwnerHack.instance.status) {
+        	String nick = e.getWolfOwner();
+        	String owner = "".equals(nick) ? "No Owner" : ("Owner: "+nick);
+        	this.renderLivingLabel(e, owner, x, y-1, z, 64);
+        }
+    	super.doRenderLiving(e, x, y, z, var8, var9);
     }
-    //public void passSpecialRender(EntityLiving entity, double x, double y, double z) {
-    	//EntityWolf wolf = (EntityWolf) entity;
-    	//this.renderLivingLabel(entity, "Owner: "+wolf.getWolfOwner(), x, y, z, 64);
-    //}
+
     protected float func_25004_a(EntityWolf var1, float var2) {
         return var1.func_25037_z();
     }

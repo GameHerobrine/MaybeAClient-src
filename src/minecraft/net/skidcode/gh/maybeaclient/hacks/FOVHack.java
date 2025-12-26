@@ -15,15 +15,8 @@ public class FOVHack extends Hack{
 		this.addSetting(this.fov);
 		instance = this;
 	}
-	
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.fov.value;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	@Override
+	public String getPrefix() {
+		return ""+this.fov.value;
 	}
-	
 }

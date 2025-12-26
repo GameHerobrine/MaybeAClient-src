@@ -9,6 +9,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.RenderHelper;
 import net.minecraft.src.RenderManager;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.KeybindingsHack;
 import net.skidcode.gh.maybeaclient.hacks.PlayerViewHack;
 import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
@@ -28,23 +29,26 @@ public class PlayerViewTab extends Tab{
 	}
 	
 	public void render() {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int prevSpace = ClickGUIHack.theme().titlebasediff;
+		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
 		if(this.minimized) {
-			this.height = 12;
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+			this.height = ySpace;
+			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 			super.render();
 			return;
 		}
 		EntityPlayer player = Client.mc.thePlayer;
-		this.height = 14 + 90; //cliff checked
+		this.height = ySpace + prevSpace + 90; //cliff checked
 		this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2 + 16*2;
 		super.render();
-		this.renderFrame((int)this.xPos, (int)this.yPos + 12 + 3, (int)this.xPos + this.width, (int)this.yPos + this.height);
+		this.renderFrame((int)this.xPos, (int)this.yPos + ySpace + prevSpace, (int)this.xPos + this.width, (int)this.yPos + this.height);
 		
 		GL11.glEnable(EXTRescaleNormal.GL_RESCALE_NORMAL_EXT);
 		GL11.glEnable(GL11.GL_COLOR_MATERIAL);
 		GL11.glPushMatrix();
 		int centerX = (this.width - 16) / 2;
-		int centerY = this.height - 12;
+		int centerY = this.height - ySpace;
 		GL11.glTranslatef((float)(centerX + this.xPos), (float)(centerY + this.yPos), 50.0F);
 		GL11.glScalef(-35, 35, 35);
 		GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
@@ -89,13 +93,13 @@ public class PlayerViewTab extends Tab{
 		for(;yOff < 4; ++yOff) {
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.xPos + this.width-16, (int)this.yPos + 15 + 18*yOff);
-			GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.xPos + this.width-16, (int)this.yPos + 15 + 18*yOff);
+			GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
+			GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.armorInventory[3-yOff], (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
 		}
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.xPos + this.width-16, (int)this.yPos + 15 + 18*yOff);
-		GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.xPos + this.width-16, (int)this.yPos + 15 + 18*yOff);
+		GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
+		GuiIngame.itemRenderer.renderItemOverlayIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, player.inventory.getCurrentItem(), (int)this.xPos + this.width-16, (int)this.yPos + ySpace + prevSpace + 18*yOff);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		RenderHelper.disableStandardItemLighting();

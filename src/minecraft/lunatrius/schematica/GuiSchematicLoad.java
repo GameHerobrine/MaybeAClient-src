@@ -102,13 +102,16 @@ public class GuiSchematicLoad extends GuiScreen {
 			} else {
 				this.settings.renderingLayer = -1;
 
-				if (this.settings.schematic.width() * this.settings.schematic.height() * this.settings.schematic.length() > 125000) {
-					this.settings.renderingLayer = 0;
-				}
+				//if (this.settings.schematic.width() * this.settings.schematic.height() * this.settings.schematic.length() > 125000) {
+				//	this.settings.renderingLayer = 0;
+				//}
 			}
 		} catch (Exception e) {
 			this.settings.selectedSchematic = 0;
 		}
 		this.settings.moveHere();
+		if(this.settings.selectedSchematic == 0) {
+			this.settings.unloadSchematic();
+		}
 	}
 }

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class ModelSheep2 extends ModelQuadraped {
+public class ModelSheep2 extends ModelQuadruped {
     public ModelSheep2() {
         super(12, 0.0F);
         this.head = new ModelRenderer(0, 0);

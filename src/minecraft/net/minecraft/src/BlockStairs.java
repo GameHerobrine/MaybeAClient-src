@@ -12,6 +12,7 @@ public class BlockStairs extends Block {
         this.setHardness(var2.blockHardness);
         this.setResistance(var2.blockResistance / 3.0F);
         this.setStepSound(var2.stepSound);
+        this.setLightOpacity(255);
     }
 
     public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {

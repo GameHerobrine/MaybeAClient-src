@@ -11,7 +11,10 @@ import net.minecraft.src.ScaledResolution;
 import net.minecraft.src.Tessellator;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
+import net.skidcode.gh.maybeaclient.utils.GUIUtils;
 
 public class SettingColor extends Setting{
 	
@@ -39,7 +42,9 @@ public class SettingColor extends Setting{
 		this.green = g;
 		this.blue = b;
 	}
-	
+	public int rgb() {
+		return 0xff000000 | ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff);
+	}
 	@Override
 	public String valueToString() {
 		return ""+this.red+";"+this.green+";"+this.blue;
@@ -103,31 +108,105 @@ public class SettingColor extends Setting{
 			}
 		}
 	}
-	public void renderText(int x, int y) {
-		Client.mc.fontRenderer.drawString(this.name, x + 2, y + 2, 0xffffff);
+	
+	@Override
+	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
+		int txtColor = 0xffffff;
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			txtColor = ClickGUIHack.instance.themeColor.rgb();
+			if(this.mouseHovering) {
+				if(hmouseY >= y && hmouseY <= (y+ySpace) && hmouseX >= x && hmouseX <= xEnd) {
+					txtColor = ClickGUIHack.instance.secColor.rgb();
+					this.mouseHovering = false;
+				}
+			}
+		}
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + txtCenter, txtColor);
+			String e = this.minimized ? "+" : "-";
+			Client.mc.fontRenderer.drawStringWithShadow(e, xEnd - Theme.HEPH_OPT_XADD - Client.mc.fontRenderer.getStringWidth(e) + 1, y + txtCenter, txtColor);
+		}else {
+			Client.mc.fontRenderer.drawString(this.name, x + 2, y + txtCenter, txtColor);
+		}
+		
 		if(this.minimized) return;
-		Client.mc.fontRenderer.drawString("Mode - "+this.getModeName(), x + 2 + 4, y + 2 + 12*1, 0xffffff);
+		
+		txtColor = 0xffffff;
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			txtColor = ClickGUIHack.instance.themeColor.rgb();
+			if(this.mouseHovering) {
+				if(hmouseY >= (y+ySpace) && hmouseY <= (y+ySpace*2) && hmouseX >= x && hmouseX <= xEnd) {
+					txtColor = ClickGUIHack.instance.secColor.rgb();
+					this.mouseHovering = false;
+				}
+			}
+		}
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			Client.mc.fontRenderer.drawStringWithShadow("Mode", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*1, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(this.getModeName(), xEnd - Theme.HEPH_OPT_XADD + 1 - Client.mc.fontRenderer.getStringWidth(this.getModeName()), y + txtCenter + ySpace*1, txtColor);
+		}else {
+			Client.mc.fontRenderer.drawString("Mode - "+this.getModeName(), x + 2 + 4, y + txtCenter + ySpace*1, txtColor);
+		}
+		
+		
 		if(this.guiMode == SettingColor.sliders) {
-			Client.mc.fontRenderer.drawString("Red - "+this.red, x + 2 + 4, y + 2 + 12*2, 0xffffff);
-			Client.mc.fontRenderer.drawString("Green - "+this.green, x + 2 + 4, y + 2 + 12*3, 0xffffff);
-			Client.mc.fontRenderer.drawString("Blue - "+this.blue, x + 2 + 4, y + 2 + 12*4, 0xffffff);
+			int txtColor2 = 0xffffff, txtColor3 = txtColor = 0xffffff;
+			ae:
+			if(ClickGUIHack.theme() == Theme.NODUS) {
+				txtColor = txtColor2 = txtColor3 = ClickGUIHack.instance.themeColor.rgb();
+				if(this.mouseHovering) {
+					this.mouseHovering = false;
+					if(hmouseY >= (y+ySpace*2) && hmouseY <= (y+ySpace*3) && hmouseX >= x && hmouseX <= xEnd) {
+						txtColor = ClickGUIHack.instance.secColor.rgb();
+						break ae;
+					}
+					if(hmouseY >= (y+ySpace*3) && hmouseY <= (y+ySpace*4) && hmouseX >= x && hmouseX <= xEnd) {
+						txtColor2 = ClickGUIHack.instance.secColor.rgb();
+						break ae;
+					}
+					if(hmouseY >= (y+ySpace*4) && hmouseY <= (y+ySpace*5) && hmouseX >= x && hmouseX <= xEnd) {
+						txtColor3 = ClickGUIHack.instance.secColor.rgb();
+						break ae;
+					}
+				}
+			}
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				Client.mc.fontRenderer.drawStringWithShadow("Red", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*2, txtColor);
+				Client.mc.fontRenderer.drawStringWithShadow("Green", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*3, txtColor2);
+				Client.mc.fontRenderer.drawStringWithShadow("Blue", x + Theme.HEPH_OPT_XADD + 2, y + txtCenter + ySpace*4, txtColor3);
+				Client.mc.fontRenderer.drawStringWithShadow(""+this.red, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.red) - Theme.HEPH_OPT_XADD + 1, y + txtCenter + ySpace*2, txtColor);
+				Client.mc.fontRenderer.drawStringWithShadow(""+this.green, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.green) - Theme.HEPH_OPT_XADD + 1, y + txtCenter + ySpace*3, txtColor2);
+				Client.mc.fontRenderer.drawStringWithShadow(""+this.blue, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.blue) - Theme.HEPH_OPT_XADD + 1, y + txtCenter + ySpace*4, txtColor3);
+			}else {
+				Client.mc.fontRenderer.drawString("Red - "+this.red, x + 2 + 4, y + txtCenter + ySpace*2, txtColor);
+				Client.mc.fontRenderer.drawString("Green - "+this.green, x + 2 + 4, y + txtCenter + ySpace*3, txtColor2);
+				Client.mc.fontRenderer.drawString("Blue - "+this.blue, x + 2 + 4, y + txtCenter + ySpace*4, txtColor3);
+			}
 		}
 	}
 	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		this.pressedOn = -1;
 	}
+	
+	@Override
 	public void onMouseMoved(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xMin += 5 + 2;
+			xMax -= 5;
+		}
+		int ySpace = ClickGUIHack.theme().yspacing;
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;
 		float step = 255f/sizeX;
 		int val = (int)((float)Math.round(mouseOff*step*100)/100);
-		
 		if(val < 0) val = 0;
 		if(val > 255) val = 255;
 		
 		if(this.guiMode == SettingColor.picker && this.pressedOn > 1) {
 			if(mouseX < xMin || mouseX > xMax) return;
-			if(mouseY < yMin+12 || mouseY > yMax) return;
+			if(mouseY < yMin+ySpace+ySpace || mouseY > yMax) return;
 			
 			int mx = Mouse.getX();
 			int my = Mouse.getY();
@@ -152,10 +231,14 @@ public class SettingColor extends Setting{
 	}
 	
 	int pressedOn = -1;
-	
-	public void onPressedInside(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-		
-		int mos = (mouseY - yMin) / 12;
+	@Override
+	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xMin += 5 + 2;
+			xMax -= 5;
+		}
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int mos = (mouseY - yMin) / ySpace;
 		if(mos > 0) {
 			int oldPressedOn = this.pressedOn;
 			this.pressedOn = mos;
@@ -168,7 +251,7 @@ public class SettingColor extends Setting{
 			if(val > 255) val = 255;
 			if(this.guiMode == SettingColor.picker && mos > 1) {
 				if(mouseX < xMin || mouseX > xMax) return;
-				if(mouseY < yMin+12 || mouseY > yMax) return;
+				if(mouseY < yMin+ySpace || mouseY > yMax) return;
 				int mx = Mouse.getX();
 				int my = Mouse.getY();
 				GL11.glReadPixels(mx, my, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, this.colPick);
@@ -204,48 +287,91 @@ public class SettingColor extends Setting{
 	}
 	
 	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
-		if(!this.minimized) tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			xStart += 5 + 2;
+			xEnd -= 5;
+		}
+		Theme theme = ClickGUIHack.theme();
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int ySpace2 = ySpace - ClickGUIHack.theme().settingYreduce;
+		float bgcolr = ClickGUIHack.r();
+		float bgcolg = ClickGUIHack.g();
+		float bgcolb = ClickGUIHack.b();
+		float bgcola = 1;
+		if(theme == Theme.NODUS) {
+			bgcolr = bgcolg = bgcolb = 0;
+			bgcola = 0x80/255f;
+		}
 		
-		int xmi = xEnd - 10;
+		if(!this.minimized && theme != Theme.HEPHAESTUS) tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+		
+		int xmi = xEnd - ySpace2;
 		int xma = xEnd;
 		int ymi = yStart;
-		int yma = yStart + 10;
-		tab.renderFrameBackGround(xmi, ymi, xma, yma, this.red / 255f, this.green / 255f, this.blue / 255f, 1f);
+		int yma = yStart + ySpace2;
+		if(theme == Theme.HEPHAESTUS) {
+			tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, yStart+3, xEnd - Theme.HEPH_OPT_XADD - 3, yStart + ySpace2 - 3, this.red / 255f, this.green / 255f, this.blue / 255f, 1);
+			tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD - 3, (double)yStart + ySpace2 - 3);
+		}else {
+			tab.renderFrameBackGround(xmi, ymi, xma, yma, this.red / 255f, this.green / 255f, this.blue / 255f, 1f);
+		}
 		
 		if(this.minimized) return;
 		
-		yStart += 12;
+		yStart += ySpace;
 		
 		int diff1 = xEnd - xStart;
 		float step = 255f/diff1;
 		
-		tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
-		yStart += 12;
+		if(theme != Theme.HEPHAESTUS) tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+		yStart += ySpace;
 		
 		if(this.guiMode == SettingColor.sliders) {
 			int value = this.red;
 			if(value > 255) value = 255;
 			if(value < 0) value = 0;
 			int diff3 = (int) ((float)value/step);
-			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
-			yStart += 12;
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				int sliderYbegin = (yStart + ySpace2) - Theme.HEPH_SLIDER_HEIGHT;
+				int sliderYend = yStart + ySpace2;
+				tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+				tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+			}else {
+				tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+			}
+			yStart += ySpace;
 			
 			value = this.green;
 			if(value > 255) value = 255;
 			if(value < 0) value = 0;
 			diff3 = (int) ((float)value/step);
-			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
-			yStart += 12;
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				int sliderYbegin = (yStart + ySpace2) - Theme.HEPH_SLIDER_HEIGHT;
+				int sliderYend = yStart + ySpace2;
+				tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+				tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+			}else {
+				tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+			}
+			yStart += ySpace;
 			
 			value = this.blue;
 			if(value > 255) value = 255;
 			if(value < 0) value = 0;
 			diff3 = (int) ((float)value/step);
-			tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				int sliderYbegin = (yStart + ySpace2) - Theme.HEPH_SLIDER_HEIGHT;
+				int sliderYend = yStart + ySpace2;
+				tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
+				tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+			}else {
+				tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+			}
 		}else {
         	Tessellator tes = Tessellator.instance;
         	int yHalfEnd = yStart + ((yEnd - yStart) / 2);
 			GL11.glPushMatrix();
+			GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 			GL11.glColor4f(0, 0, 0, 1);
         	GL11.glBegin(GL11.GL_QUADS);
         	GL11.glVertex2d(xStart, yStart);
@@ -334,6 +460,7 @@ public class SettingColor extends Setting{
         	GL11.glEnd();
         	GL11.glDisable(GL11.GL_BLEND);
         	GL11.glShadeModel(prv);
+        	GL11.glPopAttrib();
         	GL11.glPopMatrix();
 		}
 	}
@@ -341,12 +468,13 @@ public class SettingColor extends Setting{
 	@Override
 	public int getSettingWidth() {
 		int w1 = super.getSettingWidth();
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) w1 += Theme.HEPH_OPT_XADD;
 		
 		if(w1 < 90) w1 = 100;
 		return w1;
 	}
 	public int getSettingHeight() {
-		if(this.minimized) return 12;
-		return 12 + 12 + 12 + 12 + 12;
+		if(this.minimized) return ClickGUIHack.theme().yspacing;
+		return 5*ClickGUIHack.theme().yspacing;
 	}
 }

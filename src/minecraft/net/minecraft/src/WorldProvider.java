@@ -1,9 +1,11 @@
 package net.minecraft.src;
 
+import net.skidcode.gh.maybeaclient.hacks.CustomSkyHack;
+
 public class WorldProvider {
     public World worldObj;
     public WorldChunkManager worldChunkMgr;
-    public boolean field_4220_c = false;
+    public boolean isNether = false;
     public boolean isHellWorld = false;
     public boolean field_6478_e = false;
     public float[] lightBrightnessTable = new float[16];
@@ -40,7 +42,10 @@ public class WorldProvider {
     }
 
     public float calculateCelestialAngle(long var1, float var3) {
-        int var4 = (int)(var1 % 24000L);
+    	if(CustomSkyHack.instance.status) {
+        	return CustomSkyHack.calculateCelestialAngle(var1, var3);
+        }
+    	int var4 = (int)(var1 % 24000L);
         float var5 = ((float)var4 + var3) / 24000.0F - 0.25F;
         if (var5 < 0.0F) {
             ++var5;
@@ -57,7 +62,10 @@ public class WorldProvider {
     }
 
     public float[] calcSunriseSunsetColors(float var1, float var2) {
-        float var3 = 0.4F;
+        if(CustomSkyHack.instance.status) {
+        	return CustomSkyHack.calcSunriseSunsetColors(var1, var2);
+        }
+    	float var3 = 0.4F;
         float var4 = MathHelper.cos(var1 * 3.1415927F * 2.0F) - 0.0F;
         float var5 = -0.0F;
         if (var4 >= var5 - var3 && var4 <= var5 + var3) {
@@ -75,7 +83,10 @@ public class WorldProvider {
     }
 
     public Vec3D func_4096_a(float var1, float var2) {
-        float var3 = MathHelper.cos(var1 * 3.1415927F * 2.0F) * 2.0F + 0.5F;
+    	if(CustomSkyHack.instance.status) {
+        	return CustomSkyHack.getFogColor(var1, var2);
+        }
+    	float var3 = MathHelper.cos(var1 * 3.1415927F * 2.0F) * 2.0F + 0.5F;
         if (var3 < 0.0F) {
             var3 = 0.0F;
         }

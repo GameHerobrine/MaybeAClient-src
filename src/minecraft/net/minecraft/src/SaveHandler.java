@@ -77,10 +77,23 @@ public class SaveHandler implements ISaveHandler {
 
     public WorldInfo loadWorldInfo() {
         File var1 = new File(this.saveDirectory, "level.dat");
+        NBTTagCompound var2;
+        NBTTagCompound var3;
         if (var1.exists()) {
             try {
-                NBTTagCompound var2 = CompressedStreamTools.func_1138_a(new FileInputStream(var1));
-                NBTTagCompound var3 = var2.getCompoundTag("Data");
+                var2 = CompressedStreamTools.func_1138_a(new FileInputStream(var1));
+                var3 = var2.getCompoundTag("Data");
+                return new WorldInfo(var3);
+            } catch (Exception var5) {
+                var5.printStackTrace();
+            }
+        }
+
+        var1 = new File(this.saveDirectory, "level.dat_old");
+        if (var1.exists()) {
+            try {
+                var2 = CompressedStreamTools.func_1138_a(new FileInputStream(var1));
+                var3 = var2.getCompoundTag("Data");
                 return new WorldInfo(var3);
             } catch (Exception var4) {
                 var4.printStackTrace();

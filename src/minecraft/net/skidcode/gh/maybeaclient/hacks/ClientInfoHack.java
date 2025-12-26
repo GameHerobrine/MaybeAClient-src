@@ -10,7 +10,10 @@ import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.ClientInfoTab;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingEnum;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingMode;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumAlign;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumStaticPos;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class ClientInfoHack extends Hack{
@@ -24,8 +27,8 @@ public class ClientInfoHack extends Hack{
 	public SettingBoolean walkingSpeed;
 	public SettingBoolean useHorizontal = new SettingBoolean(this, "Use horizontal speed", true);
 	
-	public SettingMode alignment = new SettingMode(this, "Alignment", "Left", "Right");
-	public SettingMode staticPositon;
+	public SettingEnum<EnumAlign> alignment = new SettingEnum<>(this, "Alignment", EnumAlign.LEFT);
+	public SettingEnum<EnumStaticPos> staticPositon;
 	
 	public static ClientInfoHack instance;
 	
@@ -64,14 +67,12 @@ public class ClientInfoHack extends Hack{
 		this.addSetting(username);
 		this.addSetting(this.walkingSpeed);
 		this.addSetting(this.useHorizontal);
-		this.addSetting(this.staticPositon = new SettingMode(this, "Static Position", "Disabled", "Top Right", "Bottom Left", "Top Left", "Bottom Right") {
+		this.addSetting(this.staticPositon = new SettingEnum<EnumStaticPos>(this, "Static Position", EnumStaticPos.DISABLED) {
 			public void setValue(String value) {
 				super.setValue(value);
-				if(this.currentMode.equalsIgnoreCase("Disabled")) {
-					ClientInfoHack.instance.alignment.show();
-				}else {
-					ClientInfoHack.instance.alignment.hide();
-				}
+				EnumStaticPos val = this.getValue();
+				if(val == EnumStaticPos.DISABLED) ClientInfoHack.instance.alignment.show();
+				else ClientInfoHack.instance.alignment.hide();
 			}
 		});
 		

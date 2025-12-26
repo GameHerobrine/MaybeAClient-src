@@ -1,5 +1,7 @@
 package net.skidcode.gh.maybeaclient.gui.altman;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSmallButton;
@@ -23,15 +25,18 @@ public class GuiEditAccount extends GuiScreen{
 	public void initGui() {
 		super.initGui();
 		this.controlList.clear();
-		
-		this.username = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 + 40, 200, 20, this.info == null ? "" : this.info.name);
+		Keyboard.enableRepeatEvents(true);
+		this.username = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 4 + 40, 200, 20, this.info == null ? "" : this.info.name);
         this.username.setMaxStringLength(16);
         this.username.isFocused = true;
         this.controlList.add(this.done = new GuiSmallButton(1, this.width / 2 - 50 + 52, this.height/4 - 10 + 50 + 20 + 14 + 24, 100, 20, "Done"));
         this.done.enabled = this.username.getText().length() > 0;
         this.controlList.add(new GuiSmallButton(2, this.width / 2 - 50 - 52, this.height/4 - 10 + 50 + 20 + 14 + 24, 100, 20, "Cancel"));
 	}
-	
+	@Override
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
+	}
 	protected void keyTyped(char var1, int var2) {
         this.username.textboxKeyTyped(var1, var2);
         if (var1 == '\r') {

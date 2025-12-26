@@ -22,28 +22,30 @@ public class BlockDispenser extends BlockContainer {
     }
 
     private void setDispenserDefaultDirection(World var1, int var2, int var3, int var4) {
-        int var5 = var1.getBlockId(var2, var3, var4 - 1);
-        int var6 = var1.getBlockId(var2, var3, var4 + 1);
-        int var7 = var1.getBlockId(var2 - 1, var3, var4);
-        int var8 = var1.getBlockId(var2 + 1, var3, var4);
-        byte var9 = 3;
-        if (Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) {
-            var9 = 3;
-        }
+        if (!var1.multiplayerWorld) {
+            int var5 = var1.getBlockId(var2, var3, var4 - 1);
+            int var6 = var1.getBlockId(var2, var3, var4 + 1);
+            int var7 = var1.getBlockId(var2 - 1, var3, var4);
+            int var8 = var1.getBlockId(var2 + 1, var3, var4);
+            byte var9 = 3;
+            if (Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) {
+                var9 = 3;
+            }
 
-        if (Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) {
-            var9 = 2;
-        }
+            if (Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) {
+                var9 = 2;
+            }
 
-        if (Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) {
-            var9 = 5;
-        }
+            if (Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) {
+                var9 = 5;
+            }
 
-        if (Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) {
-            var9 = 4;
-        }
+            if (Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) {
+                var9 = 4;
+            }
 
-        var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
+            var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
+        }
     }
 
     public int getBlockTexture(IBlockAccess var1, int var2, int var3, int var4, int var5) {
@@ -107,12 +109,12 @@ public class BlockDispenser extends BlockContainer {
                 var1.playSoundEffect((double)var2, (double)var3, (double)var4, "random.bow", 1.0F, 1.2F);
             } else if (var12.itemID == Item.egg.shiftedIndex) {
                 EntityEgg var34 = new EntityEgg(var1, var13, var15, var17);
-                var34.func_20048_a((double)var9, 0.10000000149011612D, (double)var10, 1.1F, 6.0F);
+                var34.setEggHeading((double)var9, 0.10000000149011612D, (double)var10, 1.1F, 6.0F);
                 var1.entityJoinedWorld(var34);
                 var1.playSoundEffect((double)var2, (double)var3, (double)var4, "random.bow", 1.0F, 1.2F);
             } else if (var12.itemID == Item.snowball.shiftedIndex) {
                 EntitySnowball var35 = new EntitySnowball(var1, var13, var15, var17);
-                var35.func_467_a((double)var9, 0.10000000149011612D, (double)var10, 1.1F, 6.0F);
+                var35.setSnowballHeading((double)var9, 0.10000000149011612D, (double)var10, 1.1F, 6.0F);
                 var1.entityJoinedWorld(var35);
                 var1.playSoundEffect((double)var2, (double)var3, (double)var4, "random.bow", 1.0F, 1.2F);
             } else {

@@ -76,13 +76,22 @@ public class CommandModule extends Command{
 					}else {
 						String keybindRaw = args[2].toUpperCase();
 						int bind;
+						i_love_freecliff:
 						try {
 							bind = Integer.parseInt(keybindRaw);
 						}catch(NumberFormatException e) {
+							mouse_check:
+							if(keybindRaw.startsWith("MOUSE_")) {
+								try {
+									bind = Client.getKeycodeForMouseButton(Integer.parseInt(keybindRaw.substring(6)));
+									break i_love_freecliff;
+								}catch(NumberFormatException ee) {}
+							}
 							if(!keybindRaw.startsWith("KEY_")) {
 								Client.addMessage("Invalid keyname format.");
 								break;
 							}
+							
 							bind = Keyboard.getKeyIndex(keybindRaw.substring(4));
 						}
 						h.bind(bind);
@@ -113,7 +122,6 @@ public class CommandModule extends Command{
 			case "set":
 				if(argc < 4) {
 					Client.addMessage("Not enough arguments!");
-					
 				}else {
 					String name = args[1].toLowerCase();
 					String settingName = args[2].toLowerCase();
@@ -128,6 +136,7 @@ public class CommandModule extends Command{
 					}else {
 						Setting s = h.settings.get(settingName);
 						String valueRaw = args[3];
+						for(int i = 4; i < args.length; ++i) valueRaw += " "+args[i];
 						if(!s.validateValue(valueRaw)) {
 							Client.addMessage("Invalid setting value!");
 							break;
@@ -149,6 +158,7 @@ public class CommandModule extends Command{
 						Client.addMessage("Module "+ChatColor.GOLD+args[1]+ChatColor.WHITE+" is not found!");
 					}else {
 						Client.addMessage(ChatColor.GOLD+h.name);
+						Client.addMessage("Description: "+ChatColor.GOLD+h.description);
 						Client.addMessage("Status: "+(h.status ? ChatColor.LIGHTGREEN+"Enabled" : ChatColor.LIGHTRED+"Disabled"));
 						//Client.addMessage("Keybind: "+ChatColor.GOLD+Keyboard.getKeyName(h.keybinding.));
 						String s = "Settings: ";
@@ -171,7 +181,7 @@ public class CommandModule extends Command{
 				Client.addMessage(".module toggle <modulename> - Toggle module by name");
 				Client.addMessage(".module set <modulename> <settingname> <value> - Change module setting value");
 				Client.addMessage(".module reset <modulename> <settingname> - Reset module setting to default");
-				Client.addMessage(".module bind <modulename> <keycode|keyname> - Bind module to some key. The key name must start with 'KEY_'.");
+				Client.addMessage(".module bind <modulename> <keycode|keyname> - Bind module to some key. The keyboard key name must start with 'KEY_'. The mouse key name must start with 'MOUSE_'.");
 				Client.addMessage(".module gbind <modulename> - Bind module to a key using gui.");	
 				break;
 		}

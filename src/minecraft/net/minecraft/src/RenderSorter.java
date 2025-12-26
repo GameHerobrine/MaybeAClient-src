@@ -24,6 +24,7 @@ public class RenderSorter implements Comparator {
             } else if (var5 > var7) {
                 return -1;
             } else {
+            	if(var1.field_1735_w < var2.field_1735_w) return 0;
                 return var1.field_1735_w < var2.field_1735_w ? 1 : -1;
             }
         }

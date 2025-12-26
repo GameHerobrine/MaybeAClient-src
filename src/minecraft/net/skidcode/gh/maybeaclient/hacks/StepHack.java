@@ -28,16 +28,9 @@ public class StepHack extends Hack implements EventListener{
 	}
 	
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += String.format("%.2f", this.stepHeight.value);
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return String.format("%.2f", this.stepHeight.value);
 	}
-	
 	@Override
 	public void handleEvent(Event event) {
 		if(event instanceof EventPlayerUpdatePost) {

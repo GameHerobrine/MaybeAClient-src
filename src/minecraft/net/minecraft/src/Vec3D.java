@@ -44,7 +44,7 @@ public class Vec3D {
         this.zCoord = var5;
     }
 
-    public Vec3D setComponents(double var1, double var3, double var5) {
+    private Vec3D setComponents(double var1, double var3, double var5) {
         this.xCoord = var1;
         this.yCoord = var3;
         this.zCoord = var5;

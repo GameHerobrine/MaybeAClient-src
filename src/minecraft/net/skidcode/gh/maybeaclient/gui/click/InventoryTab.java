@@ -6,6 +6,7 @@ import net.minecraft.src.GuiIngame;
 import net.minecraft.src.RenderHelper;
 import net.minecraft.src.RenderManager;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.ClientNameHack;
 import net.skidcode.gh.maybeaclient.hacks.InventoryViewHack;
 
@@ -24,16 +25,19 @@ public class InventoryTab extends Tab{
 	}
 	
 	public void render() {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int prevSpace = ClickGUIHack.theme().titlebasediff;
+		int txtCenter = ClickGUIHack.theme().yaddtocenterText;
 		if(this.minimized) {
-			this.height = 12;
-			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + 2;
+			this.height = ySpace;
+			this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 			super.render();
 			return;
 		}
 		super.render();
 		this.width = 18*9 + 2;
-		this.height = 18*3 + 15;
-		this.renderFrame((int)this.xPos, (int)this.yPos + 12 + 3, (int)this.xPos + this.width, (int)this.yPos + this.height);
+		this.height = 18*3 + ySpace + prevSpace;
+		this.renderFrame((int)this.xPos, (int)this.yPos + ySpace + prevSpace, (int)this.xPos + this.width, (int)this.yPos + this.height);
 		GL11.glPushMatrix();
 		RenderHelper.enableStandardItemLighting();
 		GL11.glColor4f(1, 1, 1, 1);

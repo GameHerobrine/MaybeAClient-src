@@ -11,7 +11,7 @@ import org.lwjgl.input.Keyboard;
 public class GameSettings {
     private static final String[] RENDER_DISTANCES = new String[]{"options.renderDistance.far", "options.renderDistance.normal", "options.renderDistance.short", "options.renderDistance.tiny"};
     private static final String[] DIFFICULTIES = new String[]{"options.difficulty.peaceful", "options.difficulty.easy", "options.difficulty.normal", "options.difficulty.hard"};
-    private static final String[] field_25147_K = new String[]{"options.guiScale.auto", "options.guiScale.small", "options.guiScale.normal", "options.guiScale.large"};
+    private static final String[] GUISCALES = new String[]{"options.guiScale.auto", "options.guiScale.small", "options.guiScale.normal", "options.guiScale.large"};
     public float musicVolume = 1.0F;
     public float soundVolume = 1.0F;
     public float mouseSensitivity = 0.5F;
@@ -19,6 +19,7 @@ public class GameSettings {
     public int renderDistance = 0;
     public boolean viewBobbing = true;
     public boolean anaglyph = false;
+    public boolean field_27342_h = false;
     public boolean limitFramerate = false;
     public boolean fancyGraphics = true;
     public boolean ambientOcclusion = true;
@@ -41,16 +42,14 @@ public class GameSettings {
     public boolean thirdPersonView;
     public boolean showDebugInfo;
     public String lastServer;
-    public String realLastServer = "";
     public boolean field_22275_C;
     public boolean smoothCamera;
     public boolean field_22273_E;
     public float field_22272_F;
     public float field_22271_G;
     public int guiScale;
+	public String realLastServer = "";
 
-    
-    
     public GameSettings(Minecraft var1, File var2) {
         this.keyBindings = new KeyBinding[]{this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.keyBindToggleFog};
         this.difficulty = 2;
@@ -132,6 +131,11 @@ public class GameSettings {
             this.viewBobbing = !this.viewBobbing;
         }
 
+        if (var1 == EnumOptions.ADVANCED_OPENGL) {
+            this.field_27342_h = !this.field_27342_h;
+            this.mc.renderGlobal.loadRenderers();
+        }
+
         if (var1 == EnumOptions.ANAGLYPH) {
             this.anaglyph = !this.anaglyph;
             this.mc.renderEngine.refreshTextures();
@@ -177,8 +181,10 @@ public class GameSettings {
         case 3:
             return this.anaglyph;
         case 4:
-            return this.limitFramerate;
+            return this.field_27342_h;
         case 5:
+            return this.limitFramerate;
+        case 6:
             return this.ambientOcclusion;
         default:
             return false;
@@ -207,7 +213,7 @@ public class GameSettings {
         } else if (var1 == EnumOptions.DIFFICULTY) {
             return var3 + var2.translateKey(DIFFICULTIES[this.difficulty]);
         } else if (var1 == EnumOptions.GUI_SCALE) {
-            return var3 + var2.translateKey(field_25147_K[this.guiScale]);
+            return var3 + var2.translateKey(GUISCALES[this.guiScale]);
         } else if (var1 == EnumOptions.GRAPHICS) {
             return this.fancyGraphics ? var3 + var2.translateKey("options.graphics.fancy") : var3 + var2.translateKey("options.graphics.fast");
         } else {
@@ -256,6 +262,10 @@ public class GameSettings {
 
                 if (var3[0].equals("anaglyph3d")) {
                     this.anaglyph = var3[1].equals("true");
+                }
+
+                if (var3[0].equals("advancedOpengl")) {
+                    this.field_27342_h = var3[1].equals("true");
                 }
 
                 if (var3[0].equals("limitFramerate")) {
@@ -316,6 +326,7 @@ public class GameSettings {
             var1.println("guiScale:" + this.guiScale);
             var1.println("bobView:" + this.viewBobbing);
             var1.println("anaglyph3d:" + this.anaglyph);
+            var1.println("advancedOpengl:" + this.field_27342_h);
             var1.println("limitFramerate:" + this.limitFramerate);
             var1.println("difficulty:" + this.difficulty);
             var1.println("fancyGraphics:" + this.fancyGraphics);

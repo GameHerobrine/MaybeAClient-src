@@ -30,14 +30,14 @@ public class CraftingManager {
         this.addRecipe(new ItemStack(Block.blockSnow, 1), "##", "##", '#', Item.snowball);
         this.addRecipe(new ItemStack(Block.blockClay, 1), "##", "##", '#', Item.clay);
         this.addRecipe(new ItemStack(Block.brick, 1), "##", "##", '#', Item.brick);
-        this.addRecipe(new ItemStack(Block.lightStone, 1), "###", "###", "###", '#', Item.lightStoneDust);
+        this.addRecipe(new ItemStack(Block.glowStone, 1), "###", "###", "###", '#', Item.lightStoneDust);
         this.addRecipe(new ItemStack(Block.cloth, 1), "###", "###", "###", '#', Item.silk);
         this.addRecipe(new ItemStack(Block.tnt, 1), "X#X", "#X#", "X#X", 'X', Item.gunpowder, '#', Block.sand);
         this.addRecipe(new ItemStack(Block.stairSingle, 3, 3), "###", '#', Block.cobblestone);
         this.addRecipe(new ItemStack(Block.stairSingle, 3, 0), "###", '#', Block.stone);
         this.addRecipe(new ItemStack(Block.stairSingle, 3, 1), "###", '#', Block.sandStone);
         this.addRecipe(new ItemStack(Block.stairSingle, 3, 2), "###", '#', Block.planks);
-        this.addRecipe(new ItemStack(Block.ladder, 1), "# #", "###", "# #", '#', Item.stick);
+        this.addRecipe(new ItemStack(Block.ladder, 2), "# #", "###", "# #", '#', Item.stick);
         this.addRecipe(new ItemStack(Item.doorWood, 1), "##", "##", "##", '#', Block.planks);
         this.addRecipe(new ItemStack(Item.doorSteel, 1), "##", "##", "##", '#', Item.ingotIron);
         this.addRecipe(new ItemStack(Item.sign, 1), "###", "###", " X ", '#', Block.planks, 'X', Item.stick);
@@ -49,6 +49,8 @@ public class CraftingManager {
         this.addRecipe(new ItemStack(Block.torchWood, 4), "X", "#", 'X', new ItemStack(Item.coal, 1, 1), '#', Item.stick);
         this.addRecipe(new ItemStack(Item.bowlEmpty, 4), "# #", " # ", '#', Block.planks);
         this.addRecipe(new ItemStack(Block.minecartTrack, 16), "X X", "X#X", "X X", 'X', Item.ingotIron, '#', Item.stick);
+        this.addRecipe(new ItemStack(Block.railPowered, 6), "X X", "X#X", "XRX", 'X', Item.ingotGold, 'R', Item.redstone, '#', Item.stick);
+        this.addRecipe(new ItemStack(Block.railDetector, 6), "X X", "X#X", "XRX", 'X', Item.ingotIron, 'R', Item.redstone, '#', Block.pressurePlateStone);
         this.addRecipe(new ItemStack(Item.minecartEmpty, 1), "# #", "###", '#', Item.ingotIron);
         this.addRecipe(new ItemStack(Block.pumpkinLantern, 1), "A", "B", 'A', Block.pumpkin, 'B', Block.torchWood);
         this.addRecipe(new ItemStack(Item.minecartCrate, 1), "A", "B", 'A', Block.crate, 'B', Item.minecartEmpty);

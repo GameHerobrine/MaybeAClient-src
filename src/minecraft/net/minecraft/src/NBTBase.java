@@ -9,7 +9,8 @@ public abstract class NBTBase {
 	public static final byte LIST = 9;
     public static final byte FLOAT = 5;
     public static final byte INT = 3;
-	private String key = null;
+	public static final byte STRING = 8;
+    private String key = null;
 
     abstract void writeTagContents(DataOutput var1) throws IOException;
 

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class ModelCow extends ModelQuadraped {
+public class ModelCow extends ModelQuadruped {
     ModelRenderer udders;
     ModelRenderer horn1;
     ModelRenderer horn2;

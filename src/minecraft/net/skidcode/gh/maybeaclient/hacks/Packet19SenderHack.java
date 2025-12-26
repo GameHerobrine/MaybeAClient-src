@@ -2,7 +2,7 @@ package net.skidcode.gh.maybeaclient.hacks;
 
 import org.lwjgl.input.Keyboard;
 
-import net.minecraft.src.Packet19;
+import net.minecraft.src.Packet19EntityAction;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
@@ -30,7 +30,7 @@ public class Packet19SenderHack extends Hack implements EventListener{
 			long l = System.currentTimeMillis();
 			long addr = (long) (this.delayS.value*1000);
 			if(l > nextSend) {
-				mc.getSendQueue().addToSendQueue(new Packet19(mc.thePlayer, 3));
+				mc.getSendQueue().addToSendQueue(new Packet19EntityAction(mc.thePlayer, 3));
 				this.nextSend = l + addr;
 			}
 			

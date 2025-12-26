@@ -12,9 +12,9 @@ public class NBTTagString extends NBTBase {
 
     public NBTTagString(String var1) {
         this.stringValue = var1;
-        if (var1 == null) {
+        /*XXX if (var1 == null) {
             throw new IllegalArgumentException("Empty string not allowed");
-        }
+        }*/
     }
 
     void writeTagContents(DataOutput var1) throws IOException {

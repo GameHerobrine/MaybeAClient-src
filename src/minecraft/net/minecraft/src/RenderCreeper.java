@@ -3,6 +3,8 @@ package net.minecraft.src;
 import org.lwjgl.opengl.GL11;
 
 public class RenderCreeper extends RenderLiving {
+    private ModelBase field_27008_a = new ModelCreeper(2.0F);
+
     public RenderCreeper() {
         super(new ModelCreeper(), 0.5F);
     }
@@ -46,6 +48,42 @@ public class RenderCreeper extends RenderLiving {
         }
     }
 
+    protected boolean func_27006_a(EntityCreeper var1, int var2, float var3) {
+        if (var1.func_27022_s()) {
+            if (var2 == 1) {
+                float var4 = (float)var1.ticksExisted + var3;
+                this.loadTexture("/armor/power.png");
+                GL11.glMatrixMode(5890 /*GL_TEXTURE*/);
+                GL11.glLoadIdentity();
+                float var5 = var4 * 0.01F;
+                float var6 = var4 * 0.01F;
+                GL11.glTranslatef(var5, var6, 0.0F);
+                this.setRenderPassModel(this.field_27008_a);
+                GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/);
+                GL11.glEnable(3042 /*GL_BLEND*/);
+                float var7 = 0.5F;
+                GL11.glColor4f(var7, var7, var7, 1.0F);
+                GL11.glDisable(2896 /*GL_LIGHTING*/);
+                GL11.glBlendFunc(1, 1);
+                return true;
+            }
+
+            if (var2 == 2) {
+                GL11.glMatrixMode(5890 /*GL_TEXTURE*/);
+                GL11.glLoadIdentity();
+                GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/);
+                GL11.glEnable(2896 /*GL_LIGHTING*/);
+                GL11.glDisable(3042 /*GL_BLEND*/);
+            }
+        }
+
+        return false;
+    }
+
+    protected boolean func_27007_b(EntityCreeper var1, int var2, float var3) {
+        return false;
+    }
+
     // $FF: synthetic method
     // $FF: bridge method
     protected void preRenderCallback(EntityLiving var1, float var2) {
@@ -56,5 +94,17 @@ public class RenderCreeper extends RenderLiving {
     // $FF: bridge method
     protected int getColorMultiplier(EntityLiving var1, float var2, float var3) {
         return this.updateCreeperColorMultiplier((EntityCreeper)var1, var2, var3);
+    }
+
+    // $FF: synthetic method
+    // $FF: bridge method
+    protected boolean shouldRenderPass(EntityLiving var1, int var2, float var3) {
+        return this.func_27006_a((EntityCreeper)var1, var2, var3);
+    }
+
+    // $FF: synthetic method
+    // $FF: bridge method
+    protected boolean func_27005_b(EntityLiving var1, int var2, float var3) {
+        return this.func_27007_b((EntityCreeper)var1, var2, var3);
     }
 }

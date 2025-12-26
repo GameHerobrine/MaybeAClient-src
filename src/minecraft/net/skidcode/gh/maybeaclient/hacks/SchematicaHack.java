@@ -13,76 +13,33 @@ import lunatrius.schematica.GuiSchematicaStats;
 import lunatrius.schematica.SchematicWorld;
 import lunatrius.schematica.Settings;
 import net.minecraft.src.Block;
+import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePost;
-import net.skidcode.gh.maybeaclient.gui.click.Tab;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
-import net.skidcode.gh.maybeaclient.hacks.settings.SettingFloat;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingButton;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingInteger;
+import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
 
 public class SchematicaHack extends Hack implements EventListener{
 	
-	public SettingBoolean enableAlpha = new SettingBoolean(this, "Enable Transparency", false) {
-		@Override
-		public void setValue(boolean b) {
-			super.setValue(b);
-			Settings.instance().needsUpdate = true;
-		}
-	};
-	public SettingInteger alpha = new SettingInteger(this, "Transparency", 0, 0, 255) {
-		@Override
-		public void setValue(int i) {
-			int prev = this.value;
-			super.setValue(i);
-			if(this.value != prev) Settings.instance().needsUpdate = true;
-		}
-	};
-	
-	public SettingBoolean highlight = new SettingBoolean(this, "Highlight", true) {
-		@Override
-		public void setValue(boolean b) {
-			boolean prev = this.value;
-			super.setValue(b);
-			if(this.value != prev) Settings.instance().needsUpdate = true;
-		}
-	};
+	public SettingBoolean enableAlpha;
+	public SettingInteger alpha;
+	public SettingBoolean highlight;
 	
 	//public SettingInteger renderRangeX = new SettingInteger(this, "Render Range X", 20, 5, 50);
 	//public SettingInteger renderRangeY = new SettingInteger(this, "Render Range Y", 20, 5, 50);
 	//public SettingInteger renderRangeZ = new SettingInteger(this, "Render Range Z", 20, 5, 50);
 	//public SettingFloat blockDelta = new SettingFloat(this, "Highlight block delta", 0.005f, 0, 0.5f);
 	
-	public SettingBoolean openLoad = new SettingBoolean(this, "Load", false) {
-		public void setValue(boolean d) {}
-		public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-			mc.displayGuiScreen(new GuiSchematicLoad(mc.currentScreen));
-		}
-	};
-	
-	public SettingBoolean openSave = new SettingBoolean(this, "Save", false) {
-		public void setValue(boolean d) {}
-		public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-			mc.displayGuiScreen(new GuiSchematicSave(mc.currentScreen));
-		}
-	};
-	
-	public SettingBoolean openControl = new SettingBoolean(this, "Control", false) {
-		public void setValue(boolean d) {}
-		public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-			mc.displayGuiScreen(new GuiSchematicControl(mc.currentScreen));
-		}
-	};
-	
-	public SettingBoolean openStats = new SettingBoolean(this, "Stats", false) {
-		public void setValue(boolean d) {}
-		public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
-			mc.displayGuiScreen(new GuiSchematicaStats(mc.currentScreen));
-		}
-	};
+	public SettingButton openLoad = new SettingButton(this, "Load");
+	public SettingButton openSave = new SettingButton(this, "Save");
+	public SettingButton openControl = new SettingButton(this, "Control");
+	public SettingButton openStats = new SettingButton(this, "Stats");
 	
 	public SettingBoolean autoPlacer;
 	public SettingInteger placeDelay = new SettingInteger(this, "Delay", 5, 0, 10);
@@ -94,6 +51,31 @@ public class SchematicaHack extends Hack implements EventListener{
 	public SchematicaHack() {
 		super("Schematica", "Port of Schematica", Keyboard.KEY_NONE, Category.MISC);
 		instance = this;
+		
+		this.enableAlpha = new SettingBoolean(this, "Enable Transparency", false) {
+			@Override
+			public void setValue(boolean b) {
+				super.setValue(b);
+				Settings.instance().requestFullUpdate();
+			}
+		};
+		this.alpha = new SettingInteger(this, "Transparency", 0, 0, 255) {
+			@Override
+			public void setValue(int i) {
+				int prev = this.value;
+				super.setValue(i);
+				Settings.instance().requestFullUpdate();
+			}
+		};
+		this.highlight = new SettingBoolean(this, "Highlight", true) {
+			@Override
+			public void setValue(boolean b) {
+				boolean prev = this.value;
+				super.setValue(b);
+				Settings.instance().requestFullUpdate();
+			}
+		};
+		
 		this.addSetting(this.autoPlacer = new SettingBoolean(this, "AutoBlockPlace", false) {
 			public void setValue(boolean d) {
 				super.setValue(d);
@@ -123,6 +105,17 @@ public class SchematicaHack extends Hack implements EventListener{
         
         EventRegistry.registerListener(EventPlayerUpdatePost.class, this);
 	}
+	
+
+	@Override
+	public void onPressed(SettingButton b) {
+		if(b == openSave) mc.displayGuiScreen(new GuiSchematicSave(mc.currentScreen));
+		else if(b == openControl) mc.displayGuiScreen(new GuiSchematicControl(mc.currentScreen));
+		else if(b == openStats) mc.displayGuiScreen(new GuiSchematicaStats(mc.currentScreen));
+		else if(b == openLoad) mc.displayGuiScreen(new GuiSchematicLoad(mc.currentScreen));
+		super.onPressed(b);
+	}
+	
 	public int ticks = 0;
 	@Override
 	public void handleEvent(Event event) {
@@ -176,9 +169,9 @@ public class SchematicaHack extends Hack implements EventListener{
 								rY = y + inst.offset.y;
 								rZ = z + inst.offset.z;
 								if(rX <= maxXr && rX >= minXr && rY <= maxYr && rY >= minYr && rZ <= maxZr && rZ >= minZr) {
-									int id = schem.blocks[x][y][z];
+									int id = schem.getBlockId(x, y, z); //schem.blocks[x][y][z];
 									int worldID = mc.theWorld.getBlockId(rX, rY, rZ);
-									int meta = schem.metadata[x][y][z];
+									int meta = schem.getBlockMetadata(x, y, z); //schem.metadata[x][y][z];
 									Entry<ItemStack, Integer> ent = hm.get(id << 8 | meta);
 									if((id != 0 && (worldID == 0/*XXX modern versions: Replaceable || Block.blocksList[worldID].blockMaterial.getIsGroundCover()*/)) && id != worldID && ent != null) {
 										ItemStack is = ent.getKey();
@@ -204,19 +197,49 @@ public class SchematicaHack extends Hack implements EventListener{
 		return id == 0 || id == 10 || id == 11 || id == 8 || id == 9;
 	}
 	
+	public int getPossiblePlaceSide(int xx, int yy, int zz) {
+		
+		ItemStack item = mc.thePlayer.getCurrentEquippedItem();
+		if(item == null || !(item.getItem() instanceof ItemBlock)) return -1; 
+		
+		for(int i = 0; i < 6; ++i) {
+			int x = xx;
+			int y = yy;
+			int z = zz;
+			
+			if(i == 0) ++y;
+			if(i == 1) --y;
+			if(i == 2) ++z;
+			if(i == 3) --z;
+			if(i == 4) ++x;
+			if(i == 5) --x;
+			int placeon = mc.theWorld.getBlockId(x, y, z);
+			if(placeon == 0) continue;
+			
+			Block b = Block.blocksList[placeon];
+			if(b.blockMaterial.getIsSolid()) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+
 	public void placeBlock(int x, int y, int z) {
-		if (!canPlaceBlock(x - 1, y, z)) {
-			mc.playerController.sendPlaceBlock(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), x - 1, y, z, 5);
-		} else if (!canPlaceBlock(x + 1, y, z)) {
-			mc.playerController.sendPlaceBlock(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), x + 1, y, z, 4);
-		} else if (!canPlaceBlock(x, y, z - 1)) {
-			mc.playerController.sendPlaceBlock(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), x, y, z - 1, 3);
-		} else if (!canPlaceBlock(x, y, z + 1)) {
-			mc.playerController.sendPlaceBlock(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), x, y, z + 1, 2);
-		} else if (!canPlaceBlock(x, y - 1, z)) {
-			mc.playerController.sendPlaceBlock(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), x, y - 1, z, 1);
-		} else if (!canPlaceBlock(x, y + 1, z)) {
-			mc.playerController.sendPlaceBlock(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), x, y - 1, z, 0);
+		int face = this.getPossiblePlaceSide(x, y, z);
+		if(face != -1) {
+			if(face == 0) ++y;
+			if(face == 1) --y;
+			if(face == 2) ++z;
+			if(face == 3) --z;
+			if(face == 4) ++x;
+			if(face == 5) --x;
+			
+			//PlayerUtils.placeBlockUnsafe(x, y, z, face);
+			PlayerUtils.placeBlock(x, y, z, face);
+			//if(this.clientSidePlace.getValue()) 
+			//else PlayerUtils.placeBlock(x, y, z, face);
 		}
 	}
 	

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntityCow extends EntityAnimals {
+public class EntityCow extends EntityAnimal {
     public EntityCow(World var1) {
         super(var1);
         this.texture = "/mob/cow.png";

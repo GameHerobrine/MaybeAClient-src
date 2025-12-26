@@ -12,7 +12,7 @@ public class AutoMouseClickHack extends Hack{
 	
 	public SettingMode left, right;
 	public SettingInteger lDelayTicks, rDelayTicks;
-	
+	public SettingBoolean showDisableButton = new SettingBoolean(this, "ShowDisableButtonInContainers", true);
 	public int ldelay, rdelay;
 	
 	public static AutoMouseClickHack instance;
@@ -47,6 +47,7 @@ public class AutoMouseClickHack extends Hack{
 			}
 		};
 		
+		this.addSetting(this.showDisableButton);
 		this.addSetting(this.left);
 		this.addSetting(this.lDelayTicks);
 		this.addSetting(this.right);

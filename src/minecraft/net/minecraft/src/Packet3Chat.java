@@ -11,15 +11,19 @@ public class Packet3Chat extends Packet {
     }
 
     public Packet3Chat(String var1) {
+        if (var1.length() > 119) {
+            var1 = var1.substring(0, 119);
+        }
+
         this.message = var1;
     }
 
     public void readPacketData(DataInputStream var1) throws IOException {
-        this.message = var1.readUTF();
+        this.message = func_27048_a(var1, 119);
     }
 
     public void writePacketData(DataOutputStream var1) throws IOException {
-        var1.writeUTF(this.message);
+        func_27049_a(this.message, var1);
     }
 
     public void processPacket(NetHandler var1) {

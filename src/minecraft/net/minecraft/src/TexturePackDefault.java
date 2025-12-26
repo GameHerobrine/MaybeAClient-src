@@ -18,8 +18,6 @@ public class TexturePackDefault extends TexturePackBase {
             this.texturePackThumbnail = ImageIO.read(TexturePackDefault.class.getResource("/pack.png"));
         } catch (IOException var2) {
             var2.printStackTrace();
-        } catch(java.lang.IllegalArgumentException v) {
-        	v.printStackTrace();
         }
 
     }

@@ -7,8 +7,8 @@ public class ItemCloth extends ItemBlock {
         this.setHasSubtypes(true);
     }
 
-    public int getIconIndex(ItemStack var1) {
-        return Block.cloth.getBlockTextureFromSideAndMetadata(2, BlockCloth.func_21034_c(var1.getItemDamage()));
+    public int func_27009_a(int var1) {
+        return Block.cloth.getBlockTextureFromSideAndMetadata(2, BlockCloth.func_21034_c(var1));
     }
 
     public int func_21012_a(int var1) {

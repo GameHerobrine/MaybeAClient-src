@@ -33,9 +33,12 @@ class GuiTexturePackSlot extends GuiSlot {
     protected int getContentHeight() {
         return this.getSize() * 36;
     }
-
+    
+    @Override
     protected void drawBackground() {
-        this.parentTexturePackGui.drawDefaultBackground();
+    	if(this.parentTexturePackGui.fillBg) {
+    		this.parentTexturePackGui.drawDefaultBackground();
+    	}
     }
 
     protected void drawSlot(int var1, int var2, int var3, int var4, Tessellator var5) {

@@ -1,5 +1,7 @@
 package lunatrius.schematica.util;
 
+import net.skidcode.gh.maybeaclient.utils.MiniChunkPos;
+
 public class Vector3i {
 	public int x, y, z;
 
@@ -75,5 +77,9 @@ public class Vector3i {
 		hash = 71 * hash + this.y;
 		hash = 71 * hash + this.z;
 		return hash;
+	}
+
+	public MiniChunkPos miniChunk() {
+		return new MiniChunkPos(this.x/16, this.y/16, this.z/16);
 	}
 }

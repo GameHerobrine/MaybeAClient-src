@@ -85,11 +85,11 @@ public class EntityList {
         addMapping(EntityItem.class, "Item", 1);
         addMapping(EntityPainting.class, "Painting", 9);
         addMapping(EntityLiving.class, "Mob", 48);
-        addMapping(EntityMobs.class, "Monster", 49);
+        addMapping(EntityMob.class, "Monster", 49);
         addMapping(EntityCreeper.class, "Creeper", 50);
         addMapping(EntitySkeleton.class, "Skeleton", 51);
         addMapping(EntitySpider.class, "Spider", 52);
-        addMapping(EntityZombieSimple.class, "Giant", 53);
+        addMapping(EntityGiantZombie.class, "Giant", 53);
         addMapping(EntityZombie.class, "Zombie", 54);
         addMapping(EntitySlime.class, "Slime", 55);
         addMapping(EntityGhast.class, "Ghast", 56);

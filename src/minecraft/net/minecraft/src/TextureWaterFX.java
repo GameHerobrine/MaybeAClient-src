@@ -8,11 +8,11 @@ public class TextureWaterFX extends TextureFX {
     protected float[] field_1156_i = new float[256];
     protected float[] field_1155_j = new float[256];
     private int tickCounter = 0;
-    public boolean hasTexture = false;
+
     public TextureWaterFX() {
         super(Block.waterMoving.blockIndexInTexture);
     }
-
+    public boolean hasTexture = false;
     public void onTick() {
         ++this.tickCounter;
         if(this.hasTexture && NoRenderHack.instance.status && NoRenderHack.instance.waterAnim.value) {
@@ -86,6 +86,7 @@ public class TextureWaterFX extends TextureFX {
             this.imageData[var2 * 4 + 2] = (byte)var7;
             this.imageData[var2 * 4 + 3] = (byte)var8;
         }
-        this.hasTexture = true;
+        hasTexture = true;
+
     }
 }

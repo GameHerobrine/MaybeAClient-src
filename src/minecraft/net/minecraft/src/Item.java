@@ -142,8 +142,12 @@ public class Item {
         return this;
     }
 
-    public int getIconIndex(ItemStack var1) {
+    public int func_27009_a(int var1) {
         return this.iconIndex;
+    }
+
+    public final int getIconIndex(ItemStack var1) {
+        return this.func_27009_a(var1.getItemDamage());
     }
 
     public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
@@ -251,7 +255,11 @@ public class Item {
     }
 
     public String func_25009_k() {
-        return StatCollector.func_25200_a(this.getItemName() + ".name");
+        return StatCollector.translateToLocal(this.getItemName() + ".name");
+    }
+
+    public int func_27010_f(int var1) {
+        return 16777215;
     }
 
     static {

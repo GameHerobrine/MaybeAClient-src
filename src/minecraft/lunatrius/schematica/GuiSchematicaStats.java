@@ -107,6 +107,8 @@ public class GuiSchematicaStats extends GuiScreen{
 		this.parent = parent;
 	}
 	public void initGui() {
+		Settings.instance().emptyStats();
+		Settings.instance().recalculateStats();
 		this.slot = new GuiBlockRequired(this);
 		this.controlList.add(new GuiButton(1, this.width / 2 - 200 / 2, this.height - 25, "Back"));
 	}

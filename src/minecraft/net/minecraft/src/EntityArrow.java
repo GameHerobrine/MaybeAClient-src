@@ -2,6 +2,9 @@ package net.minecraft.src;
 
 import java.util.List;
 
+import net.skidcode.gh.maybeaclient.hacks.NoClientSideDestroyHack;
+import net.skidcode.gh.maybeaclient.hacks.TrajectoriesHack;
+
 public class EntityArrow extends Entity {
     private int xTile = -1;
     private int yTile = -1;
@@ -9,10 +12,12 @@ public class EntityArrow extends Entity {
     private int inTile = 0;
     private boolean inGround = false;
     public int arrowShake = 0;
-    public EntityLiving archer;
-    private int timeTillDeath;
-    private int flyTime = 0;
+    public EntityLiving owner;
+    private int ticksInGround;
+    private int ticksInAir = 0;
 
+    public boolean spawnedByTrajectories = false;
+    
     public EntityArrow(World var1) {
         super(var1);
         this.setSize(0.5F, 0.5F);
@@ -24,12 +29,21 @@ public class EntityArrow extends Entity {
         this.setPosition(var2, var4, var6);
         this.yOffset = 0.0F;
     }
-
     public EntityArrow(World var1, EntityLiving var2) {
+    	this(var1, var2, false);
+    }
+    public EntityArrow(World var1, EntityLiving var2, boolean spawnedByTrajectories) {
         super(var1);
-        this.archer = var2;
+        this.spawnedByTrajectories = spawnedByTrajectories;
+        if(this.spawnedByTrajectories) {
+        	--Entity.nextEntityID;
+        }
+        this.owner = var2;
         this.setSize(0.5F, 0.5F);
         this.setLocationAndAngles(var2.posX, var2.posY + (double)var2.getEyeHeight(), var2.posZ, var2.rotationYaw, var2.rotationPitch);
+        if(this.spawnedByTrajectories) {
+        	this.setLocationAndAngles(TrajectoriesHack.posX, TrajectoriesHack.posY, TrajectoriesHack.posZ, TrajectoriesHack.yaw, TrajectoriesHack.pitch);
+        }
         this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
         this.posY -= 0.10000000149011612D;
         this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
@@ -44,24 +58,29 @@ public class EntityArrow extends Entity {
     protected void entityInit() {
     }
 
-    public void setArrowHeading(double var1, double var3, double var5, float var7, float var8) {
-        float var9 = MathHelper.sqrt_double(var1 * var1 + var3 * var3 + var5 * var5);
-        var1 /= (double)var9;
-        var3 /= (double)var9;
-        var5 /= (double)var9;
-        var1 += this.rand.nextGaussian() * 0.007499999832361937D * (double)var8;
-        var3 += this.rand.nextGaussian() * 0.007499999832361937D * (double)var8;
-        var5 += this.rand.nextGaussian() * 0.007499999832361937D * (double)var8;
-        var1 *= (double)var7;
-        var3 *= (double)var7;
-        var5 *= (double)var7;
-        this.motionX = var1;
-        this.motionY = var3;
-        this.motionZ = var5;
-        float var10 = MathHelper.sqrt_double(var1 * var1 + var5 * var5);
-        this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(var1, var5) * 180.0D / 3.1415927410125732D);
-        this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(var3, (double)var10) * 180.0D / 3.1415927410125732D);
-        this.timeTillDeath = 0;
+    public void setArrowHeading(double x, double y, double z, float var7, float var8) {
+        float var9 = MathHelper.sqrt_double(x * x + y * y + z * z);
+        x /= (double)var9;
+        y /= (double)var9;
+        z /= (double)var9;
+        if(this.spawnedByTrajectories) {
+        	
+        }else {
+        	x += this.rand.nextGaussian() * 0.007499999832361937D * (double)var8;
+            y += this.rand.nextGaussian() * 0.007499999832361937D * (double)var8;
+            z += this.rand.nextGaussian() * 0.007499999832361937D * (double)var8;
+        }
+        
+        x *= (double)var7;
+        y *= (double)var7;
+        z *= (double)var7;
+        this.motionX = x;
+        this.motionY = y;
+        this.motionZ = z;
+        float dist = MathHelper.sqrt_double(x * x + z * z);
+        this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / 3.1415927410125732D);
+        this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)dist) * 180.0D / 3.1415927410125732D);
+        this.ticksInGround = 0;
     }
 
     public void setVelocity(double var1, double var3, double var5) {
@@ -77,6 +96,9 @@ public class EntityArrow extends Entity {
     }
 
     public void onUpdate() {
+    	float yaw = this.rotationYaw;
+    	float pitch = this.rotationPitch;
+    	
         super.onUpdate();
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
             float var1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
@@ -91,8 +113,13 @@ public class EntityArrow extends Entity {
         if (this.inGround) {
             int var15 = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
             if (var15 == this.inTile) {
-                ++this.timeTillDeath;
-                if (this.timeTillDeath == 1200) {
+                ++this.ticksInGround;
+                
+                if(this.spawnedByTrajectories) {
+                	this.setEntityDead();
+                }
+                
+                if (this.ticksInGround == 1200) {
                     this.setEntityDead();
                 }
 
@@ -103,10 +130,10 @@ public class EntityArrow extends Entity {
             this.motionX *= (double)(this.rand.nextFloat() * 0.2F);
             this.motionY *= (double)(this.rand.nextFloat() * 0.2F);
             this.motionZ *= (double)(this.rand.nextFloat() * 0.2F);
-            this.timeTillDeath = 0;
-            this.flyTime = 0;
+            this.ticksInGround = 0;
+            this.ticksInAir = 0;
         } else {
-            ++this.flyTime;
+            ++this.ticksInAir;
         }
 
         Vec3D var16 = Vec3D.createVector(this.posX, this.posY, this.posZ);
@@ -125,7 +152,7 @@ public class EntityArrow extends Entity {
         float var10;
         for(int var8 = 0; var8 < var5.size(); ++var8) {
             Entity var9 = (Entity)var5.get(var8);
-            if (var9.canBeCollidedWith() && (var9 != this.archer || this.flyTime >= 5)) {
+            if (var9.canBeCollidedWith() && (var9 != this.owner || this.ticksInAir >= 5)) {
                 var10 = 0.3F;
                 AxisAlignedBB var11 = var9.boundingBox.expand((double)var10, (double)var10, (double)var10);
                 MovingObjectPosition var12 = var11.func_1169_a(var16, var2);
@@ -142,11 +169,15 @@ public class EntityArrow extends Entity {
         if (var4 != null) {
             var3 = new MovingObjectPosition(var4);
         }
-
+        TrajectoriesHack.hit = var3;
         float var17;
-        if (var3 != null) {
+        ae: if (var3 != null) {
             if (var3.entityHit != null) {
-                if (var3.entityHit.attackEntityFrom(this.archer, 4)) {
+                if(this.spawnedByTrajectories) {
+                	this.setEntityDead();
+                	break ae;
+                }
+            	if (var3.entityHit.attackEntityFrom(this.owner, 4)) {
                     this.worldObj.playSoundAtEntity(this, "random.drr", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
                     this.setEntityDead();
                 } else {
@@ -155,7 +186,7 @@ public class EntityArrow extends Entity {
                     this.motionZ *= -0.10000000149011612D;
                     this.rotationYaw += 180.0F;
                     this.prevRotationYaw += 180.0F;
-                    this.flyTime = 0;
+                    this.ticksInAir = 0;
                 }
             } else {
                 this.xTile = var3.blockX;
@@ -169,7 +200,9 @@ public class EntityArrow extends Entity {
                 this.posX -= this.motionX / (double)var17 * 0.05000000074505806D;
                 this.posY -= this.motionY / (double)var17 * 0.05000000074505806D;
                 this.posZ -= this.motionZ / (double)var17 * 0.05000000074505806D;
-                this.worldObj.playSoundAtEntity(this, "random.drr", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
+                if(!this.spawnedByTrajectories) {
+                	this.worldObj.playSoundAtEntity(this, "random.drr", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
+                }
                 this.inGround = true;
                 this.arrowShake = 7;
             }
@@ -200,11 +233,16 @@ public class EntityArrow extends Entity {
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
         float var18 = 0.99F;
         var10 = 0.03F;
-        if (this.handleWaterMovement()) {
-            for(int var19 = 0; var19 < 4; ++var19) {
-                float var20 = 0.25F;
-                this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var20, this.posY - this.motionY * (double)var20, this.posZ - this.motionZ * (double)var20, this.motionX, this.motionY, this.motionZ);
-            }
+        if (this.func_27013_ag()) {
+        	if(this.spawnedByTrajectories) {
+        		
+        	}else {
+        		for(int var19 = 0; var19 < 4; ++var19) {
+                    float var20 = 0.25F;
+                    this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var20, this.posY - this.motionY * (double)var20, this.posZ - this.motionZ * (double)var20, this.motionX, this.motionY, this.motionZ);
+                }
+        	}
+            
 
             var18 = 0.8F;
         }
@@ -212,8 +250,17 @@ public class EntityArrow extends Entity {
         this.motionX *= (double)var18;
         this.motionY *= (double)var18;
         this.motionZ *= (double)var18;
-        this.motionY -= (double)var10;
+        if(this.worldObj.multiplayerWorld && NoClientSideDestroyHack.instance.status && NoClientSideDestroyHack.instance.noArrowRotation.value) {
+        	
+        }else {
+        	 this.motionY -= (double)var10;
+        }
+       
         this.setPosition(this.posX, this.posY, this.posZ);
+        if(this.worldObj.multiplayerWorld && NoClientSideDestroyHack.instance.status && NoClientSideDestroyHack.instance.noArrowRotation.value) {
+        	this.rotationYaw = this.prevRotationYaw = yaw;
+        	this.rotationPitch = this.prevRotationPitch = pitch;
+        }
     }
 
     public void writeEntityToNBT(NBTTagCompound var1) {
@@ -236,7 +283,7 @@ public class EntityArrow extends Entity {
 
     public void onCollideWithPlayer(EntityPlayer var1) {
         if (!this.worldObj.multiplayerWorld) {
-            if (this.inGround && this.archer == var1 && this.arrowShake <= 0 && var1.inventory.addItemStackToInventory(new ItemStack(Item.arrow, 1))) {
+            if (this.inGround && this.owner == var1 && this.arrowShake <= 0 && var1.inventory.addItemStackToInventory(new ItemStack(Item.arrow, 1))) {
                 this.worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 var1.onItemPickup(this, 1);
                 this.setEntityDead();

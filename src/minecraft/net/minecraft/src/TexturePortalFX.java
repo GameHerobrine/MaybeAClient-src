@@ -1,26 +1,38 @@
 package net.minecraft.src;
 
+import java.io.IOException;
 import java.util.Random;
+
+import net.skidcode.gh.maybeaclient.Client;
 
 public class TexturePortalFX extends TextureFX {
     private int field_4227_g = 0;
-    private byte[][] field_4226_h = new byte[32][1024];
+    private byte[][] field_4226_h;
 
     public TexturePortalFX() {
         super(Block.portal.blockIndexInTexture);
+        try {
+			this.textureRes = Client.getResource("/terrain.png").getWidth() / 16;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        this.field_4226_h = new byte[32][this.textureRes*this.textureRes*4];
+        this.imageData = new byte[this.textureRes*this.textureRes*4];
+        
         Random var1 = new Random(100L);
-
+        float ftextureRes = (float) this.textureRes;
+        int textureResHalf = this.textureRes / 2;
         for(int var2 = 0; var2 < 32; ++var2) {
-            for(int var3 = 0; var3 < 16; ++var3) {
-                for(int var4 = 0; var4 < 16; ++var4) {
+            for(int var3 = 0; var3 < this.textureRes; ++var3) {
+                for(int var4 = 0; var4 < this.textureRes; ++var4) {
                     float var5 = 0.0F;
 
                     int var6;
                     for(var6 = 0; var6 < 2; ++var6) {
-                        float var7 = (float)(var6 * 8);
-                        float var8 = (float)(var6 * 8);
-                        float var9 = ((float)var3 - var7) / 16.0F * 2.0F;
-                        float var10 = ((float)var4 - var8) / 16.0F * 2.0F;
+                        float var7 = (float)(var6 * textureResHalf);
+                        float var8 = (float)(var6 * textureResHalf);
+                        float var9 = ((float)var3 - var7) / ftextureRes * 2.0F;
+                        float var10 = ((float)var4 - var8) / ftextureRes * 2.0F;
                         if (var9 < -1.0F) {
                             var9 += 2.0F;
                         }
@@ -49,7 +61,7 @@ public class TexturePortalFX extends TextureFX {
                     int var13 = (int)(var5 * var5 * 200.0F + 55.0F);
                     int var14 = (int)(var5 * var5 * var5 * var5 * 255.0F);
                     int var15 = (int)(var5 * 100.0F + 155.0F);
-                    int var16 = var4 * 16 + var3;
+                    int var16 = var4 * this.textureRes + var3;
                     this.field_4226_h[var2][var16 * 4 + 0] = (byte)var13;
                     this.field_4226_h[var2][var16 * 4 + 1] = (byte)var14;
                     this.field_4226_h[var2][var16 * 4 + 2] = (byte)var6;
@@ -64,7 +76,7 @@ public class TexturePortalFX extends TextureFX {
         ++this.field_4227_g;
         byte[] var1 = this.field_4226_h[this.field_4227_g & 31];
 
-        for(int var2 = 0; var2 < 256; ++var2) {
+        for(int var2 = 0; var2 < this.textureRes*this.textureRes; ++var2) {
             int var3 = var1[var2 * 4 + 0] & 255;
             int var4 = var1[var2 * 4 + 1] & 255;
             int var5 = var1[var2 * 4 + 2] & 255;

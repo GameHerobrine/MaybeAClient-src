@@ -65,7 +65,7 @@ public final class SpawnerAnimals {
                                         }
 
                                         var10 = (ChunkCoordIntPair)var39.next();
-                                        MobSpawnerBase var11 = var0.getWorldChunkManager().func_4074_a(var10);
+                                        BiomeGenBase var11 = var0.getWorldChunkManager().func_4074_a(var10);
                                         var12 = var11.getSpawnableList(var38);
                                     } while(var12 == null);
                                 } while(var12.isEmpty());
@@ -150,7 +150,7 @@ public final class SpawnerAnimals {
         }
     }
 
-    private static boolean canCreatureTypeSpawnAtLocation(EnumCreatureType var0, World var1, int var2, int var3, int var4) {
+    public static boolean canCreatureTypeSpawnAtLocation(EnumCreatureType var0, World var1, int var2, int var3, int var4) {
         if (var0.getCreatureMaterial() == Material.water) {
             return var1.getBlockMaterial(var2, var3, var4).getIsLiquid() && !var1.isBlockOpaqueCube(var2, var3 + 1, var4);
         } else {
@@ -167,7 +167,6 @@ public final class SpawnerAnimals {
         } else if (var0 instanceof EntitySheep) {
             ((EntitySheep)var0).setFleeceColor(EntitySheep.getRandomFleeceColor(var1.rand));
         }
-
     }
 
     public static boolean performSleepSpawning(World var0, List var1) {

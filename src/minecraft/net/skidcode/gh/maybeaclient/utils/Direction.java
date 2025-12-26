@@ -28,4 +28,12 @@ public enum Direction {
 			default: return "NULL";
 		}
 	}
+
+	public boolean x() {
+		return this == XNEG || this == XPOS;
+	}
+	
+	public boolean z() {
+		return this == ZNEG || this == ZPOS;
+	}
 }

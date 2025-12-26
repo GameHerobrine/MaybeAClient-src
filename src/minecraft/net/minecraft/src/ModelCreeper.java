@@ -10,7 +10,10 @@ public class ModelCreeper extends ModelBase {
     public ModelRenderer leg4;
 
     public ModelCreeper() {
-        float var1 = 0.0F;
+        this(0.0F);
+    }
+
+    public ModelCreeper(float var1) {
         byte var2 = 4;
         this.head = new ModelRenderer(0, 0);
         this.head.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1);

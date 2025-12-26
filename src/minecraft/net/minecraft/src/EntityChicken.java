@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntityChicken extends EntityAnimals {
+public class EntityChicken extends EntityAnimal {
     public boolean field_753_a = false;
     public float field_752_b = 0.0F;
     public float field_758_c = 0.0F;

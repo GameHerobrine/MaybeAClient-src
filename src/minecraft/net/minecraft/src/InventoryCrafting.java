@@ -3,9 +3,9 @@ package net.minecraft.src;
 public class InventoryCrafting implements IInventory {
     private ItemStack[] stackList;
     private int field_21104_b;
-    private CraftingInventoryCB eventHandler;
+    private Container eventHandler;
 
-    public InventoryCrafting(CraftingInventoryCB var1, int var2, int var3) {
+    public InventoryCrafting(Container var1, int var2, int var3) {
         int var4 = var2 * var3;
         this.stackList = new ItemStack[var4];
         this.eventHandler = var1;

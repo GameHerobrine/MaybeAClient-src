@@ -9,12 +9,12 @@ public class EntityCreature extends EntityLiving {
         super(var1);
     }
 
-    protected boolean func_25028_d_() {
+    protected boolean setCanWalk() {
         return false;
     }
 
     protected void updatePlayerActionState() {
-        this.hasAttacked = this.func_25028_d_();
+        this.hasAttacked = this.setCanWalk();
         float var1 = 16.0F;
         if (this.playerToAttack == null) {
             this.playerToAttack = this.findPlayerToAttack();
@@ -30,36 +30,38 @@ public class EntityCreature extends EntityLiving {
             }
         }
 
-        if (!this.hasAttacked && this.playerToAttack != null && (this.pathToEntity == null || this.rand.nextInt(20) == 0)) {
-            this.pathToEntity = this.worldObj.getPathToEntity(this, this.playerToAttack, var1);
-        } else if (!this.hasAttacked && (this.pathToEntity == null && this.rand.nextInt(80) == 0 || this.rand.nextInt(80) == 0)) {
-            boolean var21 = false;
-            int var3 = -1;
-            int var4 = -1;
-            int var5 = -1;
-            float var6 = -99999.0F;
+        if (this.hasAttacked || this.playerToAttack == null || this.pathToEntity != null && this.rand.nextInt(20) != 0) {
+            if (!this.hasAttacked && (this.pathToEntity == null && this.rand.nextInt(80) == 0 || this.rand.nextInt(80) == 0)) {
+                boolean var21 = false;
+                int var3 = -1;
+                int var4 = -1;
+                int var5 = -1;
+                float var6 = -99999.0F;
 
-            for(int var7 = 0; var7 < 10; ++var7) {
-                int var8 = MathHelper.floor_double(this.posX + (double)this.rand.nextInt(13) - 6.0D);
-                int var9 = MathHelper.floor_double(this.posY + (double)this.rand.nextInt(7) - 3.0D);
-                int var10 = MathHelper.floor_double(this.posZ + (double)this.rand.nextInt(13) - 6.0D);
-                float var11 = this.getBlockPathWeight(var8, var9, var10);
-                if (var11 > var6) {
-                    var6 = var11;
-                    var3 = var8;
-                    var4 = var9;
-                    var5 = var10;
-                    var21 = true;
+                for(int var7 = 0; var7 < 10; ++var7) {
+                    int var8 = MathHelper.floor_double(this.posX + (double)this.rand.nextInt(13) - 6.0D);
+                    int var9 = MathHelper.floor_double(this.posY + (double)this.rand.nextInt(7) - 3.0D);
+                    int var10 = MathHelper.floor_double(this.posZ + (double)this.rand.nextInt(13) - 6.0D);
+                    float var11 = this.getBlockPathWeight(var8, var9, var10);
+                    if (var11 > var6) {
+                        var6 = var11;
+                        var3 = var8;
+                        var4 = var9;
+                        var5 = var10;
+                        var21 = true;
+                    }
+                }
+
+                if (var21) {
+                    this.pathToEntity = this.worldObj.getEntityPathToXYZ(this, var3, var4, var5, 10.0F);
                 }
             }
-
-            if (var21) {
-                this.pathToEntity = this.worldObj.getEntityPathToXYZ(this, var3, var4, var5, 10.0F);
-            }
+        } else {
+            this.pathToEntity = this.worldObj.getPathToEntity(this, this.playerToAttack, var1);
         }
 
-        int var22 = MathHelper.floor_double(this.boundingBox.minY);
-        boolean var23 = this.handleWaterMovement();
+        int var22 = MathHelper.floor_double(this.boundingBox.minY + 0.5D);
+        boolean var23 = this.func_27013_ag();
         boolean var24 = this.handleLavaMovement();
         this.rotationPitch = 0.0F;
         if (this.pathToEntity != null && this.rand.nextInt(100) != 0) {
@@ -119,7 +121,7 @@ public class EntityCreature extends EntityLiving {
                 this.faceEntity(this.playerToAttack, 30.0F, 30.0F);
             }
 
-            if (this.isCollidedHorizontally) {
+            if (this.isCollidedHorizontally && !this.hasPath()) {
                 this.isJumping = true;
             }
 

@@ -4,6 +4,7 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
@@ -18,6 +19,15 @@ public class GuiBindModule extends GuiScreen{
 	public GuiBindModule(GuiScreen parent, Hack hack) {
 		this.parent = parent;
 		this.hack = hack;
+	}
+	
+	@Override
+	public void mouseClicked(int var1, int var2, int var3) {
+		super.mouseClicked(var1, var2, var3);
+		if(this.selectedButton == null) {
+			currentKey = Client.getKeycodeForMouseButton(var3);
+			this.pressed = true;
+		}
 	}
 	
 	@Override
@@ -54,7 +64,7 @@ public class GuiBindModule extends GuiScreen{
 		this.fontRenderer.drawString(s, midX - this.fontRenderer.getStringWidth(s) / 2, midY - 24, 0xdeadbeef);
 		s = ChatColor.LIGHTCYAN+"Current bind: "+ChatColor.GOLD+hack.keybinding.valueToString();
 		this.fontRenderer.drawString(s, midX - this.fontRenderer.getStringWidth(s) / 2, midY - 12, 0xdeadbeef);
-		s = ChatColor.LIGHTCYAN+"New bind: "+ChatColor.GOLD+(this.pressed ? Keyboard.getKeyName(this.currentKey) : "Press Any Key(ESC = None)");
+		s = ChatColor.LIGHTCYAN+"New bind: "+ChatColor.GOLD+(this.pressed ? Client.getKeyName(this.currentKey) : "Press Any Key(ESC = None)");
 		this.fontRenderer.drawString(s, midX - this.fontRenderer.getStringWidth(s) / 2, midY - 0, 0xdeadbeef);
 		
 		super.drawScreen(var1, var2, var3);

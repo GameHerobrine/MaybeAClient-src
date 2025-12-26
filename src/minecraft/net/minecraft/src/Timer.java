@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import net.skidcode.gh.maybeaclient.hacks.ClockspeedHack;
+import net.skidcode.gh.maybeaclient.hacks.LowHopSpeedHack;
 
 public class Timer {
     public float ticksPerSecond;
@@ -25,6 +26,10 @@ public class Timer {
     		this.timerSpeed = ClockspeedHack.instance.speed.value;
     	}else {
     		this.timerSpeed = 1;
+    	}
+    	
+    	if(LowHopSpeedHack.instance.status) {
+    		this.timerSpeed = 1.0888f;
     	}
     	
         long var1 = System.currentTimeMillis();
@@ -58,6 +63,7 @@ public class Timer {
         this.elapsedPartialTicks = (float)((double)this.elapsedPartialTicks + var9 * (double)this.timerSpeed * (double)this.ticksPerSecond);
         this.elapsedTicks = (int)this.elapsedPartialTicks;
         this.elapsedPartialTicks -= (float)this.elapsedTicks;
+        
         if (this.elapsedTicks > 10) {
             this.elapsedTicks = 10;
         }

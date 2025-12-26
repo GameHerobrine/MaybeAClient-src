@@ -1,18 +1,18 @@
 package net.minecraft.src;
 
 public class TexturedQuad {
-    public PositionTexureVertex[] vertexPositions;
+    public PositionTextureVertex[] vertexPositions;
     public int nVertices;
     private boolean invertNormal;
 
-    public TexturedQuad(PositionTexureVertex[] var1) {
+    public TexturedQuad(PositionTextureVertex[] var1) {
         this.nVertices = 0;
         this.invertNormal = false;
         this.vertexPositions = var1;
         this.nVertices = var1.length;
     }
 
-    public TexturedQuad(PositionTexureVertex[] var1, int var2, int var3, int var4, int var5) {
+    public TexturedQuad(PositionTextureVertex[] var1, int var2, int var3, int var4, int var5) {
         this(var1);
         float var6 = 0.0015625F;
         float var7 = 0.003125F;
@@ -23,7 +23,7 @@ public class TexturedQuad {
     }
 
     public void flipFace() {
-        PositionTexureVertex[] var1 = new PositionTexureVertex[this.vertexPositions.length];
+        PositionTextureVertex[] var1 = new PositionTextureVertex[this.vertexPositions.length];
 
         for(int var2 = 0; var2 < this.vertexPositions.length; ++var2) {
             var1[var2] = this.vertexPositions[this.vertexPositions.length - var2 - 1];
@@ -44,10 +44,11 @@ public class TexturedQuad {
         }
 
         for(int var6 = 0; var6 < 4; ++var6) {
-            PositionTexureVertex var7 = this.vertexPositions[var6];
+            PositionTextureVertex var7 = this.vertexPositions[var6];
             var1.addVertexWithUV((double)((float)var7.vector3D.xCoord * var2), (double)((float)var7.vector3D.yCoord * var2), (double)((float)var7.vector3D.zCoord * var2), (double)var7.texturePositionX, (double)var7.texturePositionY);
         }
-
+        
+        
         var1.draw();
     }
 }

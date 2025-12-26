@@ -5,9 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Packet14BlockDig extends Packet {
-	
-	public boolean altered = false;
-	
     public int xPosition;
     public int yPosition;
     public int zPosition;

@@ -44,10 +44,23 @@ public class SaveFormatOld implements ISaveFormat {
             return null;
         } else {
             File var3 = new File(var2, "level.dat");
+            NBTTagCompound var4;
+            NBTTagCompound var5;
             if (var3.exists()) {
                 try {
-                    NBTTagCompound var4 = CompressedStreamTools.func_1138_a(new FileInputStream(var3));
-                    NBTTagCompound var5 = var4.getCompoundTag("Data");
+                    var4 = CompressedStreamTools.func_1138_a(new FileInputStream(var3));
+                    var5 = var4.getCompoundTag("Data");
+                    return new WorldInfo(var5);
+                } catch (Exception var7) {
+                    var7.printStackTrace();
+                }
+            }
+
+            var3 = new File(var2, "level.dat_old");
+            if (var3.exists()) {
+                try {
+                    var4 = CompressedStreamTools.func_1138_a(new FileInputStream(var3));
+                    var5 = var4.getCompoundTag("Data");
                     return new WorldInfo(var5);
                 } catch (Exception var6) {
                     var6.printStackTrace();

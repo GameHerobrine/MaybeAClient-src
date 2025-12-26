@@ -21,8 +21,10 @@ public class SchematicWorld extends World {
 	//public final static WorldSettings worldSettings = new WorldSettings(0, EnumGameType.CREATIVE, false, false, WorldType.FLAT);
 
 	public final Settings settings = Settings.instance();
-	public int[][][] blocks;
-	public int[][][] metadata;
+	public short[] blocks;
+	public byte[] metadata;
+	//public int[][][] blocks;
+	//public int[][][] metadata;
 	public List<TileEntity> tileEntities;
 	public short width;
 	public short length;
@@ -40,12 +42,24 @@ public class SchematicWorld extends World {
 
 	public SchematicWorld(int[][][] blocks, int[][][] metadata, List<TileEntity> tileEntities, short width, short height, short length) {
 		this();
-		this.blocks = blocks;
-		this.metadata = metadata;
 		this.tileEntities = tileEntities;
 		this.width = width;
 		this.length = length;
 		this.height = height;
+		this.setBlocksAndMeta(blocks, metadata);
+	}
+
+	public void setBlocksAndMeta(int[][][] blocks, int[][][] meta) {
+		 for (int x = 0; x < this.width; x++) {
+				for (int y = 0; y < this.height; y++) {
+					for (int z = 0; z < this.length; z++) {
+						int index = x + (y * this.length + z) * this.width;
+						
+						this.blocks[index] = (short) blocks[x][y][z];
+						this.metadata[index] = (byte) meta[x][y][z];
+					}
+				}
+		 }
 	}
 
 	@SuppressWarnings("null")
@@ -63,17 +77,21 @@ public class SchematicWorld extends World {
 		this.length = tagCompound.getShort("Length");
 		this.height = tagCompound.getShort("Height");
 
-		this.blocks = new int[this.width][this.height][this.length];
-		this.metadata = new int[this.width][this.height][this.length];
-
+		//this.blocks = new int[this.width][this.height][this.length];
+		//this.metadata = new int[this.width][this.height][this.length];
+		this.blocks = new short[this.width*this.height*this.length];
+		this.metadata = new byte[this.width*this.height*this.length];
+		
 		for (int x = 0; x < this.width; x++) {
 			for (int y = 0; y < this.height; y++) {
 				for (int z = 0; z < this.length; z++) {
-					this.blocks[x][y][z] = (localBlocks[x + (y * this.length + z) * this.width]) & 0xFF;
-					this.metadata[x][y][z] = (localMetadata[x + (y * this.length + z) * this.width]) & 0xFF;
+					int index = x + (y * this.length + z) * this.width;
+					
+					this.blocks[index] = (short) ((localBlocks[index]) & 0xFF);
+					this.metadata[index] = (byte) ((localMetadata[index]) & 0xFF);
 					
 					if (extra) {
-						this.blocks[x][y][z] |= ((extraBlocks[x + (y * this.length + z) * this.width]) & 0xFF) << 8;
+						this.blocks[index] |= ((extraBlocks[index]) & 0xFF) << 8;
 					}
 				}
 			}
@@ -107,9 +125,11 @@ public class SchematicWorld extends World {
 		for (int x = 0; x < this.width; x++) {
 			for (int y = 0; y < this.height; y++) {
 				for (int z = 0; z < this.length; z++) {
-					localBlocks[x + (y * this.length + z) * this.width] = (byte) this.blocks[x][y][z];
-					localMetadata[x + (y * this.length + z) * this.width] = (byte) this.metadata[x][y][z];
-					if ((extraBlocks[x + (y * this.length + z) * this.width] = (byte) (this.blocks[x][y][z] >> 8)) > 0) {
+					int index = x + (y * this.length + z) * this.width;
+					
+					localBlocks[x + (y * this.length + z) * this.width] = (byte) this.blocks[index];
+					localMetadata[x + (y * this.length + z) * this.width] = (byte) this.metadata[index];
+					if ((extraBlocks[x + (y * this.length + z) * this.width] = (byte) (this.blocks[index] >> 8)) > 0) {
 						extra = true;
 					}
 				}
@@ -139,7 +159,8 @@ public class SchematicWorld extends World {
 		if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.height || z >= this.length) {
 			return 0;
 		}
-		return (this.blocks[x][y][z]) & 0xFFF;
+		int index = x + (y * this.length + z) * this.width;
+		return (this.blocks[index]) & 0xFFF;
 	}
 
 	@Override
@@ -172,7 +193,8 @@ public class SchematicWorld extends World {
 		if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.height || z >= this.length) {
 			return 0;
 		}
-		return this.metadata[x][y][z];
+		int index = x + (y * this.length + z) * this.width;
+		return this.metadata[index] & 0xff;
 	}
 
 	@Override
@@ -198,7 +220,8 @@ public class SchematicWorld extends World {
 		if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.height || z >= this.length) {
 			return true;
 		}
-		return this.blocks[x][y][z] == 0;
+		int index = x + (y * this.length + z) * this.width;
+		return this.blocks[index] == 0;
 	}
 
 	/*@Override
@@ -222,7 +245,8 @@ public class SchematicWorld extends World {
 	}*/
 
 	public void setBlockMetadata(int x, int y, int z, byte metadata) {
-		this.metadata[x][y][z] = metadata;
+		int index = x + (y * this.length + z) * this.width;
+		this.metadata[index] = metadata;
 	}
 
 	public Block getBlock(int x, int y, int z) {
@@ -251,16 +275,19 @@ public class SchematicWorld extends World {
 		for (int x = 0; x < this.width; x++) {
 			for (int y = 0; y < this.height; y++) {
 				for (int z = 0; z < (this.length + 1) / 2; z++) {
-					tmp = this.blocks[x][y][z];
-					this.blocks[x][y][z] = this.blocks[x][y][this.length - 1 - z];
-					this.blocks[x][y][this.length - 1 - z] = tmp;
+					int index = x + (y * this.length + z) * this.width;
+					int index2 = x + (y * this.length + (this.length - 1 - z)) * this.width;
+					
+					short tmpid = this.blocks[index];
+					this.blocks[index] = this.blocks[index2];
+					this.blocks[index2] = tmpid;
 
 					if (z == this.length - 1 - z) {
-						this.metadata[x][y][z] = flipMetadataZ(this.metadata[x][y][z], this.blocks[x][y][z]);
+						this.metadata[index] = (byte) flipMetadataZ(this.metadata[index] & 0xff, this.blocks[index] & 0xfff);
 					} else {
-						tmp = this.metadata[x][y][z];
-						this.metadata[x][y][z] = flipMetadataZ(this.metadata[x][y][this.length - 1 - z], this.blocks[x][y][z]);
-						this.metadata[x][y][this.length - 1 - z] = flipMetadataZ(tmp, this.blocks[x][y][this.length - 1 - z]);
+						tmp = this.metadata[index];
+						this.metadata[index] = (byte) flipMetadataZ(this.metadata[index2] & 0xff, this.blocks[index] & 0xfff);
+						this.metadata[index2] = (byte) flipMetadataZ(tmp, this.blocks[index2] & 0xfff);
 					}
 				}
 			}
@@ -407,18 +434,26 @@ public class SchematicWorld extends World {
 	}
 
 	public void rotate() {
-		int[][][] localBlocks = new int[this.length][this.height][this.width];
-		int[][][] localMetadata = new int[this.length][this.height][this.width];
-
+		//int[][][] localBlocks = new int[this.length][this.height][this.width];
+		//int[][][] localMetadata = new int[this.length][this.height][this.width];
+		short[] localBlocks = new short[this.length*this.height*this.width];
+		byte[] localMetadata = new byte[this.length*this.height*this.width];
+		
+		//M this.blocks = new int[this.width][this.height][this.length];
+		//M this.metadata = new int[this.width][this.height][this.length];
+		//M int index = x + (y * this.length + z) * this.width;
+		
 		for (int x = 0; x < this.width; x++) {
 			for (int y = 0; y < this.height; y++) {
 				for (int z = 0; z < this.length; z++) {
-					localBlocks[z][y][x] = this.blocks[this.width - 1 - x][y][z];
-					localMetadata[z][y][x] = rotateMetadata(this.metadata[this.width - 1 - x][y][z], this.blocks[this.width - 1 - x][y][z]);
+					int oldindex = (this.width - 1 - x) + (y * this.length + z) * this.width;
+					int newindex = (z) + (y * this.width + x) * this.length;
+					localBlocks[newindex] = this.blocks[oldindex];
+					localMetadata[newindex] = (byte) rotateMetadata(this.metadata[oldindex] & 0xff, this.blocks[oldindex] & 0xfff);
 				}
 			}
 		}
-
+		System.out.println("rot suc");
 		this.blocks = localBlocks;
 		this.metadata = localMetadata;
 
@@ -431,6 +466,15 @@ public class SchematicWorld extends World {
 		this.length = tmp;
 	}
 
+	@Override
+	public boolean chunkExists(int cx, int cz) {
+		int x = cx*16;
+		int z = cz*16;
+		int xx = x - Settings.instance().offset.x;
+		int zz = z - Settings.instance().offset.z;
+		return xx >= 0 && xx <= this.width && zz >= 0 && zz <= this.length;
+	}
+	
 	public int rotateMetadata(int blockMetadata, int blockId) {
 		if (blockId == Block.torchWood.blockID || blockId == Block.torchRedstoneActive.blockID || blockId == Block.torchRedstoneIdle.blockID) {
 			switch (blockMetadata) {

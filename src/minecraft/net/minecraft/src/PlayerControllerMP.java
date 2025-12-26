@@ -4,20 +4,22 @@ import lunatrius.schematica.Settings;
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.AutoToolHack;
 import net.skidcode.gh.maybeaclient.hacks.InstantHack;
+import net.skidcode.gh.maybeaclient.hacks.PacketMineHack;
 import net.skidcode.gh.maybeaclient.hacks.ReachHack;
 import net.skidcode.gh.maybeaclient.hacks.SpeedMineHack;
+import net.skidcode.gh.maybeaclient.hacks.TunnelESPHack;
 
 public class PlayerControllerMP extends PlayerController {
-	public int currentBlockX = -1;
-	public int currentBlockY = -1;
-    public int currentBlocKZ = -1;
-    public float field_9442_f = 0.0F;
-    public float field_1080_g = 0.0F;
-    public float field_9441_h = 0.0F;
-    public int field_9440_i = 0;
-    public boolean isUsing = false;
-    public NetClientHandler netClientHandler;
-    public int field_1075_l = 0;
+    private int field_9445_c = -1;
+    private int field_9444_d = -1;
+    private int field_9443_e = -1;
+    private float field_9442_f = 0.0F;
+    private float field_1080_g = 0.0F;
+    private float field_9441_h = 0.0F;
+    private int field_9440_i = 0;
+    private boolean field_9439_j = false;
+    private NetClientHandler netClientHandler;
+    private int field_1075_l = 0;
 
     public PlayerControllerMP(Minecraft var1, NetClientHandler var2) {
         super(var1);
@@ -28,25 +30,34 @@ public class PlayerControllerMP extends PlayerController {
         var1.rotationYaw = -180.0F;
     }
 
-    public boolean sendBlockRemoved(int var1, int var2, int var3, int var4) {
-        int var5 = this.mc.theWorld.getBlockId(var1, var2, var3);
-        boolean var6 = super.sendBlockRemoved(var1, var2, var3, var4);
+    public boolean sendBlockRemoved(int x, int y, int z, int var4) {
+        int id = this.mc.theWorld.getBlockId(x, y, z);
+        boolean var6 = super.sendBlockRemoved(x, y, z, var4);
         ItemStack var7 = this.mc.thePlayer.getCurrentEquippedItem();
         if (var7 != null) {
-            var7.func_25191_a(var5, var1, var2, var3, this.mc.thePlayer);
+            var7.func_25191_a(id, x, y, z, this.mc.thePlayer);
             if (var7.stackSize == 0) {
                 var7.func_1097_a(this.mc.thePlayer);
                 this.mc.thePlayer.destroyCurrentEquippedItem();
             }
         }
 
+        if(TunnelESPHack.instance.status) TunnelESPHack.instance.forceCheckBlock(id, x, y, z);
+        //XXX schematica
+        Settings.instance().tryUpdating(x, y, z);
         return var6;
     }
 
     public void clickBlock(int var1, int var2, int var3, int var4) {
-        if (!this.isUsing || var1 != this.currentBlockX || var2 != this.currentBlockY || var3 != this.currentBlocKZ) {
+        if (!this.field_9439_j || var1 != this.field_9445_c || var2 != this.field_9444_d || var3 != this.field_9443_e) {
             this.netClientHandler.addToSendQueue(new Packet14BlockDig(0, var1, var2, var3, var4));
             int var5 = this.mc.theWorld.getBlockId(var1, var2, var3);
+            
+            
+            if(var5 > 0 && PacketMineHack.instance.status) {
+            	PacketMineHack.instance.packetMine(var1, var2, var3, var5);
+            }
+            
             if (var5 > 0 && this.field_9442_f == 0.0F) {
                 Block.blocksList[var5].onBlockClicked(this.mc.theWorld, var1, var2, var3, this.mc.thePlayer);
             }
@@ -54,10 +65,10 @@ public class PlayerControllerMP extends PlayerController {
             if (var5 > 0 && Block.blocksList[var5].blockStrength(this.mc.thePlayer) >= progress) {
                 this.sendBlockRemoved(var1, var2, var3, var4);
             } else {
-                this.isUsing = true;
-                this.currentBlockX = var1;
-                this.currentBlockY = var2;
-                this.currentBlocKZ = var3;
+                this.field_9439_j = true;
+                this.field_9445_c = var1;
+                this.field_9444_d = var2;
+                this.field_9443_e = var3;
                 this.field_9442_f = 0.0F;
                 this.field_1080_g = 0.0F;
                 this.field_9441_h = 0.0F;
@@ -65,42 +76,37 @@ public class PlayerControllerMP extends PlayerController {
         }
 
     }
-    
-    public boolean isBeingUsed() {
-    	return this.isUsing;
-    }
-    
+
     public void func_6468_a() {
         this.field_9442_f = 0.0F;
-        this.isUsing = false;
+        this.field_9439_j = false;
     }
 
     public void sendBlockRemoving(int var1, int var2, int var3, int var4) {
-        if (this.isUsing) {
+        if (this.field_9439_j) {
+        	
         	if(InstantHack.instance.status) {
 	            this.netClientHandler.addToSendQueue(new Packet14BlockDig(0, var1, var2, var3, var4)); //new Packet16BlockItemSwitch(this.field_1075_l));
 	            this.netClientHandler.addToSendQueue(new Packet14BlockDig(2, var1, var2, var3, var4));
 	            this.sendBlockRemoved(var1, var2, var3, var4);
             }
+        	
             this.func_730_e();
             if (this.field_9440_i > 0) {
                 --this.field_9440_i;
             } else {
-                if (var1 == this.currentBlockX && var2 == this.currentBlockY && var3 == this.currentBlocKZ) {
+                if (var1 == this.field_9445_c && var2 == this.field_9444_d && var3 == this.field_9443_e) {
                     int var5 = this.mc.theWorld.getBlockId(var1, var2, var3);
                     if (var5 == 0) {
-                        this.isUsing = false;
+                        this.field_9439_j = false;
                         return;
                     }
 
                     Block block = Block.blocksList[var5];
                     
-                    
                     if(AutoToolHack.instance.status) {
                     	mc.thePlayer.inventory.currentItem = AutoToolHack.getBestSlot(block);
                     }
-                    
-                    this.func_730_e();
                     
                     this.field_9442_f += block.blockStrength(this.mc.thePlayer);
                     if (this.field_9441_h % 4.0F == 0.0F && block != null) {
@@ -108,16 +114,15 @@ public class PlayerControllerMP extends PlayerController {
                     }
 
                     ++this.field_9441_h;
-                    
                     float progress = SpeedMineHack.instance.status ? SpeedMineHack.instance.sendDestroyAfter.value : 1.0f;
-                    if (this.field_9442_f >= progress) {
-                        this.isUsing = false;
+                    if (this.field_9442_f >= progress) { //1.0F) {
+                        this.field_9439_j = false;
                         this.netClientHandler.addToSendQueue(new Packet14BlockDig(2, var1, var2, var3, var4));
                         this.sendBlockRemoved(var1, var2, var3, var4);
                         this.field_9442_f = 0.0F;
                         this.field_1080_g = 0.0F;
                         this.field_9441_h = 0.0F;
-                        this.field_9440_i = 0; //CLIENT: click mining fix, original: 5
+                        this.field_9440_i = 5;
                     }
                 } else {
                     this.clickBlock(var1, var2, var3, var4);
@@ -140,7 +145,9 @@ public class PlayerControllerMP extends PlayerController {
         }
 
     }
-
+    public boolean isBeingUsed() {
+    	return this.field_9439_j; //no need to check others
+    }
     public float getBlockReachDistance() {
     	if(ReachHack.instance.status) return ReachHack.instance.radius.getValue();
         return 4.0F;
@@ -169,7 +176,9 @@ public class PlayerControllerMP extends PlayerController {
         this.func_730_e();
         this.netClientHandler.addToSendQueue(new Packet15Place(var4, var5, var6, var7, var1.inventory.getCurrentItem()));
         boolean var8 = super.sendPlaceBlock(var1, var2, var3, var4, var5, var6, var7);
-        Settings.instance().needsUpdate = true;
+        if(TunnelESPHack.instance.status) TunnelESPHack.instance.forceCheckBlock(0, var4, var5, var6);
+        //XXX schematica
+        Settings.instance().tryUpdating(var4, var5, var6);
         return var8;
     }
 
@@ -186,21 +195,21 @@ public class PlayerControllerMP extends PlayerController {
 
     public void func_6472_b(EntityPlayer var1, Entity var2) {
         this.func_730_e();
-        this.netClientHandler.addToSendQueue(new Packet7(var1.entityId, var2.entityId, 1));
+        this.netClientHandler.addToSendQueue(new Packet7UseEntity(var1.entityId, var2.entityId, 1));
         var1.attackTargetEntityWithCurrentItem(var2);
     }
 
     public void func_6475_a(EntityPlayer var1, Entity var2) {
         this.func_730_e();
-        this.netClientHandler.addToSendQueue(new Packet7(var1.entityId, var2.entityId, 0));
+        this.netClientHandler.addToSendQueue(new Packet7UseEntity(var1.entityId, var2.entityId, 0));
         var1.useCurrentItemOnEntity(var2);
     }
 
-    public ItemStack func_20085_a(int var1, int var2, int var3, EntityPlayer var4) {
-        short var5 = var4.craftingInventory.func_20111_a(var4.inventory);
-        ItemStack var6 = super.func_20085_a(var1, var2, var3, var4);
-        this.netClientHandler.addToSendQueue(new Packet102(var1, var2, var3, var6, var5));
-        return var6;
+    public ItemStack func_27174_a(int var1, int var2, int var3, boolean var4, EntityPlayer var5) {
+        short var6 = var5.craftingInventory.func_20111_a(var5.inventory);
+        ItemStack var7 = super.func_27174_a(var1, var2, var3, var4, var5);
+        this.netClientHandler.addToSendQueue(new Packet102WindowClick(var1, var2, var3, var4, var7, var6));
+        return var7;
     }
 
     public void func_20086_a(int var1, EntityPlayer var2) {

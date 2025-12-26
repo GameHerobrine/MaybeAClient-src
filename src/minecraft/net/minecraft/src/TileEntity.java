@@ -66,7 +66,7 @@ public class TileEntity {
         return this.worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
     }
 
-    public void x_() {
+    public void y_() {
         if (this.worldObj != null) {
             this.worldObj.func_698_b(this.xCoord, this.yCoord, this.zCoord, this);
         }

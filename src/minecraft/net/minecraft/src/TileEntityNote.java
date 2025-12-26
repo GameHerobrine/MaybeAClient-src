@@ -24,7 +24,7 @@ public class TileEntityNote extends TileEntity {
 
     public void changePitch() {
         this.note = (byte)((this.note + 1) % 25);
-        this.x_();
+        this.y_();
     }
 
     public void triggerNote(World var1, int var2, int var3, int var4) {

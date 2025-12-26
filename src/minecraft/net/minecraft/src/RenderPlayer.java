@@ -3,6 +3,7 @@ package net.minecraft.src;
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.EntityESPHack;
 import net.skidcode.gh.maybeaclient.hacks.NameTagsHack;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingColor;
 import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 import org.lwjgl.opengl.GL11;
@@ -58,7 +59,7 @@ public class RenderPlayer extends RenderLiving {
     }
 
     protected void renderName(EntityPlayer var1, double var2, double var4, double var6) {
-        if (Minecraft.isGuiEnabled() && var1 != this.renderManager.livingPlayer && this.renderManager.livingPlayer != null) {
+        if (Minecraft.isGuiEnabled() && var1 != this.renderManager.livingPlayer) {
             float var8 = 1.6F;
             float var9 = 0.016666668F * var8;
             float var10 = var1.getDistanceToEntity(this.renderManager.livingPlayer);
@@ -248,20 +249,20 @@ public class RenderPlayer extends RenderLiving {
     // $FF: synthetic method
     // $FF: bridge method
     protected void passSpecialRender(EntityLiving entity, double var2, double var4, double var6) {
-        
     	if (EntityESPHack.instance.status && EntityESPHack.instance.getRenderingMode(entity).equalsIgnoreCase("Box") && EntityESPHack.instance.shouldRender(entity)) {
 			
-			int r, g, b;
-        	if(entity instanceof EntityPlayer) {
-        		r = EntityESPHack.instance.playerColor.red;
-        		g = EntityESPHack.instance.playerColor.green;
-        		b = EntityESPHack.instance.playerColor.blue;
-        	}else {
-        		System.out.println("Tried rendering esp for "+entity+" that has no color (in renderplayer)!");
-        		r = 0;
-        		g = 0;
-        		b = 0;
-        	}
+    		float r, g, b;
+			SettingColor color = EntityESPHack.instance.getRenderColor(entity);
+			if(color == null) {
+				System.out.println("Tried rendering esp for "+entity+" that has no color!");
+				r = 0;
+				g = 0;
+				b = 0;
+			}else {
+				r = color.red;
+				g = color.green;
+				b = color.blue;
+			}
 			
 			GL11.glEnable(3042 /* GL_BLEND */);
 			GL11.glBlendFunc(770, 771);
@@ -285,7 +286,6 @@ public class RenderPlayer extends RenderLiving {
 			GL11.glEnable(3553 /* GL_TEXTURE_2D */);
 			GL11.glEnable(2929 /* GL_DEPTH_TEST */);
 		}
-    	
     	this.renderName((EntityPlayer)entity, var2, var4, var6);
     }
 

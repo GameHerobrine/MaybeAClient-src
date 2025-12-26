@@ -8,6 +8,7 @@ public enum EnumOptions {
     RENDER_DISTANCE("options.renderDistance", false, false),
     VIEW_BOBBING("options.viewBobbing", false, true),
     ANAGLYPH("options.anaglyph", false, true),
+    ADVANCED_OPENGL("options.advancedOpengl", false, true),
     LIMIT_FRAMERATE("options.limitFramerate", false, true),
     DIFFICULTY("options.difficulty", false, false),
     GRAPHICS("options.graphics", false, false),

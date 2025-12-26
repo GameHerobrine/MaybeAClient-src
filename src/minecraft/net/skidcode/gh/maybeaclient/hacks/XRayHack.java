@@ -13,6 +13,8 @@ import net.skidcode.gh.maybeaclient.utils.ChatColor;
 public class XRayHack extends Hack{
 	
 	public static XRayHack INSTANCE;
+
+	public static boolean applyOpacity = true;
 	
 	public SettingFloat opacity;
 	public SettingMode mode;
@@ -59,16 +61,9 @@ public class XRayHack extends Hack{
 	}
 	
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.mode.currentMode;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return this.mode.currentMode;
 	}
-	
 	@Override
 	public void toggle() {
 		super.toggle();
@@ -89,6 +84,7 @@ public class XRayHack extends Hack{
 			Block.blockGold.blockID,
 			Block.blockLapis.blockID
 	) {
+		@Override
 		public void blockChanged(int id) {
 			mc.entityRenderer.updateRenderer();
 	        mc.theWorld.markBlocksDirty((int)mc.thePlayer.posX - 256, 0, (int)mc.thePlayer.posZ - 256, (int)mc.thePlayer.posX + 256, 127, (int)mc.thePlayer.posZ + 256);

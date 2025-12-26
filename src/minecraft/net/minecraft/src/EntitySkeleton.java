@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class EntitySkeleton extends EntityMobs {
+public class EntitySkeleton extends EntityMob {
     private static final ItemStack defaultHeldItem;
 
     public EntitySkeleton(World var1) {
@@ -31,22 +31,22 @@ public class EntitySkeleton extends EntityMobs {
         super.onLivingUpdate();
     }
 
-    protected void attackEntity(Entity var1, float var2) {
+    protected void attackEntity(Entity at, float var2) {
         if (var2 < 10.0F) {
-            double var3 = var1.posX - this.posX;
-            double var5 = var1.posZ - this.posZ;
+            double xDiff = at.posX - this.posX;
+            double zDiff = at.posZ - this.posZ;
             if (this.attackTime == 0) {
-                EntityArrow var7 = new EntityArrow(this.worldObj, this);
-                ++var7.posY;
-                double var8 = var1.posY - 0.20000000298023224D - var7.posY;
-                float var10 = MathHelper.sqrt_double(var3 * var3 + var5 * var5) * 0.2F;
+                EntityArrow arrow = new EntityArrow(this.worldObj, this);
+                ++arrow.posY;
+                double yArrowDiff = at.posY - 0.20000000298023224D - arrow.posY;
+                float dist = MathHelper.sqrt_double(xDiff * xDiff + zDiff * zDiff) * 0.2F;
                 this.worldObj.playSoundAtEntity(this, "random.bow", 1.0F, 1.0F / (this.rand.nextFloat() * 0.4F + 0.8F));
-                this.worldObj.entityJoinedWorld(var7);
-                var7.setArrowHeading(var3, var8 + (double)var10, var5, 0.6F, 12.0F);
+                this.worldObj.entityJoinedWorld(arrow);
+                arrow.setArrowHeading(xDiff, yArrowDiff + (double)dist, zDiff, 0.6F, 12.0F);
                 this.attackTime = 30;
             }
 
-            this.rotationYaw = (float)(Math.atan2(var5, var3) * 180.0D / 3.1415927410125732D) - 90.0F;
+            this.rotationYaw = (float)(Math.atan2(zDiff, xDiff) * 180.0D / 3.1415927410125732D) - 90.0F;
             this.hasAttacked = true;
         }
 

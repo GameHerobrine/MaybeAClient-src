@@ -2,7 +2,7 @@ package net.skidcode.gh.maybeaclient.hacks;
 
 import org.lwjgl.input.Keyboard;
 
-import net.minecraft.src.Packet28;
+import net.minecraft.src.Packet28EntityVelocity;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
@@ -21,7 +21,7 @@ public class AntiKnockbackHack extends Hack implements EventListener{
 	public void handleEvent(Event event) {
 		if(event instanceof EventPacketReceive) {
 			EventPacketReceive ev = (EventPacketReceive) event;
-			if(ev.packet instanceof Packet28) {
+			if(ev.packet instanceof Packet28EntityVelocity) {
 				event.cancelled = true;
 			}
 		}

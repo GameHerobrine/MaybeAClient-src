@@ -5,6 +5,8 @@ import java.util.List;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.AntiSlowdownHack;
 import net.skidcode.gh.maybeaclient.hacks.AutoTunnelHack;
+import net.skidcode.gh.maybeaclient.hacks.ClimbGappedLadderHack;
+import net.skidcode.gh.maybeaclient.hacks.CombatLogHack;
 import net.skidcode.gh.maybeaclient.hacks.FastLadderHack;
 import net.skidcode.gh.maybeaclient.hacks.StrafeHack;
 
@@ -415,6 +417,10 @@ public abstract class EntityLiving extends Entity {
             var1.addToPlayerScore(this, this.scoreValue);
         }
 
+        if (var1 != null) {
+            var1.func_27015_a(this);
+        }
+
         this.unused_flag = true;
         if (!this.worldObj.multiplayerWorld) {
             this.dropFewItems();
@@ -452,16 +458,19 @@ public abstract class EntityLiving extends Entity {
 
     }
 
-    public void moveEntityWithHeading(float strafe, float fwd) {
+    public void moveEntityWithHeading(float var1, float var2) {
+    	
     	float prevYaw = this.rotationYaw;
-    	if(AutoTunnelHack.instance.status && AutoTunnelHack.instance.autoWalk.value) {
+    	if(AutoTunnelHack.autoWalking()) {
     		this.rotationYaw = AutoTunnelHack.instance.getDirection().yaw;
     	}
     	
         double var3;
-        if (this.handleWaterMovement()) {
+        if(this == Client.mc.thePlayer) StrafeHack.inLiquid = false;
+        if (this.func_27013_ag()) {
+        	if(this == Client.mc.thePlayer) StrafeHack.inLiquid = true;
             var3 = this.posY;
-            this.moveFlying(strafe, fwd, 0.02F);
+            this.moveFlying(var1, var2, 0.02F);
             this.moveEntity(this.motionX, this.motionY, this.motionZ);
             this.motionX *= 0.800000011920929D;
             this.motionY *= 0.800000011920929D;
@@ -471,8 +480,9 @@ public abstract class EntityLiving extends Entity {
                 this.motionY = 0.30000001192092896D;
             }
         } else if (this.handleLavaMovement()) {
+        	if(this == Client.mc.thePlayer) StrafeHack.inLiquid = true;
             var3 = this.posY;
-            this.moveFlying(strafe, fwd, 0.02F);
+            this.moveFlying(var1, var2, 0.02F);
             this.moveEntity(this.motionX, this.motionY, this.motionZ);
             this.motionX *= 0.5D;
             this.motionY *= 0.5D;
@@ -491,9 +501,9 @@ public abstract class EntityLiving extends Entity {
                 	else var8 = Block.blocksList[var4].slipperiness * 0.91F;
                 }
             }
-
+            
             float var9 = 0.16277136F / (var8 * var8 * var8);
-            this.moveFlying(strafe, fwd, this.onGround ? 0.1F * var9 : 0.02F);
+            this.moveFlying(var1, var2, this.onGround ? 0.1F * var9 : 0.02F);
             var8 = 0.91F;
             if (this.onGround) {
                 var8 = 0.54600006F;
@@ -512,23 +522,20 @@ public abstract class EntityLiving extends Entity {
                         this.motionY = -FastLadderHack.instance.downwardSpeed.value;
                     }
                 }else {
-                	 if (this.motionY < -0.15D) {
-                         this.motionY = -0.15D;
-                     }
+                	if (this.motionY < -0.15D) {
+                        this.motionY = -0.15D;
+                    }
                 }
-               
+                
 
                 if (this.isSneaking() && this.motionY < 0.0D) {
                     this.motionY = 0.0D;
                 }
+                
+                
             }
-            
-            double mX = this.motionX;
-            double mY = this.motionY;
-            double mZ = this.motionZ;
-            
+
             this.moveEntity(this.motionX, this.motionY, this.motionZ);
-            
             if (this.isCollidedHorizontally && this.isOnLadder()) {
                 this.motionY = 0.2D;
                 if(FastLadderHack.instance.status) {
@@ -538,8 +545,9 @@ public abstract class EntityLiving extends Entity {
 
             this.motionY -= 0.08D;
             this.motionY *= 0.9800000190734863D;
-            if(StrafeHack.instance.status && this.entityId == Client.mc.thePlayer.entityId) {
             
+            if(StrafeHack.instance.enabled() && this.entityId == Client.mc.thePlayer.entityId) {
+                
             }else {
             	this.motionX *= (double)var8;
             	this.motionZ *= (double)var8;
@@ -561,10 +569,14 @@ public abstract class EntityLiving extends Entity {
     }
 
     public boolean isOnLadder() {
-        int var1 = MathHelper.floor_double(this.posX);
-        int var2 = MathHelper.floor_double(this.boundingBox.minY);
-        int var3 = MathHelper.floor_double(this.posZ);
-        return this.worldObj.getBlockId(var1, var2, var3) == Block.ladder.blockID || this.worldObj.getBlockId(var1, var2 + 1, var3) == Block.ladder.blockID;
+        int x = MathHelper.floor_double(this.posX);
+        int y = MathHelper.floor_double(this.boundingBox.minY);
+        int z = MathHelper.floor_double(this.posZ);
+        if(ClimbGappedLadderHack.instance.status) {
+        	if(this.worldObj.getBlockId(x, y+1, z) == Block.ladder.blockID) return true;
+        	if(ClimbGappedLadderHack.instance.allowTwoBlockGaps.getValue() && this.worldObj.getBlockId(x, y+2, z) == Block.ladder.blockID) return true;
+        }
+        return this.worldObj.getBlockId(x, y, z) == Block.ladder.blockID;
     }
 
     public void writeEntityToNBT(NBTTagCompound var1) {
@@ -594,6 +606,7 @@ public abstract class EntityLiving extends Entity {
     }
 
     public void onLivingUpdate() {
+
         if (this.newPosRotationIncrements > 0) {
             double var1 = this.posX + (this.newPosX - this.posX) / (double)this.newPosRotationIncrements;
             double var3 = this.posY + (this.newPosY - this.posY) / (double)this.newPosRotationIncrements;
@@ -623,7 +636,7 @@ public abstract class EntityLiving extends Entity {
             this.updatePlayerActionState();
         }
 
-        boolean var9 = this.handleWaterMovement();
+        boolean var9 = this.func_27013_ag();
         boolean var2 = this.handleLavaMovement();
         if (this.isJumping) {
             if (var9) {
@@ -663,8 +676,7 @@ public abstract class EntityLiving extends Entity {
         return true;
     }
 
-    protected void updatePlayerActionState() {
-        ++this.field_9344_ag;
+    protected void func_27021_X() {
         EntityPlayer var1 = this.worldObj.getClosestPlayerToEntity(this, -1.0D);
         if (this.canDespawn() && var1 != null) {
             double var2 = var1.posX - this.posX;
@@ -684,11 +696,17 @@ public abstract class EntityLiving extends Entity {
             }
         }
 
+    }
+
+    protected void updatePlayerActionState() {
+        ++this.field_9344_ag;
+        EntityPlayer var1 = this.worldObj.getClosestPlayerToEntity(this, -1.0D);
+        this.func_27021_X();
         this.moveStrafing = 0.0F;
         this.moveForward = 0.0F;
-        float var10 = 8.0F;
+        float var2 = 8.0F;
         if (this.rand.nextFloat() < 0.02F) {
-            var1 = this.worldObj.getClosestPlayerToEntity(this, (double)var10);
+            var1 = this.worldObj.getClosestPlayerToEntity(this, (double)var2);
             if (var1 != null) {
                 this.currentTarget = var1;
                 this.numTicksToChaseTarget = 10 + this.rand.nextInt(20);
@@ -699,7 +717,7 @@ public abstract class EntityLiving extends Entity {
 
         if (this.currentTarget != null) {
             this.faceEntity(this.currentTarget, 10.0F, (float)this.func_25026_x());
-            if (this.numTicksToChaseTarget-- <= 0 || this.currentTarget.isDead || this.currentTarget.getDistanceSqToEntity(this) > (double)(var10 * var10)) {
+            if (this.numTicksToChaseTarget-- <= 0 || this.currentTarget.isDead || this.currentTarget.getDistanceSqToEntity(this) > (double)(var2 * var2)) {
                 this.currentTarget = null;
             }
         } else {
@@ -711,16 +729,16 @@ public abstract class EntityLiving extends Entity {
             this.rotationPitch = this.defaultPitch;
         }
 
-        boolean var3 = this.handleWaterMovement();
-        boolean var11 = this.handleLavaMovement();
-        if (var3 || var11) {
+        boolean var3 = this.func_27013_ag();
+        boolean var4 = this.handleLavaMovement();
+        if (var3 || var4) {
             this.isJumping = this.rand.nextFloat() < 0.8F;
         }
 
     }
 
     protected int func_25026_x() {
-        return 10;
+        return 40;
     }
 
     public void faceEntity(Entity var1, float var2, float var3) {
@@ -736,7 +754,7 @@ public abstract class EntityLiving extends Entity {
 
         double var14 = (double)MathHelper.sqrt_double(var4 * var4 + var8 * var8);
         float var12 = (float)(Math.atan2(var8, var4) * 180.0D / 3.1415927410125732D) - 90.0F;
-        float var13 = (float)(Math.atan2(var6, var14) * 180.0D / 3.1415927410125732D);
+        float var13 = (float)(-(Math.atan2(var6, var14) * 180.0D / 3.1415927410125732D));
         this.rotationPitch = -this.updateRotation(this.rotationPitch, var13, var3);
         this.rotationYaw = this.updateRotation(this.rotationYaw, var12, var2);
     }
@@ -848,7 +866,9 @@ public abstract class EntityLiving extends Entity {
             this.hurtTime = this.maxHurtTime = 10;
             this.attackedAtYaw = 0.0F;
             this.worldObj.playSoundAtEntity(this, this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+            CombatLogHack.mpSent = this == Client.mc.thePlayer;
             this.attackEntityFrom((Entity)null, 0);
+            CombatLogHack.mpSent = false;
         } else if (var1 == 3) {
             this.worldObj.playSoundAtEntity(this, this.getDeathSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
             this.health = 0;

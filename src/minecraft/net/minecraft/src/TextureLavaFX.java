@@ -83,6 +83,6 @@ public class TextureLavaFX extends TextureFX {
             this.imageData[var2 * 4 + 2] = (byte)var7;
             this.imageData[var2 * 4 + 3] = -1;
         }
-        this.hasTexture = true;
+        hasTexture = true;
     }
 }

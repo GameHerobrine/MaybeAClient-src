@@ -9,8 +9,12 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.ScaledResolution;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.AFKDisconnectHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
+import net.skidcode.gh.maybeaclient.hacks.Hack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
+import net.skidcode.gh.maybeaclient.utils.GUIUtils;
 import net.skidcode.gh.maybeaclient.utils.InputHandler;
 
 public class ClickGUI extends GuiScreen{
@@ -20,14 +24,15 @@ public class ClickGUI extends GuiScreen{
 	public static ArrayList<Tab> tabs = new ArrayList<>();
 	public static float mouseX, mouseY, mouseClicked;
 	
-	
 	public Tab selectedTab = null;
 	public Tab hoveringOver = null;
 	
 	public ClickGUI(GuiScreen parent) {
 		this.parent = parent;
+		descHack = null;
 	}
 	
+	@Override
 	public void keyTyped(char var1, int var2) {
 		if (var2 == Keyboard.KEY_ESCAPE) {
 			this.mc.displayGuiScreen((GuiScreen)null);
@@ -36,21 +41,22 @@ public class ClickGUI extends GuiScreen{
 		}
 
 	}
-
+	
 	@Override
 	public void handleMouseInput() {
 		
 	}
 	public static InputHandler inputHandler = null;
-	
+	public static boolean hasInputHandler = false;
 	public static boolean setInputHandler(InputHandler hd) {
-		if(inputHandler != null) inputHandler.onInputFocusStop();
+		if(inputHandler != null && hasInputHandler) inputHandler.onInputFocusStop();
 		inputHandler = hd;
 		return true;
 	}
 	
+	@Override
 	public void handleKeyboardInput() {
-		if(inputHandler != null) {
+		if(inputHandler != null && hasInputHandler) {
 			char keyname = Keyboard.getEventCharacter();
 			int keycode = Keyboard.getEventKey();
 			inputHandler.onKeyPress(keycode);
@@ -58,19 +64,29 @@ public class ClickGUI extends GuiScreen{
 			super.handleKeyboardInput();
 		}
     }
+	
+	@Override
 	public void handleInput() {
-		
 		while (Keyboard.next()) {
+			AFKDisconnectHack.stopAFKing();
 			this.handleKeyboardInput();
 		}
-
 	}
 	
+	public boolean canSelectNewTab = false;
+	public boolean justInitialized = false;
+	@Override
 	public void mouseClicked(int x, int y, int click) {
+		if(inputHandler != null && hasInputHandler) {
+			inputHandler.onKeyPress(Client.getKeycodeForMouseButton(click));
+			return;
+		}
+		if(!canSelectNewTab) return;
 		for(Tab tab : tabs) {
 			if(!tab.shown) continue;
 			if(tab.isPointInside(x, y)) {
 				this.selectedTab = tab;
+				canSelectNewTab = false;
 				tab.onSelect(click, x, y);
 				tabs.remove(this.selectedTab);
 				tabs.add(0, this.selectedTab);
@@ -91,34 +107,48 @@ public class ClickGUI extends GuiScreen{
 		}
 	}
 	
+	@Override
 	public void mouseMovedOrUp(int x, int y, int click) {
+		if(inputHandler != null && hasInputHandler) {
+			inputHandler.onKeyRelease(Client.getKeycodeForMouseButton(click));
+			return;
+		}
+		
+		if(justInitialized) {
+			canSelectNewTab = true;
+			justInitialized = false;
+		}
+		
+		if(click != -1) {
+			canSelectNewTab = true;
+		}
+		
 		if(this.selectedTab != null) {
-			
 			this.selectedTab.mouseMovedSelected(click, x, y);
 			if(click != -1) {
 				this.selectedTab.onDeselect(click, x, y);
 				this.selectedTab = null;
 			}
 		}else {
-			
-			if(hoveringOver != null && hoveringOver.isPointInside(x, y)) {
-				this.hoveringOver.mouseHovered(x, y, click);
-			}else {
-				if(this.hoveringOver != null) {
-					this.hoveringOver.stopHovering();
-				}
-				
-				for(Tab tab : tabs) {
-					if(!tab.shown) continue;
-					if(tab.isPointInside(x, y)) {
-						this.hoveringOver = tab;
-						this.hoveringOver.mouseHovered(x, y, click);
-						break;
-					}
+			Tab tb = null;
+			for(Tab tab : tabs) {
+				if(!tab.shown) continue;
+				if(tab.isPointInside(x, y)) {
+					tb = tab;
+					//this.hoveringOver = tab;
+					//this.hoveringOver.mouseHovered(x, y, click);
+					break;
 				}
 			}
-			
-			
+			if(this.hoveringOver != null && tb != this.hoveringOver) {
+				this.hoveringOver.stopHovering();
+				this.hoveringOver = null;
+			}
+
+			if(tb != null){
+				this.hoveringOver = tb;
+				this.hoveringOver.mouseHovered(x, y, click);
+			}
 		}
 	}
 	
@@ -150,24 +180,59 @@ public class ClickGUI extends GuiScreen{
 		tabs.add(new ChestContentTab());
 		tabs.add(new PlayerlistTab());
 		tabs.add(new LastSeenSpotsTab());
+		tabs.add(new SlimeRadarTab());
 	}
 	
+	public static int descX, descY;
+	public static Hack descHack;
+	public static Tab descTab;
+	public static void showDescription(int x, int y, Hack h, Tab tab) {
+		descX = x;
+		descY = y;
+		descHack = h;
+		descTab = tab;
+	}
 	
+	public static ArrayList<Tab> toAdd = new ArrayList<Tab>();
+	public static ArrayList<Tab> toRemove = new ArrayList<Tab>();
+	public static void addTab(int i, Tab tab) {
+		toAdd.add(i, tab);
+	}
+	public static void removeTab(Tab tab) {
+		toRemove.add(tab);
+	}
 	public static int prevGUIScale = -1;
 	public static int newGUIScale = -1;
+	
+	@Override
 	public void drawScreen(int var1, int var2, float var3) {
-		prevGUIScale = mc.gameSettings.guiScale;
-		newGUIScale = ClickGUIHack.instance.getScale();
-		if(prevGUIScale != newGUIScale) {
-			mc.gameSettings.guiScale = newGUIScale;
-			ScaledResolution sc = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-			this.setWorldAndResolution(mc, sc.getScaledWidth(), sc.getScaledHeight());
-			mc.entityRenderer.setupScaledResolution();
+		hasInputHandler = ClickGUI.inputHandler != null;
+		descHack = null;
+		for(int i = toAdd.size(); --i >= 0;) {
+			Tab t = toAdd.remove(i);
+			tabs.add(0, t);
+		}
+		for(int i = toRemove.size(); --i >= 0;) {
+			Tab t = toRemove.remove(i);
+			tabs.remove(t);
 		}
 		
+		prevGUIScale = mc.gameSettings.guiScale;
+		newGUIScale = ClickGUIHack.instance.getScale();
+		if(prevGUIScale != newGUIScale) GUIUtils.setGUIScale(this, newGUIScale);
+		
+		
 		while(Mouse.next()) {
+			AFKDisconnectHack.stopAFKing();
 			if(Mouse.getEventButton() != -1) break; 
 		};
+		AFKDisconnectHack.startAFKing();
+		
+		
+		for(int i = tabs.size()-1; i >= 0; --i ) {
+			Tab t = tabs.get(i);
+			t.preRender();
+		}
 		
 		for(int i = tabs.size()-1; i >= 0; --i ) { //inverse render them
 			Tab t = tabs.get(i);
@@ -177,10 +242,10 @@ public class ClickGUI extends GuiScreen{
 		}
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
-		int x;
-		int y;
-		x = (int) ((Mouse.getEventX() * this.width) / this.mc.displayWidth);
-		y = (int) (this.height - ((Mouse.getEventY() * this.height) / this.mc.displayHeight) - 1);
+		
+		int x = (int) ((Mouse.getEventX() * this.width) / this.mc.displayWidth);
+		int y = (int) (this.height - ((Mouse.getEventY() * this.height) / this.mc.displayHeight) - 1);
+		
 		int wheel = Mouse.getDWheel();
 		
 		if(wheel != 0) {
@@ -192,22 +257,37 @@ public class ClickGUI extends GuiScreen{
 		} else {
 			this.mouseMovedOrUp(x, y, Mouse.getEventButton());
 		}
+		
+		if(descHack != null) {
+			int xMin = descX;
+			int yMin = descY;
+			int xMax = xMin + 6*24;
+			Theme theme = ClickGUIHack.theme();
+			
+			int txtColor = 0xffffff;
+			if(theme == Theme.NODUS) {
+				txtColor = ClickGUIHack.instance.themeColor.rgb();
+			}
+			Client.debug = true;
+			int[] width_y = Client.mc.fontRenderer.getSplittedStringWidthAndHeight_h(descHack.description, xMax - xMin - 4, 12);
+			Client.debug = false;
+			xMax = xMin + width_y[0] + 2;
+			int yMax = yMin + width_y[1];
+			descTab.renderFrame(xMin, yMin, xMax, yMax);
+			Client.mc.fontRenderer.drawSplittedString_h(descHack.description, xMin + 2, yMin + 2, txtColor, xMax - xMin - 2, 12);
+			
+		}
+		
 		super.drawScreen(var1, var2, var3);
 		if(prevGUIScale != newGUIScale) {
-			mc.gameSettings.guiScale = prevGUIScale;
-			ScaledResolution sc = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-			this.setWorldAndResolution(mc, sc.getScaledWidth(), sc.getScaledHeight());
-			mc.entityRenderer.setupScaledResolution();
+			GUIUtils.setGUIScale(this, prevGUIScale);
 		}
 		
 	}
 	@Override
 	public void onGuiClosed() {
 		if(prevGUIScale != newGUIScale) {
-			mc.gameSettings.guiScale = prevGUIScale;
-			ScaledResolution sc = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-			this.setWorldAndResolution(mc, sc.getScaledWidth(), sc.getScaledHeight());
-			mc.entityRenderer.setupScaledResolution();
+			GUIUtils.setGUIScale(this, prevGUIScale);
 		}
 	}
 }

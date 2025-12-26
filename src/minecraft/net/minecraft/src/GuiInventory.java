@@ -30,21 +30,21 @@ public class GuiInventory extends GuiContainer {
         int var2 = this.mc.renderEngine.getTexture("/gui/inventory.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.renderEngine.bindTexture(var2);
-        int centerX = (this.width - this.xSize) / 2;
-        int centerY = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(centerX, centerY, 0, 0, this.xSize, this.ySize);
+        int var3 = (this.width - this.xSize) / 2;
+        int var4 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var3, var4, 0, 0, this.xSize, this.ySize);
         GL11.glEnable(32826 /*GL_RESCALE_NORMAL_EXT*/);
         GL11.glEnable(2903 /*GL_COLOR_MATERIAL*/);
         GL11.glPushMatrix();
-        GL11.glTranslatef((float)(centerX + 51), (float)(centerY + 75), 50.0F);
+        GL11.glTranslatef((float)(var3 + 51), (float)(var4 + 75), 50.0F);
         float var5 = 30.0F;
         GL11.glScalef(-var5, var5, var5);
         GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
         float var6 = this.mc.thePlayer.renderYawOffset;
         float var7 = this.mc.thePlayer.rotationYaw;
         float var8 = this.mc.thePlayer.rotationPitch;
-        float var9 = (float)(centerX + 51) - this.xSize_lo;
-        float var10 = (float)(centerY + 75 - 50) - this.ySize_lo;
+        float var9 = (float)(var3 + 51) - this.xSize_lo;
+        float var10 = (float)(var4 + 75 - 50) - this.ySize_lo;
         GL11.glRotatef(135.0F, 0.0F, 1.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
         GL11.glRotatef(-135.0F, 0.0F, 1.0F, 0.0F);
@@ -62,6 +62,14 @@ public class GuiInventory extends GuiContainer {
         GL11.glDisable(32826 /*GL_RESCALE_NORMAL_EXT*/);
     }
 
-    protected void actionPerformed(GuiButton var1) {
+    public void actionPerformed(GuiButton var1) {
+        if (var1.id == 0) {
+            this.mc.displayGuiScreen(new GuiAchievements(this.mc.field_25001_G));
+        }
+
+        if (var1.id == 1) {
+            this.mc.displayGuiScreen(new GuiStats(this, this.mc.field_25001_G));
+        }
+
     }
 }

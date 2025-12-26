@@ -193,8 +193,10 @@ public class TileEntityFurnace extends TileEntity implements IInventory {
                 return 100;
             } else if (var2 == Item.coal.shiftedIndex) {
                 return 1600;
+            } else if (var2 == Item.bucketLava.shiftedIndex) {
+                return 20000;
             } else {
-                return var2 == Item.bucketLava.shiftedIndex ? 20000 : 0;
+                return var2 == Block.sapling.blockID ? 100 : 0;
             }
         }
     }

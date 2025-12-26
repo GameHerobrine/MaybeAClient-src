@@ -7,11 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
+import lunatrius.schematica.util.SchematicaRenderBuffer;
 import lunatrius.schematica.util.Vector3f;
 import lunatrius.schematica.util.Vector3i;
-import lunatrius.schematica.util.Vector4i;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.ChunkCache;
@@ -25,6 +23,7 @@ import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TileEntity;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.SchematicaHack;
+import net.skidcode.gh.maybeaclient.utils.MiniChunkPos;
 
 import org.lwjgl.input.Keyboard;
 
@@ -64,7 +63,6 @@ public class Settings {
 	public Vector3i pointMax = new Vector3i();
 	public int rotationRender = 0;
 	public Vector3i offset = new Vector3i();
-	public boolean needsUpdate = true;
 	public boolean isRenderingSchematic = false;
 	public int renderingLayer = -1;
 	public boolean isRenderingGuide = false;
@@ -75,6 +73,26 @@ public class Settings {
 	private Settings() {
 		for(int i = 0; i < stats_blocksToPlace.length; ++i) {
 			stats_blocksToPlace[i] = new BlockStat(i);
+		}
+	}
+	public void tryUpdating(int x, int y, int z) {
+		if(this.schematic == null) return;
+		int minX = this.offset.x;
+		int minY = this.offset.y;
+		int minZ = this.offset.z;
+		int maxX = minX + this.schematic.width();
+		int maxY = minY + this.schematic.height();
+		int maxZ = minZ + this.schematic.length();
+		
+		if(x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ) {
+			MiniChunkPos mcp = new MiniChunkPos((x-minX)/16, (y-minY)/16, (z-minZ)/16);
+			SchematicaHack.instance.render.getRenderBuffer(mcp).update = true;
+		}
+	}
+	
+	public void requestFullUpdate() {
+		for(SchematicaRenderBuffer rb : SchematicaHack.instance.render.renderBuffers.values()) {
+			rb.update = true;
 		}
 	}
 	
@@ -165,6 +183,12 @@ public class Settings {
 
 	public void unloadSchematic() {
 		this.schematic = null;
+		
+		for(SchematicaRenderBuffer buf : SchematicaHack.instance.render.renderBuffers.values()) {
+			buf.destroy();
+		}
+		SchematicaHack.instance.render.renderBuffers.clear();
+		
 		this.renderBlocks = null;
 		this.renderTileEntity = null;
 		this.isRenderingSchematic = false;
@@ -173,6 +197,9 @@ public class Settings {
 	}
 	
 	public boolean loadSchematic(String filename) {
+		if(this.schematic != null) {
+			this.unloadSchematic();
+		}
 		try {
 			InputStream stream = new FileInputStream(filename);
 			NBTTagCompound tagCompound = CompressedStreamTools.func_1138_a(stream);
@@ -265,7 +292,7 @@ public class Settings {
 		this.pointMax.y = Math.max(this.pointA.y, this.pointB.y);
 		this.pointMax.z = Math.max(this.pointA.z, this.pointB.z);
 
-		this.needsUpdate = true;
+		this.requestFullUpdate();
 	}
 
 	public void moveHere(Vector3i point) {
@@ -329,20 +356,20 @@ public class Settings {
 	public void reloadChunkCache() {
 		if(this.schematic == null) return;
 		this.mcWorldCache = new ChunkCache(this.minecraft.theWorld, this.offset.x - 1, this.offset.y - 1, this.offset.z - 1, this.offset.x + this.schematic.width() + 1, this.offset.y + this.schematic.height() + 1, this.offset.z + this.schematic.length() + 1);
-		this.needsUpdate = true;
+		this.requestFullUpdate();
 	}
 
 	public void flipWorld() {
 		if (this.schematic != null) {
 			this.schematic.flip();
-			this.needsUpdate = true;
+			this.requestFullUpdate();
 		}
 	}
 
 	public void rotateWorld() {
 		if (this.schematic != null) {
 			this.schematic.rotate();
-			this.needsUpdate = true;
+			this.requestFullUpdate();
 		}
 	}
 }

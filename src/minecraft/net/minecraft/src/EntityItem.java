@@ -186,6 +186,14 @@ public class EntityItem extends Entity {
         if (!this.worldObj.multiplayerWorld) {
             int var2 = this.item.stackSize;
             if (this.delayBeforeCanPickup == 0 && var1.inventory.addItemStackToInventory(this.item)) {
+                if (this.item.itemID == Block.wood.blockID) {
+                    var1.func_27026_a(AchievementList.field_25198_c);
+                }
+
+                if (this.item.itemID == Item.leather.shiftedIndex) {
+                    var1.func_27026_a(AchievementList.field_27376_t);
+                }
+
                 this.worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 var1.onItemPickup(this, var2);
                 this.setEntityDead();

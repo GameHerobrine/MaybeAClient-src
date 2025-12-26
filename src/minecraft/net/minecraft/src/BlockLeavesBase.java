@@ -15,12 +15,11 @@ public class BlockLeavesBase extends Block {
     }
 
     public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-    	
     	if(XRayHack.INSTANCE.status && !XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
     		return XRayHack.INSTANCE.blockChooser.blocks[this.blockID];
     	}
     	
-        int var6 = var1.getBlockId(var2, var3, var4);
+    	int var6 = var1.getBlockId(var2, var3, var4);
         return !this.graphicsLevel && var6 == this.blockID ? false : super.shouldSideBeRendered(var1, var2, var3, var4, var5);
     }
 }

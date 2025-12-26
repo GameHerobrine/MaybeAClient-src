@@ -1,12 +1,15 @@
 package net.skidcode.gh.maybeaclient.hacks.settings;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 import net.skidcode.gh.maybeaclient.utils.InputHandler;
 
@@ -31,7 +34,7 @@ public class SettingKeybind extends Setting implements InputHandler{
 	
 	@Override
 	public String valueToString() {
-		return Keyboard.getKeyName(this.value);
+		return Client.getKeyName(this.value);
 	}
 
 	public boolean validateValue(String value) {
@@ -57,25 +60,43 @@ public class SettingKeybind extends Setting implements InputHandler{
 		this.listening = ClickGUI.setInputHandler(this);
 	}
 	
+	public boolean canRelease = false;
 	@Override
 	public void onKeyPress(int keycode) {
 		if(keycode == Keyboard.KEY_ESCAPE || Keyboard.KEY_NONE == keycode) {
 			this.value = 0;
+			canRelease = true;
 		}else {
 			this.value = keycode;
+			canRelease = true;
 		}
-		
-		ClickGUI.setInputHandler(null);
-		Client.saveModules();
 	}
 	
 	@Override
 	public void onInputFocusStop() {
 		this.listening = false;
+		canRelease = false;
+	}
+
+
+	@Override
+	public void onKeyRelease(int keycode) {
+		if(canRelease) {
+			ClickGUI.setInputHandler(null);
+			Client.saveModules();
+		}
+		
 	}
 	
 	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
-		tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0xaa / 255f, 0xaa / 255f, 1f);
+		Theme theme = ClickGUIHack.theme();
+		if(theme == Theme.NODUS) {
+			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
+		}else if(theme == Theme.HEPHAESTUS){
+			
+		}else{
+			tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+		}
 	}
 	
 	@Override
@@ -84,8 +105,29 @@ public class SettingKeybind extends Setting implements InputHandler{
 	}
 	
 	boolean listening = false;
-	public void renderText(int x, int y) {
-		Client.mc.fontRenderer.drawString(this.name + ": "+ (listening ? ChatColor.LIGHTGRAY+"Listening..." : this.valueToString()), x + 2, y + 2, 0xffffff);
+	
+	@Override
+	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+		Theme theme = ClickGUIHack.theme();
+		int txtColor = 0xffffff;
+		if(theme == Theme.NODUS) {
+			txtColor = ClickGUIHack.instance.themeColor.rgb();
+			if(this.mouseHovering) {
+				txtColor = ClickGUIHack.instance.secColor.rgb();
+			}
+		}
+		this.mouseHovering = false;
+		if(theme == Theme.HEPHAESTUS){
+			if(listening) {
+				Client.mc.fontRenderer.drawStringWithShadow("Listening...", x+Theme.HEPH_OPT_XADD, y+ClickGUIHack.theme().yaddtocenterText, 0xffffff);
+			}else {
+				String s = this.valueToString();
+				Client.mc.fontRenderer.drawStringWithShadow(this.name + ": ", x+Theme.HEPH_OPT_XADD, y+ClickGUIHack.theme().yaddtocenterText, 0xffffff);
+				Client.mc.fontRenderer.drawStringWithShadow(s, xEnd-Theme.HEPH_OPT_XADD-Client.mc.fontRenderer.getStringWidth(s), y+ClickGUIHack.theme().yaddtocenterText, 0xffffff);
+			}
+		}else {
+			Client.mc.fontRenderer.drawString(this.name + ": "+ (listening ? ChatColor.LIGHTGRAY+"Listening..." : this.valueToString()), x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}
 	}
 	
 	@Override

@@ -91,18 +91,19 @@ public class DataWatcher {
             var0.writeFloat((Float)var1.getObject());
             break;
         case 4:
-            var0.writeUTF((String)var1.getObject());
+            Packet.func_27049_a((String)var1.getObject(), var0);
             break;
         case 5:
-            ItemStack var3 = (ItemStack)var1.getObject();
-            var0.writeShort(var3.getItem().shiftedIndex);
-            var0.writeByte(var3.stackSize);
-            var0.writeShort(var3.getItemDamage());
+            ItemStack var4 = (ItemStack)var1.getObject();
+            var0.writeShort(var4.getItem().shiftedIndex);
+            var0.writeByte(var4.stackSize);
+            var0.writeShort(var4.getItemDamage());
+            break;
         case 6:
-            ChunkCoordinates var4 = (ChunkCoordinates)var1.getObject();
-            var0.writeInt(var4.x);
-            var0.writeInt(var4.y);
-            var0.writeInt(var4.z);
+            ChunkCoordinates var3 = (ChunkCoordinates)var1.getObject();
+            var0.writeInt(var3.x);
+            var0.writeInt(var3.y);
+            var0.writeInt(var3.z);
         }
 
     }
@@ -132,18 +133,19 @@ public class DataWatcher {
                 var5 = new WatchableObject(var3, var4, var0.readFloat());
                 break;
             case 4:
-                var5 = new WatchableObject(var3, var4, var0.readUTF());
+                var5 = new WatchableObject(var3, var4, Packet.func_27048_a(var0, 64));
                 break;
             case 5:
-                short var6 = var0.readShort();
-                byte var7 = var0.readByte();
-                short var8 = var0.readShort();
-                new WatchableObject(var3, var4, new ItemStack(var6, var7, var8));
+                short var9 = var0.readShort();
+                byte var10 = var0.readByte();
+                short var11 = var0.readShort();
+                var5 = new WatchableObject(var3, var4, new ItemStack(var9, var10, var11));
+                break;
             case 6:
-                int var9 = var0.readInt();
-                int var10 = var0.readInt();
-                int var11 = var0.readInt();
-                var5 = new WatchableObject(var3, var4, new ChunkCoordinates(var9, var10, var11));
+                int var6 = var0.readInt();
+                int var7 = var0.readInt();
+                int var8 = var0.readInt();
+                var5 = new WatchableObject(var3, var4, new ChunkCoordinates(var6, var7, var8));
             }
 
             var1.add(var5);

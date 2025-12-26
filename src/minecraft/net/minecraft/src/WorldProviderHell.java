@@ -1,9 +1,11 @@
 package net.minecraft.src;
 
+import net.skidcode.gh.maybeaclient.hacks.CustomSkyHack;
+
 public class WorldProviderHell extends WorldProvider {
     public void registerWorldChunkManager() {
-        this.worldChunkMgr = new WorldChunkManagerHell(MobSpawnerBase.hell, 1.0D, 0.0D);
-        this.field_4220_c = true;
+        this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.hell, 1.0D, 0.0D);
+        this.isNether = true;
         this.isHellWorld = true;
         this.field_6478_e = true;
         this.worldType = -1;
@@ -39,6 +41,9 @@ public class WorldProviderHell extends WorldProvider {
     }
 
     public float calculateCelestialAngle(long var1, float var3) {
+    	if(CustomSkyHack.instance.status) {
+        	return CustomSkyHack.calculateCelestialAngle(var1, var3);
+        }
         return 0.5F;
     }
 

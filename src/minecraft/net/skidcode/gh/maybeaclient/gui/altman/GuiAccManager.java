@@ -3,6 +3,7 @@ package net.skidcode.gh.maybeaclient.gui.altman;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.lwjgl.input.Keyboard;
+
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSmallButton;

@@ -41,7 +41,7 @@ public class EntitySnowball extends Entity {
         this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
         this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
         this.motionY = (double)(-MathHelper.sin(this.rotationPitch / 180.0F * 3.1415927F) * var3);
-        this.func_467_a(this.motionX, this.motionY, this.motionZ, 1.5F, 1.0F);
+        this.setSnowballHeading(this.motionX, this.motionY, this.motionZ, 1.5F, 1.0F);
     }
 
     public EntitySnowball(World var1, double var2, double var4, double var6) {
@@ -52,7 +52,7 @@ public class EntitySnowball extends Entity {
         this.yOffset = 0.0F;
     }
 
-    public void func_467_a(double var1, double var3, double var5, float var7, float var8) {
+    public void setSnowballHeading(double var1, double var3, double var5, float var7, float var8) {
         float var9 = MathHelper.sqrt_double(var1 * var1 + var3 * var3 + var5 * var5);
         var1 /= (double)var9;
         var3 /= (double)var9;
@@ -185,7 +185,7 @@ public class EntitySnowball extends Entity {
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
         float var18 = 0.99F;
         float var19 = 0.03F;
-        if (this.handleWaterMovement()) {
+        if (this.func_27013_ag()) {
             for(int var7 = 0; var7 < 4; ++var7) {
                 float var20 = 0.25F;
                 this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var20, this.posY - this.motionY * (double)var20, this.posZ - this.motionZ * (double)var20, this.motionX, this.motionY, this.motionZ);

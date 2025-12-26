@@ -70,6 +70,7 @@ public class ChunkProviderLoadOrGenerate implements IChunkProvider {
                         var6 = this.blankChunk;
                     } else {
                         var6 = this.chunkProvider.provideChunk(var1, var2);
+                        var6.func_25124_i();
                     }
                 }
 

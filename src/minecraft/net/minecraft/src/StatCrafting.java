@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-public class StatCrafting extends StatBasic {
+public class StatCrafting extends StatBase {
     private final int field_25073_a;
 
     public StatCrafting(int var1, String var2, int var3) {

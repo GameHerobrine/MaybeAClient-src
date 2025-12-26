@@ -20,14 +20,8 @@ public class ClockspeedHack extends Hack{
 	}
 	
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.speed.value;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return ""+this.speed.value;
 	}
 	
 }

@@ -6,20 +6,26 @@ import java.nio.IntBuffer;
 import javax.imageio.ImageIO;
 import org.lwjgl.opengl.GL11;
 
+import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.shaders.Shaders;
+import net.skidcode.gh.maybeaclient.utils.ChatColor;
+
 public class FontRenderer {
 	private int[] charWidth = new int[256];
 	public int fontTextureName = 0;
 	private int fontDisplayLists;
 	private IntBuffer buffer = GLAllocation.createDirectIntBuffer(1024 /*GL_FRONT_LEFT*/);
-
-	public FontRenderer(GameSettings var1, String var2, RenderEngine var3) {
+	public void reload() {
+		this.reload(Client.mc.gameSettings, "/font/default.png", Client.mc.renderEngine);
+	}
+	public void reload(GameSettings var1, String var2, RenderEngine var3) {
 		BufferedImage var4;
 		try {
-			var4 = ImageIO.read(RenderEngine.class.getResourceAsStream(var2));
+			var4 = ImageIO.read(Client.mc.texturePackList.selectedTexturePack.func_6481_a(var2));
 		} catch (IOException var18) {
 			throw new RuntimeException(var18);
 		}
-
+		
 		int var5 = var4.getWidth();
 		int var6 = var4.getHeight();
 		int[] var7 = new int[var5 * var6];
@@ -31,16 +37,19 @@ public class FontRenderer {
 		int var12;
 		int var15;
 		int var16;
+		int fnt8 = 8, fnt7 = 7;
+		fnt8 = var5 / 16;
+		fnt7 = fnt8-1;
 		for(int var8 = 0; var8 < 256; ++var8) {
 			var9 = var8 % 16;
 			var10 = var8 / 16;
 
-			for(var11 = 7; var11 >= 0; --var11) {
-				var12 = var9 * 8 + var11;
+			for(var11 = fnt7; var11 >= 0; --var11) {
+				var12 = var9 * fnt8 + var11;
 				boolean var13 = true;
 
-				for(int var14 = 0; var14 < 8 && var13; ++var14) {
-					var15 = (var10 * 8 + var14) * var5;
+				for(int var14 = 0; var14 < fnt8 && var13; ++var14) {
+					var15 = (var10 * fnt8 + var14) * var5;
 					var16 = var7[var12 + var15] & 255;
 					if (var16 > 0) {
 						var13 = false;
@@ -53,10 +62,10 @@ public class FontRenderer {
 			}
 
 			if (var8 == 32) {
-				var11 = 2;
+				var11 = var5/64; //XXX hd font patch 2;
 			}
-
-			this.charWidth[var8] = var11 + 2;
+			this.charWidth[var8] = (int) (128 * var11 + 256) / var5; //XXX hd font patch
+			//this.charWidth[var8] = (int) (var11 + 2);
 		}
 
 		this.fontTextureName = var3.allocateAndSetupTexture(var4);
@@ -109,7 +118,10 @@ public class FontRenderer {
 			GL11.glColor3f((float)var11 / 255.0F, (float)var12 / 255.0F, (float)var22 / 255.0F);
 			GL11.glEndList();
 		}
-
+	}
+	
+	public FontRenderer(GameSettings var1, String var2, RenderEngine var3) {
+		this.reload(var1, var2, var3);
 	}
 
 	public void drawStringWithShadow(String var1, int var2, int var3, int var4) {
@@ -120,50 +132,9 @@ public class FontRenderer {
 	public void drawString(String var1, int var2, int var3, int var4) {
 		this.renderString(var1, var2, var3, var4, false);
 	}
-	
-	public void drawSplittedString(String s, int x, int y, int col, int splitWidth, int yAdd) {
-		String toRend = ""; //bad code probably
-		
-		//String[] rend = s.split(" ");
-		char[] rend = s.toCharArray();
-		for(int i = 0; i < rend.length; ++i) {
-			if(this.getStringWidth(toRend + rend[i]) >= splitWidth) {
-				this.drawString(toRend, x, y, col);
-				toRend = rend[i]+""; // + " ";
-				y += yAdd;
-			}else {
-				toRend += rend[i];
-				//toRend += " ";
-			}
-		}
-		
-		this.drawString(toRend, x, y, col);
-	}
-	
-	public int[] getSplittedStringWidthAndHeight(String s, int splitWidth, int yAdd) {
-		int maxWidth = 0;
-		int y = yAdd;
-		String toRend = ""; //bad code probably
-		
-		//String[] rend = s.split(" ");
-		char[] rend = s.toCharArray();
-		for(int i = 0; i < rend.length; ++i) {
-			int w = this.getStringWidth(toRend + rend[i]);
-			if(w >= splitWidth) {
-				toRend = rend[i]+"";// + " ";
-				y += yAdd;
-			}else {
-				if(w > maxWidth) maxWidth = w;
-				toRend += rend[i];
-				//toRend += " ";
-			}
-		}
-		
-		return new int[]{maxWidth, y};
-	}
-	
-	public void renderString(String s, int var2, int var3, int var4, boolean var5) {
-		if (s != null) {
+
+	public void renderString(String var1, int var2, int var3, int var4, boolean var5) {
+		if (var1 != null) {
 			int var6;
 			if (var5) {
 				var6 = var4 & -16777216;
@@ -185,15 +156,35 @@ public class FontRenderer {
 			GL11.glPushMatrix();
 			GL11.glTranslatef((float)var2, (float)var3, 0.0F);
 
-			for(var6 = 0; var6 < s.length(); ++var6) {
+			for(var6 = 0; var6 < var1.length(); ++var6) {
 				int var11;
-				for(; s.length() > var6 + 1 && s.charAt(var6) == 167; var6 += 2) {
-					var11 = "0123456789abcdef".indexOf(s.toLowerCase().charAt(var6 + 1));
-					if (var11 < 0 || var11 > 15) {
-						var11 = 15;
+				for(; var1.length() > var6 + 1 && var1.charAt(var6) == 167; var6 += 2) {
+					String z = var1.toLowerCase();
+					char ca = z.charAt(var6 + 1);
+					
+					if(ca == ChatColor.EXP_RESET.color.charAt(0)) {
+						this.buffer.flip();
+	                    GL11.glCallLists(buffer);
+	                    this.buffer.clear();
+	                    GL11.glColor4f(var10, var7, var8, var9);
+					}else if(ca == ChatColor.THREEBYTECOL.color.charAt(0)){
+						this.buffer.flip();
+	                    GL11.glCallLists(buffer);
+	                    this.buffer.clear();
+	                    
+	                    float r = (z.charAt(var6+2)&0xff) / 255f; 
+	                    float g = (z.charAt(var6+3)&0xff) / 255f;
+	                    float b = (z.charAt(var6+4)&0xff) / 255f;
+	                    GL11.glColor4f(r, g, b, var9);
+	                    var6 += 3;
+					}else{
+						var11 = "0123456789abcdef".indexOf(ca);
+						if (var11 < 0 || var11 > 15) {
+							var11 = 15;
+						}
+						this.buffer.put(this.fontDisplayLists + 256 + var11 + (var5 ? 16 : 0));
 					}
-
-					this.buffer.put(this.fontDisplayLists + 256 + var11 + (var5 ? 16 : 0));
+					
 					if (this.buffer.remaining() == 0) {
 						this.buffer.flip();
 						GL11.glCallLists(this.buffer);
@@ -201,8 +192,8 @@ public class FontRenderer {
 					}
 				}
 
-				if (var6 < s.length()) {
-					var11 = FontAllowedCharacters.allowedCharacters.indexOf(s.charAt(var6));
+				if (var6 < var1.length()) {
+					var11 = ChatAllowedCharacters.allowedCharacters.indexOf(var1.charAt(var6));
 					if (var11 >= 0) {
 						this.buffer.put(this.fontDisplayLists + var11 + 32);
 					}
@@ -220,7 +211,13 @@ public class FontRenderer {
 			GL11.glPopMatrix();
 		}
 	}
-
+	public int getCharWidth(char c) {
+		int var4 = ChatAllowedCharacters.allowedCharacters.indexOf(c);
+		if (var4 >= 0) {
+			return this.charWidth[var4 + 32];
+		}
+		return -1;
+	}
 	public int getStringWidth(String var1) {
 		if (var1 == null) {
 			return 0;
@@ -229,9 +226,12 @@ public class FontRenderer {
 
 			for(int var3 = 0; var3 < var1.length(); ++var3) {
 				if (var1.charAt(var3) == 167) {
+					if(var3+1 < var1.length() && var1.charAt(var3+1) == ChatColor.THREEBYTECOL.color.charAt(0)){
+						var3 += 3;
+					}
 					++var3;
 				} else {
-					int var4 = FontAllowedCharacters.allowedCharacters.indexOf(var1.charAt(var3));
+					int var4 = ChatAllowedCharacters.allowedCharacters.indexOf(var1.charAt(var3));
 					if (var4 >= 0) {
 						var2 += this.charWidth[var4 + 32];
 					}
@@ -240,5 +240,174 @@ public class FontRenderer {
 
 			return var2;
 		}
+	}
+
+	public void func_27278_a(String var1, int var2, int var3, int var4, int var5) {
+		String[] var6 = var1.split(" ");
+		int var7 = 0;
+
+		while(var7 < var6.length) {
+			String var8;
+			for(var8 = var6[var7++] + " "; var7 < var6.length && this.getStringWidth(var8 + var6[var7]) < var4; var8 = var8 + var6[var7++] + " ") {
+			}
+
+			int var9;
+			for(; this.getStringWidth(var8) > var4; var8 = var8.substring(var9)) {
+				for(var9 = 0; this.getStringWidth(var8.substring(0, var9 + 1)) <= var4; ++var9) {
+				}
+
+				if (var8.substring(0, var9).trim().length() > 0) {
+					this.drawString(var8.substring(0, var9), var2, var3, var5);
+					var3 += 8;
+				}
+			}
+
+			if (var8.trim().length() > 0) {
+				this.drawString(var8, var2, var3, var5);
+				var3 += 8;
+			}
+		}
+
+	}
+
+	public int func_27277_a(String var1, int var2) {
+		String[] var3 = var1.split(" ");
+		int var4 = 0;
+		int var5 = 0;
+
+		while(var4 < var3.length) {
+			String var6;
+			for(var6 = var3[var4++] + " "; var4 < var3.length && this.getStringWidth(var6 + var3[var4]) < var2; var6 = var6 + var3[var4++] + " ") {
+			}
+
+			int var7;
+			for(; this.getStringWidth(var6) > var2; var6 = var6.substring(var7)) {
+				for(var7 = 0; this.getStringWidth(var6.substring(0, var7 + 1)) <= var2; ++var7) {
+				}
+
+				if (var6.substring(0, var7).trim().length() > 0) {
+					var5 += 8;
+				}
+			}
+
+			if (var6.trim().length() > 0) {
+				var5 += 8;
+			}
+		}
+
+		return var5;
+	}
+	public void drawSplittedStringWithShadow(String s, int x, int y, int col, int splitWidth, int yAdd) {
+		String toRend = ""; //bad code probably
+		
+		char[] rend = s.toCharArray();
+		for(int i = 0; i < rend.length; ++i) {
+			if(this.getStringWidth(toRend + rend[i]) > splitWidth) {
+				this.drawStringWithShadow(toRend, x, y, col);
+				toRend = rend[i]+"";
+				y += yAdd;
+			}else {
+				toRend += rend[i];
+			}
+		}
+		
+		this.drawStringWithShadow(toRend, x, y, col);
+	}
+	
+	public void drawSplittedStringWithShadow_h(String s, int x, int y, int col, int splitWidth, int yAdd) {
+		String toRend = ""; //bad code probably
+		
+		String[] rend = s.split(" ");
+		for(int i = 0; i < rend.length; ++i) {
+			if(rend[i].equals("")) continue;
+			if(this.getStringWidth(toRend + rend[i]) > splitWidth) {
+				this.drawStringWithShadow(toRend, x, y, col);
+				toRend = rend[i]+" ";
+				y += yAdd;
+			}else {
+				toRend += rend[i]+" ";
+			}
+		}
+		
+		this.drawStringWithShadow(toRend, x, y, col);
+	}
+	
+	public void drawSplittedString_h(String s, int x, int y, int col, int splitWidth, int yAdd) {
+		String toRend = ""; //bad code probably
+		
+		String[] rend = s.split(" ");
+		for(int i = 0; i < rend.length; ++i) {
+			if(rend[i].equals("")) continue;
+			if(this.getStringWidth(toRend + rend[i]) > splitWidth) {
+				this.drawStringWithShadow(toRend, x, y, col);
+				toRend = rend[i]+" ";
+				y += yAdd;
+			}else {
+				toRend += rend[i]+" ";
+			}
+		}
+		
+		this.drawStringWithShadow(toRend, x, y, col);
+	}
+	
+	public void drawSplittedString(String s, int x, int y, int col, int splitWidth, int yAdd) {
+		String toRend = ""; //bad code probably
+		
+		//String[] rend = s.split(" ");
+		char[] rend = s.toCharArray();
+		for(int i = 0; i < rend.length; ++i) {
+			if(this.getStringWidth(toRend + rend[i]) > splitWidth) {
+				this.drawString(toRend, x, y, col);
+				toRend = rend[i]+""; // + " ";
+				if(i+1 <= rend.length) y += yAdd;
+				
+			}else {
+				toRend += rend[i];
+			}
+		}
+		
+		this.drawString(toRend, x, y, col);
+	}
+	
+	public int[] getSplittedStringWidthAndHeight_h(String s, int splitWidth, int yAdd) {
+		int y = yAdd;
+		String toRend = ""; //bad code probably
+		
+		String[] rend = s.split(" ");
+		for(int i = 0; i < rend.length; ++i) {
+			int ae = this.getStringWidth(toRend);
+			
+			if(rend[i].equals("")) continue;
+			if(ae > splitWidth) splitWidth = ae;
+			
+			int w = this.getStringWidth(toRend + rend[i]);
+			if(w > splitWidth) {
+				toRend = rend[i]+" ";
+				if(i+1 <= rend.length) y += yAdd;
+			}else {
+				toRend += rend[i]+" ";
+			}
+		}
+		
+		return new int[]{splitWidth, y};
+	}
+	
+	public int[] getSplittedStringWidthAndHeight(String s, int splitWidth, int yAdd) {
+		int y = yAdd;
+		String toRend = ""; //bad code probably
+		
+		//String[] rend = s.split(" ");
+		char[] rend = s.toCharArray();
+		for(int i = 0; i < rend.length; ++i) {
+			int w = this.getStringWidth(toRend + rend[i]);
+			if(w > splitWidth) {
+				toRend = rend[i]+"";// + " ";
+				if(i+1 <= rend.length) y += yAdd;
+			}else {
+				toRend += rend[i];
+			}
+		}
+		
+		return new int[]{splitWidth, y};
 	}
 }

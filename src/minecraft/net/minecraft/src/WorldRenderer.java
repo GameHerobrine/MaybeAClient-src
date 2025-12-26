@@ -5,8 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.BlockESPHack;
+import net.skidcode.gh.maybeaclient.hacks.TunnelESPHack;
+import net.skidcode.gh.maybeaclient.hacks.UnsafeLightLevelsHack;
+import net.skidcode.gh.maybeaclient.hacks.XRayHack;
 import net.skidcode.gh.maybeaclient.utils.BlockPos;
+import net.skidcode.gh.maybeaclient.utils.ChunkPos;
 
 public class WorldRenderer {
     public World worldObj;
@@ -32,7 +37,7 @@ public class WorldRenderer {
     public int field_1741_s;
     public float field_1740_t;
     public boolean needsUpdate;
-    public AxisAlignedBB field_1736_v;
+    public AxisAlignedBB rendererBoundingBox;
     public int field_1735_w;
     public boolean isVisible = true;
     public boolean isWaitingOnOcclusionQuery;
@@ -53,12 +58,20 @@ public class WorldRenderer {
         this.needsUpdate = false;
     }
 
+    public ArrayList<ChunkPos> chunksOccupied = new ArrayList<>();
+    
     public void setPosition(int var1, int var2, int var3) {
         if (var1 != this.posX || var2 != this.posY || var3 != this.posZ) {
             this.setDontDraw();
             this.posX = var1;
             this.posY = var2;
             this.posZ = var3;
+            chunksOccupied.clear();
+            for(int x = this.posX >> 4; x < (this.posX+this.sizeWidth) >> 4; x += 1) {
+            	for(int z = this.posZ >> 4; z < (this.posZ+this.sizeDepth) >> 4; z += 1) {
+            		chunksOccupied.add(new ChunkPos(x, z));
+                }
+            }
             this.field_1746_q = var1 + this.sizeWidth / 2;
             this.field_1743_r = var2 + this.sizeHeight / 2;
             this.field_1741_s = var3 + this.sizeDepth / 2;
@@ -69,7 +82,7 @@ public class WorldRenderer {
             this.field_1754_j = var2 - this.field_1751_m;
             this.field_1753_k = var3 - this.field_1750_n;
             float var4 = 6.0F;
-            this.field_1736_v = AxisAlignedBB.getBoundingBox((double)((float)var1 - var4), (double)((float)var2 - var4), (double)((float)var3 - var4), (double)((float)(var1 + this.sizeWidth) + var4), (double)((float)(var2 + this.sizeHeight) + var4), (double)((float)(var3 + this.sizeDepth) + var4));
+            this.rendererBoundingBox = AxisAlignedBB.getBoundingBox((double)((float)var1 - var4), (double)((float)var2 - var4), (double)((float)var3 - var4), (double)((float)(var1 + this.sizeWidth) + var4), (double)((float)(var2 + this.sizeHeight) + var4), (double)((float)(var3 + this.sizeDepth) + var4));
             GL11.glNewList(this.glRenderList + 2, 4864 /*GL_COMPILE*/);
             RenderItem.renderAABB(AxisAlignedBB.getBoundingBoxFromPool((double)((float)this.field_1752_l - var4), (double)((float)this.field_1751_m - var4), (double)((float)this.field_1750_n - var4), (double)((float)(this.field_1752_l + this.sizeWidth) + var4), (double)((float)(this.field_1751_m + this.sizeHeight) + var4), (double)((float)(this.field_1750_n + this.sizeDepth) + var4)));
             GL11.glEndList();
@@ -102,8 +115,12 @@ public class WorldRenderer {
             byte var8 = 1;
             ChunkCache var9 = new ChunkCache(this.worldObj, var1 - var8, var2 - var8, var3 - var8, var4 + var8, var5 + var8, var6 + var8);
             RenderBlocks var10 = new RenderBlocks(var9);
-
+            
+            boolean opacityEnabled = XRayHack.INSTANCE.status && XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity");
             for(int var11 = 0; var11 < 2; ++var11) {
+            	XRayHack.applyOpacity = var11 != 0;
+            	XRayHack.applyOpacity &= opacityEnabled;
+            	
                 boolean var12 = false;
                 boolean var13 = false;
                 boolean var14 = false;
@@ -112,6 +129,10 @@ public class WorldRenderer {
                     for(int z = var3; z < var6; ++z) {
                         for(int x = var1; x < var4; ++x) {
                             int id = var9.getBlockId(x, y, z);
+                            if(UnsafeLightLevelsHack.instance.status && var11 == 0) {
+                            	UnsafeLightLevelsHack.instance.checkBlock(id, x, y, z);
+                            }
+                            
                             if (id > 0) {
                                 if (!var14) {
                                     var14 = true;
@@ -126,13 +147,17 @@ public class WorldRenderer {
                                     tessellator.setTranslationD((double)(-this.posX), (double)(-this.posY), (double)(-this.posZ));
                                 }
                                 
-                                if(BlockESPHack.instance.status) {
+                                if(BlockESPHack.instance.status && var11 == 0) {
         							if(BlockESPHack.instance.blocks.blocks[id]) {
         								BlockPos pos = new BlockPos(x, y, z);
         								if(!BlockESPHack.blocksToRender.contains(pos)) {
         									BlockESPHack.blocksToRender.add(pos);
         								}
         							}
+        						}
+                                
+                                if(TunnelESPHack.instance.status && var11 == 0) {
+        							TunnelESPHack.instance.checkBlock(id, x, y, z);
         						}
                                 
                                 if (var11 == 0 && Block.isBlockContainer[id]) {
@@ -213,14 +238,14 @@ public class WorldRenderer {
     }
 
     public void updateInFrustrum(ICamera var1) {
-        this.isInFrustum = var1.isBoundingBoxInFrustum(this.field_1736_v);
+        this.isInFrustum = var1.isBoundingBoxInFrustum(this.rendererBoundingBox);
     }
 
     public void callOcclusionQueryList() {
         GL11.glCallList(this.glRenderList + 2);
     }
 
-    public boolean canRender() {
+    public boolean skipAllRenderPasses() {
         if (!this.isInitialized) {
             return false;
         } else {

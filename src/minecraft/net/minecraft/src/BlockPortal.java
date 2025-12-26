@@ -3,6 +3,7 @@ package net.minecraft.src;
 import java.util.Random;
 
 import net.skidcode.gh.maybeaclient.hacks.FastPortalHack;
+import net.skidcode.gh.maybeaclient.hacks.NoPortalSoundsHack;
 
 public class BlockPortal extends BlockBreakable {
     public BlockPortal(int var1, int var2) {
@@ -10,7 +11,7 @@ public class BlockPortal extends BlockBreakable {
     }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-        return null;
+    	return null;
     }
 
     public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
@@ -140,7 +141,9 @@ public class BlockPortal extends BlockBreakable {
 
     public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
         if (var5.nextInt(100) == 0) {
-            var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "portal.portal", 1.0F, var5.nextFloat() * 0.4F + 0.8F);
+        	if(!NoPortalSoundsHack.instance.status) {
+        		var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "portal.portal", 1.0F, var5.nextFloat() * 0.4F + 0.8F);
+        	}
         }
 
         for(int var6 = 0; var6 < 4; ++var6) {

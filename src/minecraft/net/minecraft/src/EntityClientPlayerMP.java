@@ -1,8 +1,10 @@
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventMPMovementUpdate;
+import net.skidcode.gh.maybeaclient.hacks.CombatLogHack;
 
 public class EntityClientPlayerMP extends EntityPlayerSP {
     public NetClientHandler sendQueue;
@@ -12,8 +14,8 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
     private double field_9378_bz;
     private double field_9377_bA;
     private double field_9376_bB;
-    private float field_9385_bC;
-    private float field_9384_bD;
+    public float field_9385_bC;
+    public float field_9384_bD;
     private boolean field_9382_bF = false;
     private boolean field_9381_bG = false;
     private int field_12242_bI = 0;
@@ -24,6 +26,13 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
     }
 
     public boolean attackEntityFrom(Entity var1, int var2) {
+    	if(CombatLogHack.mpSent && this == mc.thePlayer && CombatLogHack.instance.status && CombatLogHack.instance.mode.currentMode.equalsIgnoreCase("OnHit")) {
+    		if(mc.isMultiplayerWorld()) {
+    			Client.forceDisconnect(CombatLogHack.instance);
+    		}else {
+    			CombatLogHack.shouldQuit = true;
+    		}
+    	}
         return false;
     }
 
@@ -32,9 +41,9 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
 
     public void onUpdate() {
     	//XXX Fixes freecam
-        //if (this.worldObj.blockExists(MathHelper.floor_double(this.posX), 64, MathHelper.floor_double(this.posZ))) {
-            super.onUpdate();
-            this.func_4056_N();
+    	//if (this.worldObj.blockExists(MathHelper.floor_double(this.posX), 64, MathHelper.floor_double(this.posZ))) {
+        super.onUpdate();
+        this.func_4056_N();
         //}
     }
 
@@ -42,7 +51,6 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
     	
     	EventMPMovementUpdate ev = new EventMPMovementUpdate();
     	EventRegistry.handleEvent(ev);
-    	
     	
         if (this.field_9380_bx++ == 20) {
             this.sendInventoryChanged();
@@ -52,9 +60,9 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
         boolean var1 = this.isSneaking();
         if (var1 != this.field_9381_bG) {
             if (var1) {
-                this.sendQueue.addToSendQueue(new Packet19(this, 1));
+                this.sendQueue.addToSendQueue(new Packet19EntityAction(this, 1));
             } else {
-                this.sendQueue.addToSendQueue(new Packet19(this, 2));
+                this.sendQueue.addToSendQueue(new Packet19EntityAction(this, 2));
             }
 
             this.field_9381_bG = var1;
@@ -125,12 +133,12 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
 
     public void swingItem() {
         super.swingItem();
-        this.sendQueue.addToSendQueue(new Packet18ArmAnimation(this, 1));
+        this.sendQueue.addToSendQueue(new Packet18Animation(this, 1));
     }
 
     public void respawnPlayer() {
         this.sendInventoryChanged();
-        this.sendQueue.addToSendQueue(new Packet9());
+        this.sendQueue.addToSendQueue(new Packet9Respawn());
     }
 
     protected void damageEntity(int var1) {
@@ -138,11 +146,11 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
     }
 
     public void func_20059_m() {
-        this.sendQueue.addToSendQueue(new Packet101(this.craftingInventory.windowId));
+        this.sendQueue.addToSendQueue(new Packet101CloseWindow(this.craftingInventory.windowId));
         this.inventory.setItemStack((ItemStack)null);
         super.func_20059_m();
     }
-    
+
     public void setHealth(int var1) {
         if (this.field_21093_bH) {
             super.setHealth(var1);
@@ -151,5 +159,23 @@ public class EntityClientPlayerMP extends EntityPlayerSP {
             this.field_21093_bH = true;
         }
 
+    }
+
+    public void addStat(StatBase var1, int var2) {
+        if (var1 != null) {
+            if (var1.field_27088_g) {
+                super.addStat(var1, var2);
+            }
+
+        }
+    }
+
+    public void func_27027_b(StatBase var1, int var2) {
+        if (var1 != null) {
+            if (!var1.field_27088_g) {
+                super.addStat(var1, var2);
+            }
+
+        }
     }
 }

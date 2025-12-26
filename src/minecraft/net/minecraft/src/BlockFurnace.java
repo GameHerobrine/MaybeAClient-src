@@ -21,28 +21,30 @@ public class BlockFurnace extends BlockContainer {
     }
 
     private void setDefaultDirection(World var1, int var2, int var3, int var4) {
-        int var5 = var1.getBlockId(var2, var3, var4 - 1);
-        int var6 = var1.getBlockId(var2, var3, var4 + 1);
-        int var7 = var1.getBlockId(var2 - 1, var3, var4);
-        int var8 = var1.getBlockId(var2 + 1, var3, var4);
-        byte var9 = 3;
-        if (Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) {
-            var9 = 3;
-        }
+        if (!var1.multiplayerWorld) {
+            int var5 = var1.getBlockId(var2, var3, var4 - 1);
+            int var6 = var1.getBlockId(var2, var3, var4 + 1);
+            int var7 = var1.getBlockId(var2 - 1, var3, var4);
+            int var8 = var1.getBlockId(var2 + 1, var3, var4);
+            byte var9 = 3;
+            if (Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) {
+                var9 = 3;
+            }
 
-        if (Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) {
-            var9 = 2;
-        }
+            if (Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) {
+                var9 = 2;
+            }
 
-        if (Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) {
-            var9 = 5;
-        }
+            if (Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) {
+                var9 = 5;
+            }
 
-        if (Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) {
-            var9 = 4;
-        }
+            if (Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) {
+                var9 = 4;
+            }
 
-        var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
+            var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
+        }
     }
 
     public int getBlockTexture(IBlockAccess var1, int var2, int var3, int var4, int var5) {

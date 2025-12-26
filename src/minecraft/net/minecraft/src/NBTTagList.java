@@ -8,7 +8,7 @@ import java.util.List;
 
 public class NBTTagList extends NBTBase {
     private List tagList = new ArrayList();
-    private byte tagType;
+    public byte tagType;
 
     void writeTagContents(DataOutput var1) throws IOException {
         if (this.tagList.size() > 0) {

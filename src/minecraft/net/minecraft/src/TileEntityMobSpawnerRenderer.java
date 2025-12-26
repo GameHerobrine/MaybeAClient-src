@@ -28,6 +28,7 @@ public class TileEntityMobSpawnerRenderer extends TileEntitySpecialRenderer {
             GL11.glTranslatef(0.0F, -0.4F, 0.0F);
             GL11.glScalef(var10, var10, var10);
             var9.setLocationAndAngles(var2, var4, var6, 0.0F, 0.0F);
+            //XXX fix for nametags
             boolean debugEnabled = Minecraft.isDebugInfoEnabled();
             Client.mc.gameSettings.showDebugInfo = false;
             RenderManager.instance.renderEntityWithPosYaw(var9, 0.0D, 0.0D, 0.0D, 0.0F, var8);

@@ -26,13 +26,19 @@ public class GuiGameOver extends GuiScreen {
         }
 
         if (var1.id == 2) {
+        	this.mc.theWorld.sendQuittingDisconnectingPacket();
             this.mc.changeWorld1((World)null);
             this.mc.displayGuiScreen(new GuiMainMenu());
         }
 
     }
-
+    public long lastPacket = 0;
+    
     public void drawScreen(int var1, int var2, float var3) {
+    	if(System.currentTimeMillis() - this.lastPacket > 1000) {
+    		this.lastPacket = System.currentTimeMillis();
+    		if(mc.isMultiplayerWorld()) mc.getSendQueue().addToSendQueue(new Packet0KeepAlive());
+    	}
         this.drawGradientRect(0, 0, this.width, this.height, 1615855616, -1602211792);
         GL11.glPushMatrix();
         GL11.glScalef(2.0F, 2.0F, 2.0F);

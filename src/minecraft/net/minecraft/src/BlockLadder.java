@@ -2,6 +2,8 @@ package net.minecraft.src;
 
 import java.util.Random;
 
+import net.skidcode.gh.maybeaclient.hacks.ClimbGappedLadderHack;
+
 public class BlockLadder extends Block {
     protected BlockLadder(int var1, int var2) {
         super(var1, var2, Material.circuits);
@@ -9,21 +11,28 @@ public class BlockLadder extends Block {
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockMetadata(var2, var3, var4);
+        
         float var6 = 0.125F;
+        float yb = 0;
+        if(ClimbGappedLadderHack.instance.status && ClimbGappedLadderHack.instance.allowTwoBlockGaps.getValue()) {
+        	if(var1.getBlockId(var2, var3+3, var4) == this.blockID && var1.getBlockId(var2, var3+2, var4) != this.blockID && var1.getBlockId(var2, var3+1, var4) != this.blockID) {
+        		yb = 0.5f;
+        	}
+        }
         if (var5 == 2) {
-            this.setBlockBounds(0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F, 1.0F);
+            this.setBlockBounds(0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F+yb, 1.0F);
         }
 
         if (var5 == 3) {
-            this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, var6);
+            this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F+yb, var6);
         }
 
         if (var5 == 4) {
-            this.setBlockBounds(1.0F - var6, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+            this.setBlockBounds(1.0F - var6, 0.0F, 0.0F, 1.0F, 1.0F+yb, 1.0F);
         }
 
         if (var5 == 5) {
-            this.setBlockBounds(0.0F, 0.0F, 0.0F, var6, 1.0F, 1.0F);
+            this.setBlockBounds(0.0F, 0.0F, 0.0F, var6, 1.0F+yb, 1.0F);
         }
 
         return super.getCollisionBoundingBoxFromPool(var1, var2, var3, var4);

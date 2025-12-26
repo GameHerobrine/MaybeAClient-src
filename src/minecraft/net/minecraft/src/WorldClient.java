@@ -10,18 +10,27 @@ public class WorldClient extends World {
     private LinkedList field_1057_z = new LinkedList();
     private NetClientHandler sendQueue;
     private ChunkProviderClient field_20915_C;
-    private MCHashTable field_1055_D = new MCHashTable();
+    private MCHash field_1055_D = new MCHash();
     private Set field_20914_E = new HashSet();
     private Set field_1053_F = new HashSet();
-	public SaveHandler downloadSaveHandler;
+
+    public SaveHandler downloadSaveHandler;
 	public IChunkLoader downloadChunkLoader;
 	public boolean downloadThisWorld = false;
-
+    
     public WorldClient(NetClientHandler var1, long var2, int var4) {
         super(new SaveHandlerMP(), "MpServer", WorldProvider.func_4101_a(var4), var2);
         this.sendQueue = var1;
         this.setSpawnPoint(new ChunkCoordinates(8, 64, 8));
     }
+
+    public void setNewBlockTileEntity(int x, int y, int z, TileEntity tile) {
+    	Chunk chunk = getChunkFromChunkCoords(x >> 4, z >> 4);
+        if(chunk != null)
+        {
+            chunk.setNewChunkBlockTileEntity(x & 0xf, y, z & 0xf, tile);
+        }
+	}
     
     public void saveWorld(boolean var1, IProgressUpdate var2) {
     	if(this.downloadThisWorld) {
@@ -30,38 +39,15 @@ public class WorldClient extends World {
     	}
     	super.saveWorld(var1, var2);
     }
-    public void playNoteAt(int x, int y, int z, int var4, int var5) {
-    	super.playNoteAt(x, y, z, var4, var5);
-    	if(!downloadThisWorld)
-        {
-            return;
-        }
-        if(getBlockId(x, y, z) == Block.musicBlock.blockID)
-        {
-            TileEntityNote tileentitynote = (TileEntityNote)getBlockTileEntity(x, y, z);
-            if(tileentitynote == null)
-            {
-                setBlockTileEntity(x, y, z, new TileEntityNote());
-            }
-            tileentitynote.note = (byte)(var5 % 25);
-            tileentitynote.x_();
-            setNewBlockTileEntity(x, y, z, tileentitynote);
-        }
-    }
-    public void setNewBlockTileEntity(int x, int y, int z, TileEntity tile) {
-    	Chunk chunk = getChunkFromChunkCoords(x >> 4, z >> 4);
-        if(chunk != null)
-        {
-            chunk.setNewChunkBlockTileEntity(x & 0xf, y, z & 0xf, tile);
-        }
-	}
-
-	public void tick() {
+    
+    public void tick() {
         this.setWorldTime(this.getWorldTime() + 1L);
+        
         long oldTime = this.getWorldTime();
         if(LockTimeHack.INSTANCE.status) {
         	this.worldInfo.setWorldTime(LockTimeHack.INSTANCE.lockedTime.value);
         }
+        
         int var1 = this.calculateSkylightSubtracted(1.0F);
         int var2;
         if (var1 != this.skylightSubtracted) {
@@ -71,8 +57,9 @@ public class WorldClient extends World {
                 ((IWorldAccess)this.worldAccesses.get(var2)).updateAllRenderers();
             }
         }
-
+        
         if(LockTimeHack.INSTANCE.status) {
+        	LockTimeHack.INSTANCE.realTime = oldTime;
         	this.worldInfo.setWorldTime(oldTime);
         }
         
@@ -106,6 +93,25 @@ public class WorldClient extends World {
 
     }
 
+    public void playNoteAt(int x, int y, int z, int var4, int var5) {
+    	super.playNoteAt(x, y, z, var4, var5);
+    	if(!downloadThisWorld)
+        {
+            return;
+        }
+        if(getBlockId(x, y, z) == Block.musicBlock.blockID)
+        {
+            TileEntityNote tileentitynote = (TileEntityNote)getBlockTileEntity(x, y, z);
+            if(tileentitynote == null)
+            {
+                setBlockTileEntity(x, y, z, new TileEntityNote());
+            }
+            tileentitynote.note = (byte)(var5 % 25);
+            tileentitynote.y_();
+            setNewBlockTileEntity(x, y, z, tileentitynote);
+        }
+    }
+    
     protected IChunkProvider getChunkProvider() {
         this.field_20915_C = new ChunkProviderClient(this);
         return this.field_20915_C;

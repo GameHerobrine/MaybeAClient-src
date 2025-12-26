@@ -10,4 +10,8 @@ public class BlockGlass extends BlockBreakable {
     public int quantityDropped(Random var1) {
         return 0;
     }
+
+    public int getRenderBlockPass() {
+        return 0;
+    }
 }

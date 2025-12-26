@@ -11,23 +11,23 @@ public class GuiButton extends Gui {
     public String displayString;
     public int id;
     public boolean enabled;
-    public boolean shown;
+    public boolean enabled2;
 
     public GuiButton(int var1, int var2, int var3, String var4) {
         this(var1, var2, var3, 200, 20, var4);
     }
 
-    public GuiButton(int var1, int var2, int var3, int var4, int var5, String var6) {
+    public GuiButton(int id, int x, int y, int width, int height, String text) {
         this.width = 200;
         this.height = 20;
         this.enabled = true;
-        this.shown = true;
-        this.id = var1;
-        this.xPosition = var2;
-        this.yPosition = var3;
-        this.width = var4;
-        this.height = var5;
-        this.displayString = var6;
+        this.enabled2 = true;
+        this.id = id;
+        this.xPosition = x;
+        this.yPosition = y;
+        this.width = width;
+        this.height = height;
+        this.displayString = text;
     }
 
     protected int getHoverState(boolean var1) {
@@ -42,7 +42,7 @@ public class GuiButton extends Gui {
     }
 
     public void drawButton(Minecraft var1, int var2, int var3) {
-        if (this.shown) {
+        if (this.enabled2) {
             FontRenderer var4 = var1.fontRenderer;
             GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, var1.renderEngine.getTexture("/gui/gui.png"));
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

@@ -3,7 +3,13 @@ package net.minecraft.src;
 import java.nio.IntBuffer;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
+//XXX nojitter
 public class RenderList {
+	static {
+		Client.class.getClass();
+	}
     private int field_1242_a;
     private int field_1241_b;
     private int field_1240_c;

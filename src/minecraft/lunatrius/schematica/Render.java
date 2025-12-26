@@ -8,67 +8,47 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Map;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
-
+import lunatrius.schematica.util.SchematicaRenderBuffer;
 import lunatrius.schematica.util.Vector3f;
 import lunatrius.schematica.util.Vector3i;
-import lunatrius.schematica.util.Vector4i;
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.EntityRenderer;
 import net.minecraft.src.GLAllocation;
 import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.RenderBlocks;
-import net.minecraft.src.RenderEngine;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.TexturePackBase;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.TileEntitySign;
 import net.minecraft.src.TileEntitySpecialRenderer;
-import net.minecraft.src.Timer;
 import net.skidcode.gh.maybeaclient.hacks.SchematicaHack;
-
-import org.lwjgl.BufferUtils;
+import net.skidcode.gh.maybeaclient.utils.MiniChunkPos;
 import org.lwjgl.opengl.GL11;
 
 public class Render {
 	public final Settings settings = Settings.instance();
 	public final List<String> textures = new ArrayList<String>();
 	public final BufferedImage missingTextureImage = new BufferedImage(64, 64, 2);
-	//public Field fieldTextureMap = null;
-	//public Field fieldSingleIntBuffer = null;
-	public boolean hasBlockList = false;
-	private int glBlockList;
-
-	public int bufferSizeQuad = 1048576;
-	public FloatBuffer cBufferQuad = BufferUtils.createFloatBuffer(this.bufferSizeQuad * 4);
-	public FloatBuffer vBufferQuad = BufferUtils.createFloatBuffer(this.bufferSizeQuad * 3);
-	public int objectCountQuad = -1;
-	public boolean needsExpansionQuad = false;
-
-	public int bufferSizeLine = 1048576;
-	public FloatBuffer cBufferLine = BufferUtils.createFloatBuffer(this.bufferSizeLine * 4);
-	public FloatBuffer vBufferLine = BufferUtils.createFloatBuffer(this.bufferSizeLine * 3);
-	public int objectCountLine = -1;
-	public boolean needsExpansionLine = false;
-	
+	public HashMap<MiniChunkPos, SchematicaRenderBuffer> renderBuffers = new HashMap<>();
+	public SchematicaRenderBuffer globalRenderBuffer = new SchematicaRenderBuffer(false);
+	public boolean useGlobalRenderBuffer = true;
 	public SchematicaHack schematica;
 	
 	public Render(SchematicaHack insatnce) {
 		this.schematica = insatnce;
 		initTexture();
-		initReflection();
 	}
 
 	public void initTexture() {
@@ -78,9 +58,6 @@ public class Render {
 		graphics.setColor(Color.BLACK);
 		graphics.drawString("missingtex", 1, 10);
 		graphics.dispose();
-	}
-
-	public void initReflection() {
 	}
 
 	public void onRender(EntityRenderer event, float f) {
@@ -104,25 +81,10 @@ public class Render {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthMask(true);
-
-		if (this.needsExpansionQuad) {
-			//Settings.logger.log(Level.INFO, "Expanding QUADS buffer...");
-			this.bufferSizeQuad *= 2;
-			this.cBufferQuad = BufferUtils.createFloatBuffer(this.bufferSizeQuad * 4);
-			this.vBufferQuad = BufferUtils.createFloatBuffer(this.bufferSizeQuad * 3);
-			this.needsExpansionQuad = false;
-		}
-
-		if (this.needsExpansionLine) {
-			//Settings.logger.log(Level.INFO, "Expanding LINES buffer...");
-			this.bufferSizeLine *= 2;
-			this.cBufferLine = BufferUtils.createFloatBuffer(this.bufferSizeLine * 4);
-			this.vBufferLine = BufferUtils.createFloatBuffer(this.bufferSizeLine * 3);
-			this.needsExpansionLine = false;
-		}
-
 		int minX = 0, maxX = 0, minY = 0, maxY = 0, minZ = 0, maxZ = 0;
-
+		HashSet<MiniChunkPos> toRender = null;
+		
+		this.globalRenderBuffer.clear();
 		if (this.settings.schematic != null) {
 			maxX = this.settings.schematic.width();
 			maxY = this.settings.schematic.height();
@@ -132,79 +94,75 @@ public class Render {
 				minY = this.settings.renderingLayer;
 				maxY = this.settings.renderingLayer + 1;
 			}
+		
+			toRender = new HashSet<MiniChunkPos>();
+			useGlobalRenderBuffer = false;
+			for(int x = minX/16; x <= maxX/16; ++x) {
+				for(int z = minZ/16; z <= maxZ/16; ++z) {
+					for(int y = minY/16; y <= maxY/16; ++y) {
+						MiniChunkPos mcp = new MiniChunkPos(x, y, z);
+						SchematicaRenderBuffer rb = this.getRenderBuffer(mcp);
+						toRender.add(mcp);
+						if(rb.update) {
+							rb.clear();
+							GL11.glNewList(rb.blockDisplayList, GL11.GL_COMPILE);
+							int minBX = x*16;
+							int maxBX = (x+1)*16;
+							int minBY = y*16;
+							int maxBY = (y+1)*16;
+							int minBZ = z*16;
+							int maxBZ = (z+1)*16;
+							if(minBX < minX) minBX = minX;
+							if(minBY < minY) minBY = minY;
+							if(minBZ < minZ) minBZ = minZ;
+							if(maxBX > maxX) maxBX = maxX;
+							if(maxBY > maxY) maxBY = maxY;
+							if(maxBZ > maxZ) maxBZ = maxZ;
+							
+							this.renderBlocks(minBX, minBY, minBZ, maxBX, maxBY, maxBZ);
+							
+							GL11.glEndList();
+							rb.update = false;
+						}
+					}
+				}
+			}
+			
+			useGlobalRenderBuffer = true;
+			SchematicWorld world = Settings.instance().schematic;
+			drawCuboidLine(Vector3i.ZERO, new Vector3i(world.width(), world.height(), world.length()), 0x3F, 0.75f, 0.0f, 0.75f, 0.25f);
 		}
-
-		if (this.settings.needsUpdate) {
-			this.objectCountQuad = 0;
-			this.objectCountLine = 0;
-
-			this.cBufferQuad.clear();
-			this.vBufferQuad.clear();
-			this.cBufferLine.clear();
-			this.vBufferLine.clear();
-			if(!this.hasBlockList) {
-				this.hasBlockList = true;
-				this.glBlockList = GL11.glGenLists(1);
-			}
-			GL11.glNewList(this.glBlockList, GL11.GL_COMPILE);
-
-			if (this.settings.isRenderingSchematic && this.settings.schematic != null) {
-				renderBlocks(minX, minY, minZ, maxX, maxY, maxZ);
-			}
-
-			if (this.settings.isRenderingGuide) {
-				renderGuide();
-			}
-
-			GL11.glEndList();
-
-			this.settings.needsUpdate = false;
+		
+		if (this.settings.isRenderingGuide) {
+			renderGuide();
 		}
-
+		
 		GL11.glTranslatef(-this.settings.getTranslationX(), -this.settings.getTranslationY(), -this.settings.getTranslationZ());
-		if(!this.hasBlockList) {
-			this.hasBlockList = true;
-			this.glBlockList = GL11.glGenLists(1);
+		if (this.settings.isRenderingSchematic && this.settings.schematic != null) {
+			ArrayList<MiniChunkPos> toRemove = new ArrayList<>();
+			for(Map.Entry<MiniChunkPos, SchematicaRenderBuffer> kp : this.renderBuffers.entrySet()) {
+				if(!toRender.contains(kp.getKey())) {
+					kp.getValue().destroy();
+					toRemove.add(kp.getKey());
+					continue;
+				}
+				kp.getValue().drawBlocks();
+			}
+			while(toRemove.size() > 0) this.renderBuffers.remove(toRemove.remove(toRemove.size()-1));
+			
+			for(Map.Entry<MiniChunkPos, SchematicaRenderBuffer> kp : this.renderBuffers.entrySet()) {
+				kp.getValue().drawHighlight();
+			}
 		}
-		GL11.glCallList(this.glBlockList);
+		
+		this.globalRenderBuffer.drawHighlight();
 
+		
 		if (this.settings.isRenderingSchematic && this.settings.schematic != null) {
 			renderTileEntities(minX, minY, minZ, maxX, maxY, maxZ);
 		}
 
-		if (this.objectCountQuad > 0 || this.objectCountLine > 0) {
-			this.cBufferQuad.flip();
-			this.vBufferQuad.flip();
-
-			this.cBufferLine.flip();
-			this.vBufferLine.flip();
-
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-
-			GL11.glLineWidth(1.5f);
-
-			GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-			GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-
-			if (this.objectCountQuad > 0) {
-				GL11.glColorPointer(4, 0, this.cBufferQuad);
-				GL11.glVertexPointer(3, 0, this.vBufferQuad);
-				GL11.glDrawArrays(GL11.GL_QUADS, 0, this.objectCountQuad);
-			}
-
-			if (this.objectCountLine > 0) {
-				GL11.glColorPointer(4, 0, this.cBufferLine);
-				GL11.glVertexPointer(3, 0, this.vBufferLine);
-				GL11.glDrawArrays(GL11.GL_LINES, 0, this.objectCountLine);
-			}
-
-			GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
-			GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-		}
-
-		GL11.glTranslatef(this.settings.getTranslationX(), +this.settings.getTranslationY(), +this.settings.getTranslationZ());
+		//GL11.glTranslatef(this.settings.getTranslationX(), +this.settings.getTranslationY(), +this.settings.getTranslationZ());
 
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -215,27 +173,17 @@ public class Render {
 		IBlockAccess mcWorld = this.settings.minecraft.theWorld;
 		SchematicWorld world = this.settings.schematic;
 		RenderBlocks renderBlocks = this.settings.renderBlocks;
-		List<Vector4i> invalidBlockId = new ArrayList<Vector4i>();
-		List<Vector4i> invalidBlockMetadata = new ArrayList<Vector4i>();
-		List<Vector4i> todoBlocks = new ArrayList<Vector4i>();
 
 		int x, y, z;
 		int blockId = 0, mcBlockId = 0;
 		int sides = 0;
 		Block block = null;
-		String lastTexture = "";
 
 		boolean ambientOcclusion = this.settings.minecraft.gameSettings.ambientOcclusion;
 		this.settings.minecraft.gameSettings.ambientOcclusion = false;
 		Tessellator.instance.schematicaRendering = true;
 		
 		Tessellator.instance.startDrawingQuads();
-		this.settings.emptyStats();
-		boolean incrStats = true;
-		if(minY != 0 || maxY != this.settings.schematic.height()) {
-			incrStats = false;
-			this.settings.recalculateStats();
-		}
 		
 		for (x = minX; x < maxX; x++) {
 			for (y = minY; y < maxY; y++) {
@@ -247,87 +195,54 @@ public class Render {
 						
 						sides = 0;
 						if (block != null) {
-							if (block.shouldSideBeRendered(world, x, y - 1, z, 0)) {
-								sides |= 0x01;
-							}
-
-							if (block.shouldSideBeRendered(world, x, y + 1, z, 1)) {
-								sides |= 0x02;
-							}
-
-							if (block.shouldSideBeRendered(world, x, y, z - 1, 2)) {
-								sides |= 0x04;
-							}
-
-							if (block.shouldSideBeRendered(world, x, y, z + 1, 3)) {
-								sides |= 0x08;
-							}
-
-							if (block.shouldSideBeRendered(world, x - 1, y, z, 4)) {
-								sides |= 0x10;
-							}
-
-							if (block.shouldSideBeRendered(world, x + 1, y, z, 5)) {
-								sides |= 0x20;
-							}
+							if (block.shouldSideBeRendered(world, x, y - 1, z, 0)) sides |= 0x01;
+							if (block.shouldSideBeRendered(world, x, y + 1, z, 1)) sides |= 0x02;
+							if (block.shouldSideBeRendered(world, x, y, z - 1, 2)) sides |= 0x04;
+							if (block.shouldSideBeRendered(world, x, y, z + 1, 3)) sides |= 0x08;
+							if (block.shouldSideBeRendered(world, x - 1, y, z, 4)) sides |= 0x10;
+							if (block.shouldSideBeRendered(world, x + 1, y, z, 5)) sides |= 0x20;
 						}
 
 						if (mcBlockId != 0) {
 							if (blockId != mcBlockId) {
-								if(incrStats) this.settings.incrementStat(mcBlockId, BlockStat.REMOVE);
-								if(incrStats) this.settings.incrementStat(blockId, BlockStat.PLACE);
-								if(this.schematica.highlight.value) invalidBlockId.add(new Vector4i(x, y, z, sides));
+								//if(incrStats) this.settings.incrementStat(mcBlockId, BlockStat.REMOVE);
+								//if(incrStats) this.settings.incrementStat(blockId, BlockStat.PLACE);
+								if(this.schematica.highlight.value) {
+									Vector3i tmp = new Vector3i(x, y, z);
+									drawCuboidQuad(tmp, tmp.clone().add(1), sides, 1.0f, 0.0f, 0.0f, 0.25f);
+									drawCuboidLine(tmp, tmp.clone().add(1), sides, 1.0f, 0.0f, 0.0f, 0.25f);
+								}
 							} else if (world.getBlockMetadata(x, y, z) != mcWorld.getBlockMetadata(x + this.settings.offset.x, y + this.settings.offset.y, z + this.settings.offset.z)) {
-								if(incrStats) this.settings.incrementStat(blockId, BlockStat.METAINVALID);
-								if(this.schematica.highlight.value) invalidBlockMetadata.add(new Vector4i(x, y, z, sides));
-							}else if(mcBlockId == blockId){
-								if(incrStats) this.settings.incrementStat(blockId, BlockStat.DONEPLACE);
-							}
+								//if(incrStats) this.settings.incrementStat(blockId, BlockStat.METAINVALID);
+								if(this.schematica.highlight.value) {
+									Vector3i tmp = new Vector3i(x, y, z);
+									drawCuboidQuad(tmp, tmp.clone().add(1), sides, 0.75f, 0.35f, 0.0f, 0.45f);
+									drawCuboidLine(tmp, tmp.clone().add(1), sides, 0.75f, 0.35f, 0.0f, 0.45f);
+								}
+							}//else if(mcBlockId == blockId){
+								//if(incrStats) this.settings.incrementStat(blockId, BlockStat.DONEPLACE);
+							//}
 						} else if (mcBlockId == 0 && blockId > 0 && blockId < 0x1000) {
 							if (this.schematica.highlight.value) {
-								todoBlocks.add(new Vector4i(x, y, z, sides));
-							}
-							if(incrStats) this.settings.incrementStat(blockId, BlockStat.PLACE);
+								Vector3i tmp = new Vector3i(x, y, z);
 
-							if (block != null) {
-								//mod_Schematica.instance.mc.theWorld.setBlockAndMetadata(x + this.settings.offset.x, y + this.settings.offset.y, z + this.settings.offset.z, block.blockID, mcWorld.getBlockMetadata(x + this.settings.offset.x, y + this.settings.offset.y, z + this.settings.offset.z));
-								renderBlocks.renderBlockByRenderType(block, x, y, z);
+								drawCuboidQuad(tmp, tmp.clone().add(1), sides, 0.0f, 0.75f, 1.0f, 0.25f);
+								drawCuboidLine(tmp, tmp.clone().add(1), sides, 0.0f, 0.75f, 1.0f, 0.25f);
 							}
+							
+							//if(incrStats) this.settings.incrementStat(blockId, BlockStat.PLACE);
+
+							if (block != null) renderBlocks.renderBlockByRenderType(block, x, y, z);
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						//e.printStackTrace();
 					}
 				}
 			}
 		}
 		Tessellator.instance.draw();
 		Tessellator.instance.schematicaRendering = false;
-		this.settings.stats_initialized = true;
 		this.settings.minecraft.gameSettings.ambientOcclusion = ambientOcclusion;
-
-		drawCuboidLine(Vector3i.ZERO, new Vector3i(world.width(), world.height(), world.length()), 0x3F, 0.75f, 0.0f, 0.75f, 0.25f);
-
-		Vector3i tmp;
-		for (Vector4i invalidBlock : invalidBlockId) {
-			tmp = new Vector3i(invalidBlock.x, invalidBlock.y, invalidBlock.z);
-
-			drawCuboidQuad(tmp, tmp.clone().add(1), invalidBlock.w, 1.0f, 0.0f, 0.0f, 0.25f);
-			drawCuboidLine(tmp, tmp.clone().add(1), invalidBlock.w, 1.0f, 0.0f, 0.0f, 0.25f);
-		}
-
-		for (Vector4i invalidBlock : invalidBlockMetadata) {
-			tmp = new Vector3i(invalidBlock.x, invalidBlock.y, invalidBlock.z);
-
-			drawCuboidQuad(tmp, tmp.clone().add(1), invalidBlock.w, 0.75f, 0.35f, 0.0f, 0.45f);
-			drawCuboidLine(tmp, tmp.clone().add(1), invalidBlock.w, 0.75f, 0.35f, 0.0f, 0.45f);
-		}
-
-		for (Vector4i todoBlock : todoBlocks) {
-			tmp = new Vector3i(todoBlock.x, todoBlock.y, todoBlock.z);
-
-			drawCuboidQuad(tmp, tmp.clone().add(1), todoBlock.w, 0.0f, 0.75f, 1.0f, 0.25f);
-			drawCuboidLine(tmp, tmp.clone().add(1), todoBlock.w, 0.0f, 0.75f, 1.0f, 0.25f);
-		}
 	}
 
 	public void renderTileEntities(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
@@ -391,196 +306,183 @@ public class Render {
 		drawCuboidLine(start, end, 0x3F, 0.0f, 0.0f, 0.75f, 0.25f);
 		drawCuboidQuad(start, end, 0x3F, 0.0f, 0.0f, 0.75f, 0.25f);
 	}
+	
+	public SchematicaRenderBuffer getRenderBuffer(MiniChunkPos cp) {
+		SchematicaRenderBuffer rb = this.renderBuffers.get(cp);
+		if(rb == null) this.renderBuffers.put(cp, rb = new SchematicaRenderBuffer(true));
+		return rb;
+	}
 
 	public void drawCuboidQuad(Vector3i a, Vector3i b, int sides, float red, float green, float blue, float alpha) {
+		MiniChunkPos cp = a.miniChunk();
+		SchematicaRenderBuffer rb = useGlobalRenderBuffer ? this.globalRenderBuffer : this.renderBuffers.get(cp);
 		Vector3f zero = new Vector3f(a.x, a.y, a.z).sub(this.settings.blockDelta);
 		Vector3f size = new Vector3f(b.x, b.y, b.z).add(this.settings.blockDelta);
 
-		if (this.objectCountQuad + 24 >= this.bufferSizeQuad) {
-			this.needsExpansionQuad = true;
-			return;
-		}
-
 		int total = 0;
-
+		rb.colorq(red, green, blue, alpha);
 		// left
 		if ((sides & 0x10) != 0) {
-			this.vBufferQuad.put(zero.x).put(zero.y).put(zero.z);
-			this.vBufferQuad.put(zero.x).put(zero.y).put(size.z);
-			this.vBufferQuad.put(zero.x).put(size.y).put(size.z);
-			this.vBufferQuad.put(zero.x).put(size.y).put(zero.z);
-
+			rb.vertexq(zero.x, zero.y, zero.z);
+			rb.vertexq(zero.x, zero.y, size.z);
+			rb.vertexq(zero.x, size.y, size.z);
+			rb.vertexq(zero.x, size.y, zero.z);
 			total += 4;
 		}
 
 		// right
 		if ((sides & 0x20) != 0) {
-			this.vBufferQuad.put(size.x).put(zero.y).put(size.z);
-			this.vBufferQuad.put(size.x).put(zero.y).put(zero.z);
-			this.vBufferQuad.put(size.x).put(size.y).put(zero.z);
-			this.vBufferQuad.put(size.x).put(size.y).put(size.z);
+			rb.vertexq(size.x, zero.y, size.z);
+			rb.vertexq(size.x, zero.y, zero.z);
+			rb.vertexq(size.x, size.y, zero.z);
+			rb.vertexq(size.x, size.y, size.z);
 
 			total += 4;
 		}
 
 		// near
 		if ((sides & 0x04) != 0) {
-			this.vBufferQuad.put(size.x).put(zero.y).put(zero.z);
-			this.vBufferQuad.put(zero.x).put(zero.y).put(zero.z);
-			this.vBufferQuad.put(zero.x).put(size.y).put(zero.z);
-			this.vBufferQuad.put(size.x).put(size.y).put(zero.z);
+			rb.vertexq(size.x, zero.y, zero.z);
+			rb.vertexq(zero.x, zero.y, zero.z);
+			rb.vertexq(zero.x, size.y, zero.z);
+			rb.vertexq(size.x, size.y, zero.z);
 
 			total += 4;
 		}
 
 		// far
 		if ((sides & 0x08) != 0) {
-			this.vBufferQuad.put(zero.x).put(zero.y).put(size.z);
-			this.vBufferQuad.put(size.x).put(zero.y).put(size.z);
-			this.vBufferQuad.put(size.x).put(size.y).put(size.z);
-			this.vBufferQuad.put(zero.x).put(size.y).put(size.z);
+			rb.vertexq(zero.x, zero.y, size.z);
+			rb.vertexq(size.x, zero.y, size.z);
+			rb.vertexq(size.x, size.y, size.z);
+			rb.vertexq(zero.x, size.y, size.z);
 
 			total += 4;
 		}
 
 		// bottom
 		if ((sides & 0x01) != 0) {
-			this.vBufferQuad.put(size.x).put(zero.y).put(zero.z);
-			this.vBufferQuad.put(size.x).put(zero.y).put(size.z);
-			this.vBufferQuad.put(zero.x).put(zero.y).put(size.z);
-			this.vBufferQuad.put(zero.x).put(zero.y).put(zero.z);
+			rb.vertexq(size.x, zero.y, zero.z);
+			rb.vertexq(size.x, zero.y, size.z);
+			rb.vertexq(zero.x, zero.y, size.z);
+			rb.vertexq(zero.x, zero.y, zero.z);
 
 			total += 4;
 		}
 
 		// top
 		if ((sides & 0x02) != 0) {
-			this.vBufferQuad.put(size.x).put(size.y).put(zero.z);
-			this.vBufferQuad.put(zero.x).put(size.y).put(zero.z);
-			this.vBufferQuad.put(zero.x).put(size.y).put(size.z);
-			this.vBufferQuad.put(size.x).put(size.y).put(size.z);
+			rb.vertexq(size.x, size.y, zero.z);
+			rb.vertexq(zero.x, size.y, zero.z);
+			rb.vertexq(zero.x, size.y, size.z);
+			rb.vertexq(size.x, size.y, size.z);
 
 			total += 4;
 		}
-
-		for (int i = 0; i < total; i++) {
-			this.cBufferQuad.put(red).put(green).put(blue).put(alpha);
-		}
-
-		this.objectCountQuad += total;
 	}
 
 	public void drawCuboidLine(Vector3i a, Vector3i b, int sides, float red, float green, float blue, float alpha) {
 		Vector3f zero = new Vector3f(a.x, a.y, a.z).sub(this.settings.blockDelta);
 		Vector3f size = new Vector3f(b.x, b.y, b.z).add(this.settings.blockDelta);
-
-		if (this.objectCountLine + 24 >= this.bufferSizeLine) {
-			this.needsExpansionLine = true;
-			return;
-		}
-
+		MiniChunkPos cp = a.miniChunk();
+		SchematicaRenderBuffer rb = useGlobalRenderBuffer ? this.globalRenderBuffer : this.renderBuffers.get(cp);
+		
 		int total = 0;
-
+		rb.colorl(red, green, blue, alpha);
 		// bottom left
 		if ((sides & 0x11) != 0) {
-			this.vBufferLine.put(zero.x).put(zero.y).put(zero.z);
-			this.vBufferLine.put(zero.x).put(zero.y).put(size.z);
+			rb.vertexl(zero.x, zero.y, zero.z);
+			rb.vertexl(zero.x, zero.y, size.z);
 			total += 2;
 		}
 
 		// top left
 		if ((sides & 0x12) != 0) {
-			this.vBufferLine.put(zero.x).put(size.y).put(zero.z);
-			this.vBufferLine.put(zero.x).put(size.y).put(size.z);
+			rb.vertexl(zero.x, size.y, zero.z);
+			rb.vertexl(zero.x, size.y, size.z);
 
 			total += 2;
 		}
 
 		// bottom right
 		if ((sides & 0x21) != 0) {
-			this.vBufferLine.put(size.x).put(zero.y).put(zero.z);
-			this.vBufferLine.put(size.x).put(zero.y).put(size.z);
+			rb.vertexl(size.x, zero.y, zero.z);
+			rb.vertexl(size.x, zero.y, size.z);
 
 			total += 2;
 		}
 
 		// top right
 		if ((sides & 0x22) != 0) {
-			this.vBufferLine.put(size.x).put(size.y).put(zero.z);
-			this.vBufferLine.put(size.x).put(size.y).put(size.z);
+			rb.vertexl(size.x, size.y, zero.z);
+			rb.vertexl(size.x, size.y, size.z);
 
 			total += 2;
 		}
 
 		// bottom near
 		if ((sides & 0x05) != 0) {
-			this.vBufferLine.put(zero.x).put(zero.y).put(zero.z);
-			this.vBufferLine.put(size.x).put(zero.y).put(zero.z);
+			rb.vertexl(zero.x, zero.y, zero.z);
+			rb.vertexl(size.x, zero.y, zero.z);
 
 			total += 2;
 		}
 
 		// top near
 		if ((sides & 0x06) != 0) {
-			this.vBufferLine.put(zero.x).put(size.y).put(zero.z);
-			this.vBufferLine.put(size.x).put(size.y).put(zero.z);
+			rb.vertexl(zero.x, size.y, zero.z);
+			rb.vertexl(size.x, size.y, zero.z);
 
 			total += 2;
 		}
 
 		// bottom far
 		if ((sides & 0x09) != 0) {
-			this.vBufferLine.put(zero.x).put(zero.y).put(size.z);
-			this.vBufferLine.put(size.x).put(zero.y).put(size.z);
+			rb.vertexl(zero.x, zero.y, size.z);
+			rb.vertexl(size.x, zero.y, size.z);
 
 			total += 2;
 		}
 
 		// top far
 		if ((sides & 0x0A) != 0) {
-			this.vBufferLine.put(zero.x).put(size.y).put(size.z);
-			this.vBufferLine.put(size.x).put(size.y).put(size.z);
+			rb.vertexl(zero.x, size.y, size.z);
+			rb.vertexl(size.x, size.y, size.z);
 
 			total += 2;
 		}
 
 		// near left
 		if ((sides & 0x14) != 0) {
-			this.vBufferLine.put(zero.x).put(zero.y).put(zero.z);
-			this.vBufferLine.put(zero.x).put(size.y).put(zero.z);
+			rb.vertexl(zero.x, zero.y, zero.z);
+			rb.vertexl(zero.x, size.y, zero.z);
 
 			total += 2;
 		}
 
 		// near right
 		if ((sides & 0x24) != 0) {
-			this.vBufferLine.put(size.x).put(zero.y).put(zero.z);
-			this.vBufferLine.put(size.x).put(size.y).put(zero.z);
+			rb.vertexl(size.x, zero.y, zero.z);
+			rb.vertexl(size.x, size.y, zero.z);
 
 			total += 2;
 		}
 
 		// far left
 		if ((sides & 0x18) != 0) {
-			this.vBufferLine.put(zero.x).put(zero.y).put(size.z);
-			this.vBufferLine.put(zero.x).put(size.y).put(size.z);
+			rb.vertexl(zero.x, zero.y, size.z);
+			rb.vertexl(zero.x, size.y, size.z);
 
 			total += 2;
 		}
 
 		// far right
 		if ((sides & 0x28) != 0) {
-			this.vBufferLine.put(size.x).put(zero.y).put(size.z);
-			this.vBufferLine.put(size.x).put(size.y).put(size.z);
+			rb.vertexl(size.x, zero.y, size.z);
+			rb.vertexl(size.x, size.y, size.z);
 
 			total += 2;
 		}
-
-		for (int i = 0; i < total; i++) {
-			this.cBufferLine.put(red).put(green).put(blue).put(alpha);
-		}
-
-		this.objectCountLine += total;
 	}
 
 	public String getTextureName(String texture) {
@@ -600,7 +502,6 @@ public class Render {
 			
 			if (!newTextureFile.exists()) {
 				BufferedImage bufferedImage = readTextureImage(texturePackBase.func_6481_a(texture));
-				System.out.println(bufferedImage);
 				if (bufferedImage == null) {
 					return texture;
 				}

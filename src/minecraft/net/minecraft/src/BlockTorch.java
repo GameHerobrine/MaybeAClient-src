@@ -2,6 +2,8 @@ package net.minecraft.src;
 
 import java.util.Random;
 
+import net.skidcode.gh.maybeaclient.Client;
+
 public class BlockTorch extends Block {
     protected BlockTorch(int var1, int var2) {
         super(var1, var2, Material.circuits);
@@ -150,9 +152,11 @@ public class BlockTorch extends Block {
 
     public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
         int var6 = var1.getBlockMetadata(var2, var3, var4);
-        double var7 = (double)((float)var2 + 0.5F);
-        double var9 = (double)((float)var3 + 0.7F);
-        double var11 = (double)((float)var4 + 0.5F);
+        Client.class.getClass();
+        //XXX NoJitter fixes
+        double var7 = (double)(var2 + 0.5D);
+        double var9 = (double)(var3 + 0.7D);
+        double var11 = (double)(var4 + 0.5D);
         double var13 = 0.2199999988079071D;
         double var15 = 0.27000001072883606D;
         if (var6 == 1) {

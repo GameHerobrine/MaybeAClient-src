@@ -12,7 +12,7 @@ import net.skidcode.gh.maybeaclient.hacks.SchematicaHack;
 import net.skidcode.gh.maybeaclient.hacks.XRayHack;
 
 public class Tessellator {
-    public static boolean convertQuadsToTriangles = true;
+    private static boolean convertQuadsToTriangles = true;
     private static boolean tryVBO = false;
     private ByteBuffer byteBuffer;
     private IntBuffer intBuffer;
@@ -40,6 +40,7 @@ public class Tessellator {
     private int vboIndex = 0;
     private int vboCount = 10;
     private int bufferSize;
+	public boolean schematicaRendering = false;
 
     private Tessellator(int var1) {
         this.bufferSize = var1;
@@ -174,9 +175,7 @@ public class Tessellator {
     public void setColorRGBA_F(float var1, float var2, float var3, float var4) {
         this.setColorRGBA((int)(var1 * 255.0F), (int)(var2 * 255.0F), (int)(var3 * 255.0F), (int)(var4 * 255.0F));
     }
-    
-    public boolean schematicaRendering = false;
-    
+
     public void setColorOpaque(int var1, int var2, int var3) {
     	if(schematicaRendering) {
     		if(SchematicaHack.instance.enableAlpha.value) {
@@ -185,14 +184,14 @@ public class Tessellator {
     			this.setColorRGBA(var1, var2, var3, 255);
     		}
     	}else {
-    		if(XRayHack.INSTANCE.status && XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
-        		this.setColorRGBA(var1, var2, var3, (int)(XRayHack.INSTANCE.opacity.value * 255) & 255);
-        	}else {
-        		this.setColorRGBA(var1, var2, var3, 255);
-        	}
+    		if(XRayHack.applyOpacity) {
+    			this.setColorRGBA(var1, var2, var3, (int)(XRayHack.INSTANCE.opacity.value * 255) & 255);
+    		}else {
+    			this.setColorRGBA(var1, var2, var3, 255);
+    		}
     	}
     	
-        
+    	//this.setColorRGBA(var1, var2, var3, 255);
     }
 
     public void setColorRGBA(int var1, int var2, int var3, int var4) {
@@ -238,7 +237,13 @@ public class Tessellator {
 
         }
     }
-
+    public void setColorRGBAu(int var1, int var2, int var3, int var4) {
+        if (!this.isColorDisabled) {
+            this.hasColor = true;
+            if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) this.color = var4 << 24 | var3 << 16 | var2 << 8 | var1;
+            else this.color = var1 << 24 | var2 << 16 | var3 << 8 | var4;
+        }
+    }
     public void addVertexWithUV(double var1, double var3, double var5, double var7, double var9) {
         this.setTextureUV(var7, var9);
         this.addVertex(var1, var3, var5);
@@ -313,7 +318,7 @@ public class Tessellator {
         if (!this.isDrawing) {
             System.out.println("But..");
         }
-
+        
         this.hasNormals = true;
         byte var4 = (byte)((int)(var1 * 128.0F));
         byte var5 = (byte)((int)(var2 * 127.0F));

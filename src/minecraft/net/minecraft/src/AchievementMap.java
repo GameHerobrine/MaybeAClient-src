@@ -19,6 +19,8 @@ public class AchievementMap {
                 int var4 = Integer.parseInt(var3[0]);
                 this.field_25209_b.put(var4, var3[1]);
             }
+
+            var1.close();
         } catch (Exception var5) {
             var5.printStackTrace();
         }

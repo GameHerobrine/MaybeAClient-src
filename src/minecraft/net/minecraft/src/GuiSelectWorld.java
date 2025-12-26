@@ -6,19 +6,19 @@ import java.util.Collections;
 import java.util.List;
 
 public class GuiSelectWorld extends GuiScreen {
-    private final DateFormat dateFormatter = new SimpleDateFormat();
+    public final DateFormat dateFormatter = new SimpleDateFormat();
     protected GuiScreen parentScreen;
     protected String screenTitle = "Select world";
     private boolean selected = false;
-    private int selectedWorld;
-    private List saveList;
+    public int selectedWorld;
+    public List saveList;
     private GuiWorldSlot worldSlotContainer;
-    private String field_22098_o;
-    private String field_22097_p;
+    public String field_22098_o;
+    public String field_22097_p;
     private boolean deleting;
-    private GuiButton buttonRename;
-    private GuiButton buttonSelect;
-    private GuiButton buttonDelete;
+    public GuiButton buttonRename;
+    public GuiButton buttonSelect;
+    public GuiButton buttonDelete;
 
     public GuiSelectWorld(GuiScreen var1) {
         this.parentScreen = var1;
@@ -131,50 +131,5 @@ public class GuiSelectWorld extends GuiScreen {
         this.worldSlotContainer.drawScreen(var1, var2, var3);
         this.drawCenteredString(this.fontRenderer, this.screenTitle, this.width / 2, 20, 16777215);
         super.drawScreen(var1, var2, var3);
-    }
-
-    // $FF: synthetic method
-    static List getSize(GuiSelectWorld var0) {
-        return var0.saveList;
-    }
-
-    // $FF: synthetic method
-    static int onElementSelected(GuiSelectWorld var0, int var1) {
-        return var0.selectedWorld = var1;
-    }
-
-    // $FF: synthetic method
-    static int getSelectedWorld(GuiSelectWorld var0) {
-        return var0.selectedWorld;
-    }
-
-    // $FF: synthetic method
-    static GuiButton getSelectButton(GuiSelectWorld var0) {
-        return var0.buttonSelect;
-    }
-
-    // $FF: synthetic method
-    static GuiButton getRenameButton(GuiSelectWorld var0) {
-        return var0.buttonRename;
-    }
-
-    // $FF: synthetic method
-    static GuiButton getDeleteButton(GuiSelectWorld var0) {
-        return var0.buttonDelete;
-    }
-
-    // $FF: synthetic method
-    static String func_22087_f(GuiSelectWorld var0) {
-        return var0.field_22098_o;
-    }
-
-    // $FF: synthetic method
-    static DateFormat getDateFormatter(GuiSelectWorld var0) {
-        return var0.dateFormatter;
-    }
-
-    // $FF: synthetic method
-    static String func_22088_h(GuiSelectWorld var0) {
-        return var0.field_22097_p;
     }
 }

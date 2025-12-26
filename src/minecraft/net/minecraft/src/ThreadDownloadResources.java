@@ -31,7 +31,7 @@ public class ThreadDownloadResources extends Thread {
 
     public void run() {
         try {
-            URL var1 = new URL("http://s3.amazonaws.com/MinecraftResources/"); //TODO replace
+            URL var1 = new URL("http://s3.amazonaws.com/MinecraftResources/");
             DocumentBuilderFactory var2 = DocumentBuilderFactory.newInstance();
             DocumentBuilder var3 = var2.newDocumentBuilder();
             Document var4 = var3.parse(var1.openStream());

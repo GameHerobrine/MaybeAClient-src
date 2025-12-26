@@ -10,11 +10,10 @@ public class EntitySorter implements Comparator {
     }
 
     public int sortByDistanceToEntity(WorldRenderer var1, WorldRenderer var2) {
-    	
-    	float dist1 = var1.distanceToEntitySquared(this.entityForSorting);
-    	float dist2 = var2.distanceToEntitySquared(this.entityForSorting);
-    	
-        return dist1 < dist2 ? -1 : (dist1 == dist2 ? 0 : 1);
+    	double d1 = var1.distanceToEntitySquared(this.entityForSorting);
+    	double d2 = var2.distanceToEntitySquared(this.entityForSorting);
+    	if(d1 == d2) return 0;
+        return d1 < d2 ? -1 : 1;
     }
 
     // $FF: synthetic method

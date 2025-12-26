@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class NBTTagCompound extends NBTBase {
-    public Map<String, NBTBase> tagMap = new HashMap<>();
+	public Map<String, NBTBase> tagMap = new HashMap<>();
 
     public void writeTagContents(DataOutput var1) throws IOException {
         Iterator var2 = this.tagMap.values().iterator();
@@ -74,7 +74,7 @@ public class NBTTagCompound extends NBTBase {
     public void setCompoundTag(String var1, NBTTagCompound var2) {
         this.tagMap.put(var1, var2.setKey(var1));
     }
-    
+
     public void setBoolean(String var1, boolean var2) {
         this.setByte(var1, (byte)(var2 ? 1 : 0));
     }
@@ -116,10 +116,7 @@ public class NBTTagCompound extends NBTBase {
     }
 
     public NBTTagCompound getCompoundTag(String var1) {
-    	if(!this.tagMap.containsKey(var1)) return new NBTTagCompound();
-    	NBTBase tg = this.tagMap.get(var1);
-    	if(tg instanceof NBTTagCompound) return (NBTTagCompound) tg;
-    	return new NBTTagCompound();
+        return !this.tagMap.containsKey(var1) ? new NBTTagCompound() : (NBTTagCompound)this.tagMap.get(var1);
     }
 
     public NBTTagList getTagList(String var1) {

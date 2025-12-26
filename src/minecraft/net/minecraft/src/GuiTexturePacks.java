@@ -9,9 +9,14 @@ public class GuiTexturePacks extends GuiScreen {
     private int field_6454_o = -1;
     private String fileLocation = "";
     private GuiTexturePackSlot guiTexturePackSlot;
-
     public GuiTexturePacks(GuiScreen var1) {
+    	this(var1, true);
+    }
+    //XXX Modifed
+    public boolean fillBg = true;
+    public GuiTexturePacks(GuiScreen var1, boolean fillBg) {
         this.guiScreen = var1;
+        this.fillBg = fillBg;
     }
 
     public void initGui() {
@@ -29,7 +34,7 @@ public class GuiTexturePacks extends GuiScreen {
             if (var1.id == 5) {
                 Sys.openURL("file://" + this.fileLocation);
             } else if (var1.id == 6) {
-                this.mc.renderEngine.refreshTextures();
+                //this.mc.renderEngine.refreshTextures();
                 this.mc.displayGuiScreen(this.guiScreen);
             } else {
                 this.guiTexturePackSlot.actionPerformed(var1);

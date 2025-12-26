@@ -16,7 +16,17 @@ public enum ChatColor {
 	LIGHTRED("c"), 
 	MAGENTA("d"), 
 	YELLOW("e"), 
-	WHITE("f");
+	WHITE("f"),
+	EXP_RESET("\01"),
+	THREEBYTECOL("\02");
+	
+	public static String custom(int rgb) {
+		return custom((rgb & 0xff0000) >> 16, (rgb & 0xff00) >> 8, rgb & 0xff);
+	}
+	public static String custom(int r, int g, int b) {
+		return THREEBYTECOL+""+(char)(r&0xff)+(char)(g&0xff)+(char)(b&0xff);
+	}
+	
 	public final String color;
 	public static final String SYM = "§";
 	ChatColor(String s) {

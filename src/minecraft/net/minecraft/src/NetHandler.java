@@ -1,6 +1,8 @@
 package net.minecraft.src;
 
-public class NetHandler {
+public abstract class NetHandler {
+    public abstract boolean func_27247_c();
+
     public void handleMapChunk(Packet51MapChunk var1) {
     }
 
@@ -78,11 +80,11 @@ public class NetHandler {
         this.registerPacket(var1);
     }
 
-    public void handleArmAnimation(Packet18ArmAnimation var1) {
+    public void handleArmAnimation(Packet18Animation var1) {
         this.registerPacket(var1);
     }
 
-    public void func_21147_a(Packet19 var1) {
+    public void func_21147_a(Packet19EntityAction var1) {
         this.registerPacket(var1);
     }
 
@@ -102,63 +104,63 @@ public class NetHandler {
         this.registerPacket(var1);
     }
 
-    public void func_6498_a(Packet28 var1) {
+    public void func_6498_a(Packet28EntityVelocity var1) {
         this.registerPacket(var1);
     }
 
-    public void func_21148_a(Packet40 var1) {
+    public void func_21148_a(Packet40EntityMetadata var1) {
         this.registerPacket(var1);
     }
 
-    public void func_6497_a(Packet39 var1) {
+    public void func_6497_a(Packet39AttachEntity var1) {
         this.registerPacket(var1);
     }
 
-    public void func_6499_a(Packet7 var1) {
+    public void handleUseEntity(Packet7UseEntity var1) {
         this.registerPacket(var1);
     }
 
-    public void func_9447_a(Packet38 var1) {
+    public void func_9447_a(Packet38EntityStatus var1) {
         this.registerPacket(var1);
     }
 
-    public void handleHealth(Packet8 var1) {
+    public void handleHealth(Packet8UpdateHealth var1) {
         this.registerPacket(var1);
     }
 
-    public void func_9448_a(Packet9 var1) {
+    public void func_9448_a(Packet9Respawn var1) {
         this.registerPacket(var1);
     }
 
-    public void func_12245_a(Packet60 var1) {
+    public void func_12245_a(Packet60Explosion var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20087_a(Packet100 var1) {
+    public void func_20087_a(Packet100OpenWindow var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20092_a(Packet101 var1) {
+    public void func_20092_a(Packet101CloseWindow var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20091_a(Packet102 var1) {
+    public void func_20091_a(Packet102WindowClick var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20088_a(Packet103 var1) {
+    public void func_20088_a(Packet103SetSlot var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20094_a(Packet104 var1) {
+    public void func_20094_a(Packet104WindowItems var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20093_a(Packet130 var1) {
+    public void func_20093_a(Packet130UpdateSign var1) {
         this.registerPacket(var1);
     }
 
-    public void func_20090_a(Packet105 var1) {
+    public void func_20090_a(Packet105UpdateProgressbar var1) {
         this.registerPacket(var1);
     }
 
@@ -166,24 +168,31 @@ public class NetHandler {
         this.registerPacket(var1);
     }
 
-    public void func_20089_a(Packet106 var1) {
+    public void func_20089_a(Packet106Transaction var1) {
         this.registerPacket(var1);
     }
 
-    public void func_21146_a(Packet25 var1) {
+    public void func_21146_a(Packet25EntityPainting var1) {
         this.registerPacket(var1);
     }
 
-    public void func_21145_a(Packet54 var1) {
+    public void func_21145_a(Packet54PlayNoteBlock var1) {
+        this.registerPacket(var1);
+    }
+
+    public void func_27245_a(Packet200Statistic var1) {
         this.registerPacket(var1);
     }
 
     public void func_22186_a(Packet17Sleep var1) {
     }
 
-    public void func_22185_a(Packet27 var1) {
+    public void func_22185_a(Packet27Position var1) {
     }
 
-    public void func_25118_a(Packet70 var1) {
+    public void func_25118_a(Packet70Bed var1) {
+    }
+
+    public void func_27246_a(Packet71Weather var1) {
     }
 }

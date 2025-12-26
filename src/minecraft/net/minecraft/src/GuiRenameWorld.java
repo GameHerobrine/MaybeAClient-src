@@ -25,7 +25,7 @@ public class GuiRenameWorld extends GuiScreen {
         ISaveFormat var2 = this.mc.getSaveLoader();
         WorldInfo var3 = var2.func_22173_b(this.field_22113_i);
         String var4 = var3.getWorldName();
-        this.field_22114_h = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 60, 200, 20, var4);
+        this.field_22114_h = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, 60, 200, 20, var4);
         this.field_22114_h.isFocused = true;
         this.field_22114_h.setMaxStringLength(32);
     }

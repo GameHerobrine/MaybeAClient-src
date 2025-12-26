@@ -4,15 +4,14 @@ import org.lwjgl.input.Keyboard;
 
 public class GuiMultiplayer extends GuiScreen {
     private GuiScreen parentScreen;
-    private GuiTextField serverIp;
-    public GuiTextField username;
-    
+    private GuiTextField field_22111_h;
+
     public GuiMultiplayer(GuiScreen var1) {
         this.parentScreen = var1;
     }
 
     public void updateScreen() {
-        this.serverIp.updateCursorCounter();
+        this.field_22111_h.updateCursorCounter();
     }
 
     public void initGui() {
@@ -23,12 +22,9 @@ public class GuiMultiplayer extends GuiScreen {
         this.controlList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + 12, var1.translateKey("gui.cancel")));
         String var2 = this.mc.gameSettings.lastServer.replaceAll("_", ":");
         ((GuiButton)this.controlList.get(0)).enabled = var2.length() > 0;
-        this.serverIp = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 - 10 + 50 + 18, 200, 20, var2);
-        this.serverIp.isFocused = true;
-        this.serverIp.setMaxStringLength(32);
-        
-        this.username = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 - 10 + 50 + 18 + 24, 150, 20, mc.session.username);
-        this.controlList.add(new GuiButton(2, this.width / 2 - 100 + 152, this.height / 4 - 10 + 50 + 18 + 24, 50, 20, "Change"));
+        this.field_22111_h = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, this.height / 4 - 10 + 50 + 18, 200, 20, var2);
+        this.field_22111_h.isFocused = true;
+        this.field_22111_h.setMaxStringLength(32);
     }
 
     public void onGuiClosed() {
@@ -40,13 +36,11 @@ public class GuiMultiplayer extends GuiScreen {
             if (var1.id == 1) {
                 this.mc.displayGuiScreen(this.parentScreen);
             } else if (var1.id == 0) {
-                String var2 = this.serverIp.getText();
+                String var2 = this.field_22111_h.getText();
                 this.mc.gameSettings.lastServer = var2.replaceAll(":", "_");
                 this.mc.gameSettings.saveOptions();
                 String[] var3 = var2.split(":");
                 this.mc.displayGuiScreen(new GuiConnecting(this.mc, var3[0], var3.length > 1 ? getPort(var3[1], 25565) : 25565));
-            }else if(var1.id == 2) {
-            	mc.session.username = this.username.getText();
             }
 
         }
@@ -61,19 +55,17 @@ public class GuiMultiplayer extends GuiScreen {
     }
 
     protected void keyTyped(char var1, int var2) {
-        this.serverIp.textboxKeyTyped(var1, var2);
-        this.username.textboxKeyTyped(var1, var2);
+        this.field_22111_h.textboxKeyTyped(var1, var2);
         if (var1 == '\r') {
             this.actionPerformed((GuiButton)this.controlList.get(0));
         }
 
-        ((GuiButton)this.controlList.get(0)).enabled = this.serverIp.getText().length() > 0;
+        ((GuiButton)this.controlList.get(0)).enabled = this.field_22111_h.getText().length() > 0;
     }
 
     protected void mouseClicked(int var1, int var2, int var3) {
         super.mouseClicked(var1, var2, var3);
-        this.serverIp.mouseClicked(var1, var2, var3);
-        this.username.mouseClicked(var1, var2, var3);
+        this.field_22111_h.mouseClicked(var1, var2, var3);
     }
 
     public void drawScreen(int var1, int var2, float var3) {
@@ -83,8 +75,7 @@ public class GuiMultiplayer extends GuiScreen {
         this.drawString(this.fontRenderer, var4.translateKey("multiplayer.info1"), this.width / 2 - 140, this.height / 4 - 60 + 60 + 0, 10526880);
         this.drawString(this.fontRenderer, var4.translateKey("multiplayer.info2"), this.width / 2 - 140, this.height / 4 - 60 + 60 + 9, 10526880);
         this.drawString(this.fontRenderer, var4.translateKey("multiplayer.ipinfo"), this.width / 2 - 140, this.height / 4 - 60 + 60 + 36, 10526880);
-        this.serverIp.drawTextBox();
-        this.username.drawTextBox();
+        this.field_22111_h.drawTextBox();
         super.drawScreen(var1, var2, var3);
     }
 }

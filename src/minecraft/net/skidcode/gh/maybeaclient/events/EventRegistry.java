@@ -1,8 +1,6 @@
 package net.skidcode.gh.maybeaclient.events;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 

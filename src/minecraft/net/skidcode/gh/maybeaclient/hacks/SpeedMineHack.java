@@ -17,16 +17,8 @@ public class SpeedMineHack extends Hack{
 		
 		this.addSetting(this.sendDestroyAfter);
 	}
-	
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.sendDestroyAfter.value;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return ""+this.sendDestroyAfter.value;
 	}
-	
 }

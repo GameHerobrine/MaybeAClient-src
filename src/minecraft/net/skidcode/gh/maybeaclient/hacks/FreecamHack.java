@@ -13,10 +13,12 @@ import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePost;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingDouble;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingMode;
 
 public class FreecamHack extends Hack implements EventListener{
 	
 	//TODO old/new mode maybe?
+	//public SettingMode mode = new SettingMode(this, "Mode", "Old", "New");
 	public SettingDouble speedMultiplier = new SettingDouble(this, "Speed Multiplier", 1, 0.1, 2.0);
 	public SettingBoolean noclip = new SettingBoolean(this, "NoClip", true);
 	public SettingBoolean resetPositonOnDisable = new SettingBoolean(this, "ResetPositionOnDisable", true);
@@ -67,5 +69,8 @@ public class FreecamHack extends Hack implements EventListener{
 		}else if(event instanceof EventPlayerUpdatePost) {
 			FlyHack.handleFly(this.speedMultiplier.value); 
 		}
+	}
+	public static boolean movementTaken() {
+		return false; //instance.status && instance.mode.currentMode.equalsIgnoreCase("New");
 	}
 }

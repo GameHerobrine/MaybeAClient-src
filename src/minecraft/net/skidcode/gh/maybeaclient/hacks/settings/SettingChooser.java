@@ -5,7 +5,10 @@ import java.util.HashMap;
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
+import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
+import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class SettingChooser extends Setting{
@@ -117,26 +120,61 @@ public class SettingChooser extends Setting{
 	
 	@Override
 	public void renderElement(Tab tab, int xStart, int yStart, int xEnd, int yEnd) {
+		
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int yReduce = ClickGUIHack.theme().settingYreduce;
+		
 		if(this.minimized) return;
-		tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + 10, 0, 0xaa / 255f, 0xaa / 255f, 1f);
-		
-		yStart += 11;
-		
-		for(int i = 0; i < this.choices.length; ++i) {
-			if(this.getValue(this.choices[i])) {
-				tab.renderFrameBackGround(xStart, yStart + 1, xEnd, yStart + 12 - 1, 0, 0xaa / 255f, 0xaa / 255f, 1f);
-			}
-			yStart += 12;
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS){
+			
+		}else{
+			tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 		
+		yStart += ySpace;
+		
+		for(int i = 0; i < this.choices.length; ++i) {
+			boolean bb = this.getValue(this.choices[i]);
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				float r, g, b, a = 128f/255f;
+				g = b = r = 21/255f;
+				if(bb) {
+					r = ClickGUIHack.r();
+					g = ClickGUIHack.g();
+					b = ClickGUIHack.b();
+					a = 255/255f;
+				}
+				tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - 7, yStart+3, xEnd - Theme.HEPH_OPT_XADD + 1, yStart + ySpace - 3, r, g, b, a);
+				tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - 7, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD + 1, (double)yStart + ySpace - 3);
+				
+			}else if(bb) {
+				if(ClickGUIHack.theme() == Theme.NODUS) {
+					tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+				}else {
+					tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
+				}
+			}
+			yStart += ySpace;
+		}
 	}
 	public int lastPressed = -1;
 	@Override
-	public void onPressedInside(int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+	public void onPressedInside(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		if(this.lastPressed != -1) return;
+		int ySpace = ClickGUIHack.theme().yspacing;
 		int diff = mouseY - yMin;
-		int md = diff / 12;
+		int md = diff / ySpace;
 		if(md > 0) {
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				int d = diff % ySpace;
+				System.out.println(d);
+				if(mouseX < (xMax - Theme.HEPH_OPT_XADD - 7) || mouseX > (xMax - Theme.HEPH_OPT_XADD + 1) || d < 3 || d > (ySpace-3)) {
+					this.lastPressed = md;
+					return;
+				}
+			}
 			md -= 1;
 			this.setValue(this.choices[md], !this.getValue(this.choices[md]));
 		}else if(md == 0){
@@ -152,21 +190,60 @@ public class SettingChooser extends Setting{
 	public void onDeselect(Tab tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
 		this.lastPressed = -1;
 	}
-	public void renderText(int x, int y) {
-		Client.mc.fontRenderer.drawString(this.name, x + 2, y + 2, 0xffffff);
+	@Override
+	public void renderText(Tab tab, int x, int y, int xEnd, int yEnd) {
+		int ySpace = ClickGUIHack.theme().yspacing;
+		int txtColor = 0xffffff;
+		if(ClickGUIHack.theme() == Theme.NODUS) {
+			txtColor = ClickGUIHack.instance.themeColor.rgb();
+			if(this.mouseHovering) {
+				if(hmouseY >= y && hmouseY <= (y+ySpace) && hmouseX >= x && hmouseX <= xEnd) {
+					txtColor = ClickGUIHack.instance.secColor.rgb();
+					this.mouseHovering = false;
+				}
+			}
+		}
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			if(this == NoRenderHack.instance.particles) {
+				txtColor = this.minimized ? Theme.HEPH_DISABLED_COLOR : 0xffffff;
+			}
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			String s = this.minimized ? "+" : "-";
+			Client.mc.fontRenderer.drawStringWithShadow(s, xEnd - Theme.HEPH_OPT_XADD - Client.mc.fontRenderer.getStringWidth(s) + 1, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}else {
+			Client.mc.fontRenderer.drawString(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}
+		
 		if(this.minimized) return;
 		
 		int rx = x + 2 + 4;
-		int ry = y + 12;
+		int ry = y + ySpace;
 		
 		for(int i = 0; i < this.choices.length; ++i){
-			Client.mc.fontRenderer.drawString(this.choices[i], rx + 2, ry + i*12 + 2, 0xffffff);
+			txtColor = 0xffffff;
+			if(ClickGUIHack.theme() == Theme.NODUS) {
+				txtColor = ClickGUIHack.instance.themeColor.rgb();
+				if(this.mouseHovering) {
+					if(hmouseY >= (ry+i*ySpace) && hmouseY <= (ry+i*ySpace+ySpace) && hmouseX >= rx && hmouseX <= xEnd) {
+						txtColor = ClickGUIHack.instance.secColor.rgb();
+						this.mouseHovering = false;
+					}
+				}
+			}
+			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+				int color = 0xffffff;
+				//if(!this.getValue(this.choices[i])) color = Theme.HEPH_DISABLED_COLOR;
+				
+				Client.mc.fontRenderer.drawStringWithShadow(this.choices[i], rx + Theme.HEPH_OPT_XADD + 2, ry + i*ySpace + ClickGUIHack.theme().yaddtocenterText, color);
+			}else {
+				Client.mc.fontRenderer.drawString(this.choices[i], rx + 2, ry + i*ySpace + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			}
 		}
 		
 	}
 	
 	public int getSettingHeight() {
-		if(this.minimized) return 12;
-		return 12*this.choices.length + 12;
+		if(this.minimized) return ClickGUIHack.theme().yspacing;
+		return ClickGUIHack.theme().yspacing*this.choices.length + ClickGUIHack.theme().yspacing;
 	}
 }

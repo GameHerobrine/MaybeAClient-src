@@ -1,20 +1,21 @@
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePost;
 import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePre;
 import net.skidcode.gh.maybeaclient.hacks.AutoTunnelHack;
 import net.skidcode.gh.maybeaclient.hacks.AutoWalkHack;
-import net.skidcode.gh.maybeaclient.hacks.ChestCheckerHack;
 import net.skidcode.gh.maybeaclient.hacks.CombatLogHack;
+import net.skidcode.gh.maybeaclient.hacks.FreecamHack;
 import net.skidcode.gh.maybeaclient.hacks.StrafeHack;
 
 public class EntityPlayerSP extends EntityPlayer {
     public MovementInput movementInput;
     protected Minecraft mc;
     public int field_9373_b = 20;
-    public boolean inPortal = false;
+    private boolean inPortal = false;
     public float timeInPortal;
     public float prevTimeInPortal;
     private MouseFilter field_21903_bJ = new MouseFilter();
@@ -35,30 +36,51 @@ public class EntityPlayerSP extends EntityPlayer {
     public void moveEntity(double var1, double var3, double var5) {
         super.moveEntity(var1, var3, var5);
     }
-
+    
+    @Override
+    public boolean attackEntityFrom(Entity var1, int var2) {
+    	boolean b = super.attackEntityFrom(var1, var2);
+    	if(this == mc.thePlayer && CombatLogHack.instance.status && CombatLogHack.instance.mode.currentMode.equalsIgnoreCase("OnHit")) {
+    		if(mc.isMultiplayerWorld()) {
+    			Client.forceDisconnect(CombatLogHack.instance);
+    		}else {
+    			CombatLogHack.shouldQuit = true;
+    		}
+    	}
+    	return b;
+    }
+    
     public void updatePlayerActionState() {
         super.updatePlayerActionState();
-        this.moveStrafing = this.movementInput.moveStrafe;
-        this.moveForward = this.movementInput.moveForward;
-        this.isJumping = this.movementInput.jump;
-        if(AutoTunnelHack.instance.status && AutoTunnelHack.instance.autoWalk.value) {
+        
+        if(!FreecamHack.movementTaken()) {
+	        this.moveStrafing = this.movementInput.moveStrafe;
+	        this.moveForward = this.movementInput.moveForward;
+	        this.isJumping = this.movementInput.jump;
+        }
+        if(AutoTunnelHack.autoWalking()) {
         	this.moveForward = 1;
         }
         if(AutoWalkHack.instance.status) {
         	this.moveForward = 1;
         }
         
-        if(StrafeHack.instance.status) {
+        if(StrafeHack.instance.enabled()) {
         	this.moveForward = this.moveStrafing = 0;
         }
+        
     }
 
     public void onLivingUpdate() {
-    	this.prevTimeInPortal = this.timeInPortal;
-    	
-    	EventPlayerUpdatePre e = new EventPlayerUpdatePre();
+        if (!this.mc.field_25001_G.func_27183_a(AchievementList.field_25195_b)) {
+            this.mc.field_25002_t.func_27101_b(AchievementList.field_25195_b);
+        }
+        
+        this.prevTimeInPortal = this.timeInPortal;
+        
+        EventPlayerUpdatePre e = new EventPlayerUpdatePre();
         EventRegistry.handleEvent(e);
-    	
+        
         if (this.inPortal) {
             if (this.timeInPortal == 0.0F) {
                 this.mc.sndManager.func_337_a("portal.trigger", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
@@ -87,10 +109,14 @@ public class EntityPlayerSP extends EntityPlayer {
             --this.field_9373_b;
         }
 
-        this.movementInput.updatePlayerMoveState(this);
-        if (this.movementInput.sneak && this.ySize < 0.2F) {
-            this.ySize = 0.2F;
+        if(!FreecamHack.movementTaken()) {
+        	this.movementInput.updatePlayerMoveState(this);
+        	if (this.movementInput.sneak && this.ySize < 0.2F) {
+                this.ySize = 0.2F;
+            }
         }
+        
+
         EventPlayerUpdatePost ee = new EventPlayerUpdatePost();
         EventRegistry.handleEvent(ee);
         
@@ -98,11 +124,11 @@ public class EntityPlayerSP extends EntityPlayer {
     }
 
     public void resetPlayerKeyState() {
-        this.movementInput.resetKeyState();
+    	this.movementInput.resetKeyState();
     }
 
     public void handleKeyPress(int var1, boolean var2) {
-        this.movementInput.checkKeyForMovementInput(var1, var2);
+    	this.movementInput.checkKeyForMovementInput(var1, var2);
     }
 
     public void writeEntityToNBT(NBTTagCompound var1) {
@@ -152,7 +178,7 @@ public class EntityPlayerSP extends EntityPlayer {
     }
 
     public boolean isSneaking() {
-        return this.movementInput.sneak;
+        return this.movementInput.sneak && !this.sleeping;
     }
 
     public void setInPortal() {
@@ -176,32 +202,37 @@ public class EntityPlayerSP extends EntityPlayer {
         }
 
     }
-    public boolean attackEntityFrom(Entity var1, int var2) {
-    	boolean b = super.attackEntityFrom(var1, var2);
-    	if(this == mc.thePlayer && CombatLogHack.instance.status && CombatLogHack.instance.mode.currentMode.equalsIgnoreCase("OnHit")) {
-    		if(mc.isMultiplayerWorld()) {
-    			mc.theWorld.sendQuittingDisconnectingPacket();
-    		}else {
-    			CombatLogHack.shouldQuit = true;
-    		}
-    	}
-    	return b;
-    }
+
     public void respawnPlayer() {
         this.mc.respawn(false);
     }
 
     public void func_6420_o() {
     }
-    
-    public void addChatMessageWithMoreOpacityBG(String var1) {
-        this.mc.ingameGUI.addChatMessageWithMoreOpacityBG(var1);
-    }
-    
+
     public void addChatMessage(String var1) {
         this.mc.ingameGUI.func_22064_c(var1);
     }
-
-    public void addStat(StatBasic var1, int var2) {
+    public void addChatMessageWithMoreOpacityBG(String var1) {
+        this.mc.ingameGUI.addChatMessageWithMoreOpacityBG(var1);
     }
+    public void addStat(StatBase var1, int var2) {
+        if (var1 != null) {
+            if (var1.func_25067_a()) {
+                Achievement var3 = (Achievement)var1;
+                if (var3.field_25076_c == null || this.mc.field_25001_G.func_27183_a(var3.field_25076_c)) {
+                    if (!this.mc.field_25001_G.func_27183_a(var3)) {
+                        this.mc.field_25002_t.func_27102_a(var3);
+                    }
+
+                    this.mc.field_25001_G.func_25100_a(var1, var2);
+                }
+            } else {
+                this.mc.field_25001_G.func_25100_a(var1, var2);
+            }
+
+        }
+    }
+
+	
 }

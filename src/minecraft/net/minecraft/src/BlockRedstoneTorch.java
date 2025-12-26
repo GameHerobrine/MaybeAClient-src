@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.skidcode.gh.maybeaclient.Client;
+
 public class BlockRedstoneTorch extends BlockTorch {
     private boolean torchActive = false;
     private static List torchUpdates = new ArrayList();
@@ -89,7 +91,7 @@ public class BlockRedstoneTorch extends BlockTorch {
         }
     }
 
-    private boolean func_22026_h(World var1, int var2, int var3, int var4) {
+    private boolean func_27036_h(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockMetadata(var2, var3, var4);
         if (var5 == 5 && var1.isBlockIndirectlyProvidingPowerTo(var2, var3 - 1, var4, 0)) {
             return true;
@@ -105,7 +107,7 @@ public class BlockRedstoneTorch extends BlockTorch {
     }
 
     public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-        boolean var6 = this.func_22026_h(var1, var2, var3, var4);
+        boolean var6 = this.func_27036_h(var1, var2, var3, var4);
 
         while(torchUpdates.size() > 0 && var1.getWorldTime() - ((RedstoneUpdateInfo)torchUpdates.get(0)).updateTime > 100L) {
             torchUpdates.remove(0);
@@ -150,10 +152,12 @@ public class BlockRedstoneTorch extends BlockTorch {
 
     public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
         if (this.torchActive) {
+        	Client.class.getClass();
+            //XXX NoJitter fixes
             int var6 = var1.getBlockMetadata(var2, var3, var4);
-            double var7 = (double)((float)var2 + 0.5F) + (double)(var5.nextFloat() - 0.5F) * 0.2D;
-            double var9 = (double)((float)var3 + 0.7F) + (double)(var5.nextFloat() - 0.5F) * 0.2D;
-            double var11 = (double)((float)var4 + 0.5F) + (double)(var5.nextFloat() - 0.5F) * 0.2D;
+            double var7 = (double)(var2 + 0.5D) + (double)(var5.nextFloat() - 0.5F) * 0.2D;
+            double var9 = (double)(var3 + 0.7D) + (double)(var5.nextFloat() - 0.5F) * 0.2D;
+            double var11 = (double)(var4 + 0.5D) + (double)(var5.nextFloat() - 0.5F) * 0.2D;
             double var13 = 0.2199999988079071D;
             double var15 = 0.27000001072883606D;
             if (var6 == 1) {

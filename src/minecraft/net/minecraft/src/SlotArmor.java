@@ -4,9 +4,9 @@ class SlotArmor extends Slot {
     // $FF: synthetic field
     final int armorType;
     // $FF: synthetic field
-    final CraftingInventoryPlayerCB inventory;
+    final ContainerPlayer inventory;
 
-    SlotArmor(CraftingInventoryPlayerCB var1, IInventory var2, int var3, int var4, int var5, int var6) {
+    SlotArmor(ContainerPlayer var1, IInventory var2, int var3, int var4, int var5, int var6) {
         super(var2, var3, var4, var5);
         this.inventory = var1;
         this.armorType = var6;

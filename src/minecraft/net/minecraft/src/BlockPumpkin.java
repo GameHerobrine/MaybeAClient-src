@@ -21,14 +21,14 @@ public class BlockPumpkin extends Block {
                 ++var3;
             }
 
-            if (var2 == 0 && var1 == 2) {
+            if (var2 == 2 && var1 == 2) {
                 return var3;
-            } else if (var2 == 1 && var1 == 5) {
+            } else if (var2 == 3 && var1 == 5) {
                 return var3;
-            } else if (var2 == 2 && var1 == 3) {
+            } else if (var2 == 0 && var1 == 3) {
                 return var3;
             } else {
-                return var2 == 3 && var1 == 4 ? var3 : this.blockIndexInTexture + 16;
+                return var2 == 1 && var1 == 4 ? var3 : this.blockIndexInTexture + 16;
             }
         }
     }
@@ -49,11 +49,11 @@ public class BlockPumpkin extends Block {
 
     public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
         int var5 = var1.getBlockId(var2, var3, var4);
-        return (var5 == 0 || Block.blocksList[var5].blockMaterial.getIsLiquid()) && var1.isBlockOpaqueCube(var2, var3 - 1, var4);
+        return (var5 == 0 || Block.blocksList[var5].blockMaterial.func_27283_g()) && var1.isBlockOpaqueCube(var2, var3 - 1, var4);
     }
 
     public void onBlockPlacedBy(World var1, int var2, int var3, int var4, EntityLiving var5) {
-        int var6 = MathHelper.floor_double((double)(var5.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        int var6 = MathHelper.floor_double((double)(var5.rotationYaw * 4.0F / 360.0F) + 2.5D) & 3;
         var1.setBlockMetadataWithNotify(var2, var3, var4, var6);
     }
 }

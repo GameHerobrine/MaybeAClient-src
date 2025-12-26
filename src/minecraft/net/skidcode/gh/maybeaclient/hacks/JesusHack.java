@@ -21,14 +21,7 @@ public class JesusHack extends Hack{
 		this.addSetting(this.mode);
 	}
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.mode.currentMode;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return this.mode.currentMode;
 	}
-	
 }

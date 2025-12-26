@@ -8,6 +8,8 @@ import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class LockTimeHack extends Hack{
 	public SettingLong lockedTime = new SettingLong(this, "Time", 0, 0, 24000);
+
+	public long realTime = 0;
 	
 	public static LockTimeHack INSTANCE;
 	
@@ -18,13 +20,7 @@ public class LockTimeHack extends Hack{
 	}
 	
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.lockedTime.value;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return ""+this.lockedTime.value;
 	}
 }

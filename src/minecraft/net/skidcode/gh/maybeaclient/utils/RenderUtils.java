@@ -4,38 +4,43 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.FontRenderer;
+import net.minecraft.src.MathHelper;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.Tessellator;
 import net.skidcode.gh.maybeaclient.Client;
 
 public class RenderUtils {
-	
-	public static void drawOutlinedBlockBB(double x, double y, double z) {
+	public static void drawOutlinedBlockBB(double x, double y, double z, int w, int h, int d) {
 		Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawing(3);
+		
+        tessellator.startDrawing(GL11.GL_LINE_STRIP);
         tessellator.addVertex(x, y, z);
-        tessellator.addVertex(x + 1, y, z);
-        tessellator.addVertex(x + 1, y, z + 1);
-        tessellator.addVertex(x, y, z + 1);
+        tessellator.addVertex(x + w, y, z);
+        tessellator.addVertex(x + w, y, z + d);
+        tessellator.addVertex(x, y, z + d);
         tessellator.addVertex(x, y, z);
+        
+        tessellator.addVertex(x, y + h, z);
+        tessellator.addVertex(x + w, y + h, z);
+        tessellator.addVertex(x + w, y + h, z + d);
+        tessellator.addVertex(x, y + h, z + d);
+        tessellator.addVertex(x, y + h, z);
+        
         tessellator.draw();
-        tessellator.startDrawing(3);
-        tessellator.addVertex(x, y + 1, z);
-        tessellator.addVertex(x + 1, y + 1, z);
-        tessellator.addVertex(x + 1, y + 1, z + 1);
-        tessellator.addVertex(x, y + 1, z + 1);
-        tessellator.addVertex(x, y + 1, z);
-        tessellator.draw();
-        tessellator.startDrawing(1);
+        
+        tessellator.startDrawing(GL11.GL_LINES);
         tessellator.addVertex(x, y, z);
-        tessellator.addVertex(x, y + 1, z);
-        tessellator.addVertex(x + 1, y, z);
-        tessellator.addVertex(x + 1, y + 1, z);
-        tessellator.addVertex(x + 1, y, z + 1);
-        tessellator.addVertex(x + 1, y + 1, z + 1);
-        tessellator.addVertex(x, y, z + 1);
-        tessellator.addVertex(x, y + 1, z + 1);
+        tessellator.addVertex(x, y + h, z);
+        tessellator.addVertex(x + w, y, z);
+        tessellator.addVertex(x + w, y + h, z);
+        tessellator.addVertex(x + w, y, z + d);
+        tessellator.addVertex(x + w, y + h, z + d);
+        tessellator.addVertex(x, y, z + d);
+        tessellator.addVertex(x, y + h, z + d);
         tessellator.draw();
+	}
+	public static void drawOutlinedBlockBB(double x, double y, double z) {
+		drawOutlinedBlockBB(x, y, z, 1, 1, 1);
 	}
 	public static void drawOutlinedBB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		Tessellator tessellator = Tessellator.instance;
@@ -67,6 +72,69 @@ public class RenderUtils {
 	public static void drawOutlinedBB(AxisAlignedBB bb) {
 		drawOutlinedBB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
 	}
+	
+	public static void renderChunk(int x, int z, float r, float g, float b, boolean depthTest) {
+		x *= 16;
+		z *= 16;
+		GL11.glPushMatrix();
+		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		if(!depthTest) GL11.glDisable(GL11.GL_DEPTH_TEST);
+		else GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		GL11.glDepthMask(false);
+		GL11.glColor4f(r, g, b, 1);
+		Tessellator.instance.setTranslationD(-RenderManager.renderPosX, -RenderManager.renderPosY, -RenderManager.renderPosZ);
+		Tessellator.instance.startDrawing(GL11.GL_LINES);
+		
+		
+		int ppos = MathHelper.floor_double(Client.mc.thePlayer.posY);
+		if(ppos > 128) ppos = 128;
+		if(ppos < 0) ppos = 0;
+		for(int i = 0; i <= 16; i += 1) {
+			if(ppos < 128) {
+				Tessellator.instance.addVertex(x+i, 128, z);
+				Tessellator.instance.addVertex(x+i, ppos, z);
+				Tessellator.instance.addVertex(x+i, 128, z+16);
+				Tessellator.instance.addVertex(x+i, ppos, z+16);
+				Tessellator.instance.addVertex(x, 128, z+i);
+				Tessellator.instance.addVertex(x, ppos, z+i);
+				Tessellator.instance.addVertex(x+16, 128, z+i);
+				Tessellator.instance.addVertex(x+16, ppos, z+i);
+			}
+			
+			if(ppos > 0) {
+				Tessellator.instance.addVertex(x+i, ppos, z);
+				Tessellator.instance.addVertex(x+i, 0, z);
+				Tessellator.instance.addVertex(x+i, ppos, z+16);
+				Tessellator.instance.addVertex(x+i, 0, z+16);
+				Tessellator.instance.addVertex(x, ppos, z+i);
+				Tessellator.instance.addVertex(x, 0, z+i);
+				Tessellator.instance.addVertex(x+16, ppos, z+i);
+				Tessellator.instance.addVertex(x+16, 0, z+i);
+			}
+		}
+		
+		for(int i = 0; i <= 128; i += 1) {
+			Tessellator.instance.addVertex(x, i, z);
+			Tessellator.instance.addVertex(x, i, z+16);
+			
+			Tessellator.instance.addVertex(x, i, z+16);
+			Tessellator.instance.addVertex(x+16, i, z+16);
+			
+			Tessellator.instance.addVertex(x+16, i, z+16);
+			Tessellator.instance.addVertex(x+16, i, z);
+			
+			Tessellator.instance.addVertex(x+16, i, z);
+			Tessellator.instance.addVertex(x, i, z);
+		}
+		
+		Tessellator.instance.draw();
+		Tessellator.instance.setTranslationD(0, 0, 0);
+		GL11.glPopAttrib();
+		GL11.glPopMatrix();
+	}
+	
 	public static void drawString(String s, double d, double d1, double d2)
     {
         double f = Math.sqrt(
@@ -83,7 +151,6 @@ public class RenderUtils {
 			f2 *= scale * 0.1f * f;
 			
 			if(0.016666668F * f1 > f2) f2 = 0.016666668F * f1;
-        
         
         GL11.glPushMatrix();
         GL11.glTranslated(d - RenderManager.renderPosX, d1 - RenderManager.renderPosY + 2.3D, d2 - RenderManager.renderPosZ);

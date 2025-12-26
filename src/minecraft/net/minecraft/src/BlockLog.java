@@ -18,7 +18,6 @@ public class BlockLog extends Block {
 
     public void harvestBlock(World var1, EntityPlayer var2, int var3, int var4, int var5, int var6) {
         super.harvestBlock(var1, var2, var3, var4, var5, var6);
-        var2.addStat(AchievementList.field_25198_c, 1);
     }
 
     public void onBlockRemoval(World var1, int var2, int var3, int var4) {
@@ -31,8 +30,8 @@ public class BlockLog extends Block {
                         int var10 = var1.getBlockId(var2 + var7, var3 + var8, var4 + var9);
                         if (var10 == Block.leaves.blockID) {
                             int var11 = var1.getBlockMetadata(var2 + var7, var3 + var8, var4 + var9);
-                            if ((var11 & 4) == 0) {
-                                var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, var11 | 4);
+                            if ((var11 & 8) == 0) {
+                                var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, var11 | 8);
                             }
                         }
                     }

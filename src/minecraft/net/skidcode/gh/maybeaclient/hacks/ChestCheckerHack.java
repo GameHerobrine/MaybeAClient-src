@@ -3,15 +3,14 @@ package net.skidcode.gh.maybeaclient.hacks;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.src.Block;
-import net.minecraft.src.CraftingInventoryChestCB;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryBasic;
 import net.minecraft.src.InventoryLargeChest;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.Packet100;
-import net.minecraft.src.Packet101;
-import net.minecraft.src.Packet104;
+import net.minecraft.src.Packet100OpenWindow;
+import net.minecraft.src.Packet101CloseWindow;
+import net.minecraft.src.Packet104WindowItems;
 import net.minecraft.src.Packet15Place;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
@@ -38,17 +37,17 @@ public class ChestCheckerHack extends Hack implements EventListener{
 	@Override
 	public void handleEvent(Event event) {
 		if(event instanceof EventPacketReceive) {
-			if(waitingGui && ((EventPacketReceive) event).packet instanceof Packet104) {
-				Packet104 pk = (Packet104) ((EventPacketReceive) event).packet;
+			if(waitingGui && ((EventPacketReceive) event).packet instanceof Packet104WindowItems) {
+				Packet104WindowItems pk = (Packet104WindowItems) ((EventPacketReceive) event).packet;
 				ItemStack[] chest = new ItemStack[pk.itemStack.length - 36];
 				System.arraycopy(pk.itemStack, 0, chest, 0, chest.length);
 				this.setData(requestedX, requestedY, requestedZ, chest);
 				event.cancelled = true;
-			}else if(!realOpened && ((EventPacketReceive) event).packet instanceof Packet100) {
-				Packet100 pk = (Packet100) ((EventPacketReceive) event).packet;
+			}else if(!realOpened && ((EventPacketReceive) event).packet instanceof Packet100OpenWindow) {
+				Packet100OpenWindow pk = (Packet100OpenWindow) ((EventPacketReceive) event).packet;
 				if(pk.inventoryType == 0) { //chest
 					event.cancelled = true;
-					mc.getSendQueue().addToSendQueue(new Packet101(pk.windowId));
+					mc.getSendQueue().addToSendQueue(new Packet101CloseWindow(pk.windowId));
 					
 				}
 			}

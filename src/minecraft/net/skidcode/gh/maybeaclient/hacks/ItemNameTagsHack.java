@@ -11,7 +11,7 @@ public class ItemNameTagsHack extends Hack{
 	public static ItemNameTagsHack instance;
 	public static SettingBoolean enableCountDisplay;
 	public ItemNameTagsHack() {
-		super("ItemNameTags", "show item nametags", Keyboard.KEY_NONE, Category.RENDER);
+		super("ItemNameTags", "Show item nametags", Keyboard.KEY_NONE, Category.RENDER);
 		instance = this;
 		this.addSetting(enableCountDisplay = new SettingBoolean(this, "Display count", true));
 	}

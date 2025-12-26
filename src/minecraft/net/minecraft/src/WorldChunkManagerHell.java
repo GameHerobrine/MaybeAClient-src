@@ -3,21 +3,21 @@ package net.minecraft.src;
 import java.util.Arrays;
 
 public class WorldChunkManagerHell extends WorldChunkManager {
-    private MobSpawnerBase field_4201_e;
+    private BiomeGenBase field_4201_e;
     private double field_4200_f;
     private double field_4199_g;
 
-    public WorldChunkManagerHell(MobSpawnerBase var1, double var2, double var4) {
+    public WorldChunkManagerHell(BiomeGenBase var1, double var2, double var4) {
         this.field_4201_e = var1;
         this.field_4200_f = var2;
         this.field_4199_g = var4;
     }
 
-    public MobSpawnerBase func_4074_a(ChunkCoordIntPair var1) {
+    public BiomeGenBase func_4074_a(ChunkCoordIntPair var1) {
         return this.field_4201_e;
     }
 
-    public MobSpawnerBase func_4073_a(int var1, int var2) {
+    public BiomeGenBase func_4073_a(int var1, int var2) {
         return this.field_4201_e;
     }
 
@@ -25,7 +25,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
         return this.field_4200_f;
     }
 
-    public MobSpawnerBase[] func_4069_a(int var1, int var2, int var3, int var4) {
+    public BiomeGenBase[] func_4069_a(int var1, int var2, int var3, int var4) {
         this.field_4195_d = this.loadBlockGeneratorData(this.field_4195_d, var1, var2, var3, var4);
         return this.field_4195_d;
     }
@@ -39,9 +39,9 @@ public class WorldChunkManagerHell extends WorldChunkManager {
         return var1;
     }
 
-    public MobSpawnerBase[] loadBlockGeneratorData(MobSpawnerBase[] var1, int var2, int var3, int var4, int var5) {
+    public BiomeGenBase[] loadBlockGeneratorData(BiomeGenBase[] var1, int var2, int var3, int var4, int var5) {
         if (var1 == null || var1.length < var4 * var5) {
-            var1 = new MobSpawnerBase[var4 * var5];
+            var1 = new BiomeGenBase[var4 * var5];
             this.temperature = new double[var4 * var5];
             this.humidity = new double[var4 * var5];
         }

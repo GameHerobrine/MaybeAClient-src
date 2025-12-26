@@ -3,7 +3,7 @@ package net.skidcode.gh.maybeaclient.hacks;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.src.GuiInventory;
-import net.minecraft.src.Packet101;
+import net.minecraft.src.Packet101CloseWindow;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventPacketSend;
@@ -20,7 +20,7 @@ public class XCarryHack extends Hack implements EventListener<EventPacketSend>{
 	
 	@Override
 	public void handleEvent(EventPacketSend e) {
-		if(e.packet instanceof Packet101 && (this.alwaysCancelPacket.value || mc.currentScreen instanceof GuiInventory)) {
+		if(e.packet instanceof Packet101CloseWindow && (this.alwaysCancelPacket.value || mc.currentScreen instanceof GuiInventory)) {
 			e.cancelled = true;
 		}
 	}

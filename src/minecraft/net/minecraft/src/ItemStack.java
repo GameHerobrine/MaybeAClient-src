@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import java.util.ArrayList;
+
 public final class ItemStack {
     public int stackSize;
     public int animationsToGo;
@@ -57,6 +59,7 @@ public final class ItemStack {
 
     public boolean useItem(EntityPlayer var1, World var2, int var3, int var4, int var5, int var6) {
         boolean var7 = this.getItem().onItemUse(this, var1, var2, var3, var4, var5, var6);
+        if(StatList.field_25172_A == null) return var7;
         if (var7) {
             var1.addStat(StatList.field_25172_A[this.itemID], 1);
         }
@@ -200,4 +203,17 @@ public final class ItemStack {
     public String toString() {
         return this.stackSize + "x" + Item.itemsList[this.itemID].getItemName() + "@" + this.itemDamage;
     }
+
+    
+	public ArrayList<String[]> getTooltip() {
+		//XXX MaybeAClient
+		ArrayList<String[]> tooltip = new ArrayList<String[]>();
+		if(this.getItem().func_25007_g()) {
+			int maxdmg = this.getItem().getMaxDamage();
+			int damage = maxdmg - this.itemDamage;
+			tooltip.add(new String[]{"Durability", damage+"/"+maxdmg});
+		}
+		
+		return tooltip;
+	}
 }

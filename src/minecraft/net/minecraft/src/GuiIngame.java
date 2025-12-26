@@ -5,22 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
-import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.IngameHook;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventRenderIngameNoDebug;
 import net.skidcode.gh.maybeaclient.hacks.HideChatHack;
-import net.skidcode.gh.maybeaclient.utils.ChatColor;
+import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
 
 import org.lwjgl.opengl.GL11;
 
 public class GuiIngame extends Gui {
-    public static RenderItem itemRenderer = new RenderItem();
+	public static RenderItem itemRenderer = new RenderItem();
     private List chatMessageList = new ArrayList();
     private List<Boolean> chatMessagesBGs = new ArrayList<>();
     private Random rand = new Random();
     private Minecraft mc;
-    public String field_933_a = null;
     private int updateCounter = 0;
     private String recordPlaying = "";
     private int recordPlayingUpFor = 0;
@@ -172,7 +170,7 @@ public class GuiIngame extends Gui {
 
         String var23;
         if (this.mc.gameSettings.showDebugInfo) {
-            var8.drawStringWithShadow("Minecraft Beta 1.4_01 (" + this.mc.debug + ")", 2, 2, 16777215);
+            var8.drawStringWithShadow("Minecraft Beta 1.5_01 (" + this.mc.debug + ")", 2, 2, 16777215);
             var8.drawStringWithShadow(this.mc.func_6241_m(), 2, 12, 16777215);
             var8.drawStringWithShadow(this.mc.func_6262_n(), 2, 22, 16777215);
             var8.drawStringWithShadow(this.mc.func_6245_o(), 2, 32, 16777215);
@@ -189,7 +187,8 @@ public class GuiIngame extends Gui {
             this.drawString(var8, "y: " + this.mc.thePlayer.posY, 2, 72, 14737632);
             this.drawString(var8, "z: " + this.mc.thePlayer.posZ, 2, 80, 14737632);
         } else {
-            EventRegistry.handleEvent(new EventRenderIngameNoDebug(var5));
+            //var8.drawStringWithShadow("Minecraft Beta 1.5_01", 2, 2, 16777215);
+        	EventRegistry.handleEvent(new EventRenderIngameNoDebug(var5));
             IngameHook.handleIngame(var5);
         }
 
@@ -227,7 +226,7 @@ public class GuiIngame extends Gui {
             var31 = true;
             if(HideChatHack.instance.mode.currentMode.equalsIgnoreCase("HideExceptChatGui")) renderChat = true;
         }
-
+        
         if(renderChat) {
 	        GL11.glEnable(3042 /*GL_BLEND*/);
 	        GL11.glBlendFunc(770, 771);
@@ -235,7 +234,7 @@ public class GuiIngame extends Gui {
 	        GL11.glDisable(GL11.GL_DEPTH_TEST); //XXX maybeaclient
 	        GL11.glPushMatrix();
 	        GL11.glTranslatef(0.0F, (float)(var7 - 48), 0.0F);
-	        
+	
 	        for(var17 = 0; var17 < this.chatMessageList.size() && var17 < var26; ++var17) {
 	            if (((ChatLine)this.chatMessageList.get(var17)).updateCounter < 200 || var31) {
 	                double var32 = (double)((ChatLine)this.chatMessageList.get(var17)).updateCounter / 200.0D;
@@ -264,7 +263,7 @@ public class GuiIngame extends Gui {
 	                    }else {
 	                    	this.drawRect(var33, var22 - 1, var33 + 320, var22 + 8, var20 / 2 << 24);
 	                    }
-	                    
+	                    //this.drawRect(var33, var22 - 1, var33 + 320, var22 + 8, var20 / 2 << 24);
 	                    GL11.glEnable(3042 /*GL_BLEND*/);
 	                    var8.drawStringWithShadow(var23, var33, var22, 16777215 + (var20 << 24));
 	                }
@@ -299,6 +298,7 @@ public class GuiIngame extends Gui {
     }
 
     private void renderVignette(float var1, int var2, int var3) {
+    	
         var1 = 1.0F - var1;
         if (var1 < 0.0F) {
             var1 = 0.0F;
@@ -314,13 +314,18 @@ public class GuiIngame extends Gui {
         GL11.glBlendFunc(0, 769);
         GL11.glColor4f(this.prevVignetteBrightness, this.prevVignetteBrightness, this.prevVignetteBrightness, 1.0F);
         GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, this.mc.renderEngine.getTexture("%blur%/misc/vignette.png"));
-        Tessellator var4 = Tessellator.instance;
-        var4.startDrawingQuads();
-        var4.addVertexWithUV(0.0D, (double)var3, -90.0D, 0.0D, 1.0D);
-        var4.addVertexWithUV((double)var2, (double)var3, -90.0D, 1.0D, 1.0D);
-        var4.addVertexWithUV((double)var2, 0.0D, -90.0D, 1.0D, 0.0D);
-        var4.addVertexWithUV(0.0D, 0.0D, -90.0D, 0.0D, 0.0D);
-        var4.draw();
+        
+       
+	    draw: {
+        	if(NoRenderHack.instance.status && NoRenderHack.instance.vignette.getValue()) break draw;
+	        Tessellator var4 = Tessellator.instance;
+	        var4.startDrawingQuads();
+	        var4.addVertexWithUV(0.0D, (double)var3, -90.0D, 0.0D, 1.0D);
+	        var4.addVertexWithUV((double)var2, (double)var3, -90.0D, 1.0D, 1.0D);
+	        var4.addVertexWithUV((double)var2, 0.0D, -90.0D, 1.0D, 0.0D);
+	        var4.addVertexWithUV(0.0D, 0.0D, -90.0D, 0.0D, 0.0D);
+	        var4.draw();
+        }
         GL11.glDepthMask(true);
         GL11.glEnable(2929 /*GL_DEPTH_TEST*/);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -387,32 +392,9 @@ public class GuiIngame extends Gui {
         }
 
     }
-    
-    public void addChatMessageWithMoreOpacityBG(String var1) {
-    	 while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
-             int var2;
-             
-             String lastFormatting = "";
-             for(var2 = 0; var2 < var1.length() && this.mc.fontRenderer.getStringWidth(var1.substring(0, var2 + 1)) <= 320; ++var2) {
-             	if(var1.charAt(var2) == '§' && (var2+1) < var1.length()) {
-             		lastFormatting = "§"+var1.charAt(var2+1);
-             	}
-             
-             }
-             this.addChatMessageWithMoreOpacityBG(var1.substring(0, var2));
-             var1 = lastFormatting+var1.substring(var2);
-         }
 
-         this.chatMessageList.add(0, new ChatLine(var1));
-         this.chatMessagesBGs.add(0, true);
-         while(this.chatMessageList.size() > 50) {
-             this.chatMessageList.remove(this.chatMessageList.size() - 1);
-             this.chatMessagesBGs.remove(this.chatMessagesBGs.size() - 1);
-         }
-    }
-    
     public void addChatMessage(String var1) {
-        while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
+    	while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
             int var2;
             
             String lastFormatting = "";
@@ -430,7 +412,6 @@ public class GuiIngame extends Gui {
         this.chatMessagesBGs.add(0, false);
         while(this.chatMessageList.size() > 50) {
             this.chatMessageList.remove(this.chatMessageList.size() - 1);
-            this.chatMessagesBGs.remove(this.chatMessagesBGs.size() - 1);
         }
 
     }
@@ -446,4 +427,27 @@ public class GuiIngame extends Gui {
         String var3 = var2.translateKey(var1);
         this.addChatMessage(var3);
     }
+
+	public void addChatMessageWithMoreOpacityBG(String var1) {
+		while(this.mc.fontRenderer.getStringWidth(var1) > 320) {
+            int var2;
+            
+            String lastFormatting = "";
+            for(var2 = 0; var2 < var1.length() && this.mc.fontRenderer.getStringWidth(var1.substring(0, var2 + 1)) <= 320; ++var2) {
+            	if(var1.charAt(var2) == '§' && (var2+1) < var1.length()) {
+            		lastFormatting = "§"+var1.charAt(var2+1);
+            	}
+            
+            }
+            this.addChatMessageWithMoreOpacityBG(var1.substring(0, var2));
+            var1 = lastFormatting+var1.substring(var2);
+        }
+
+        this.chatMessageList.add(0, new ChatLine(var1));
+        this.chatMessagesBGs.add(0, true);
+        while(this.chatMessageList.size() > 50) {
+            this.chatMessageList.remove(this.chatMessageList.size() - 1);
+            this.chatMessagesBGs.remove(this.chatMessagesBGs.size() - 1);
+        }
+	}
 }

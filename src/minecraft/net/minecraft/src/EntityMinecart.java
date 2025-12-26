@@ -144,8 +144,8 @@ public class EntityMinecart extends Entity implements IInventory {
         double var7;
         if (this.worldObj.multiplayerWorld && this.field_9415_k > 0) {
             if (this.field_9415_k > 0) {
-                double var41 = this.posX + (this.field_9414_l - this.posX) / (double)this.field_9415_k;
-                double var42 = this.posY + (this.field_9413_m - this.posY) / (double)this.field_9415_k;
+                double var46 = this.posX + (this.field_9414_l - this.posX) / (double)this.field_9415_k;
+                double var47 = this.posY + (this.field_9413_m - this.posY) / (double)this.field_9415_k;
                 double var5 = this.posZ + (this.field_9412_n - this.posZ) / (double)this.field_9415_k;
 
                 for(var7 = this.field_9411_o - (double)this.rotationYaw; var7 < -180.0D; var7 += 360.0D) {
@@ -158,7 +158,7 @@ public class EntityMinecart extends Entity implements IInventory {
                 this.rotationYaw = (float)((double)this.rotationYaw + var7 / (double)this.field_9415_k);
                 this.rotationPitch = (float)((double)this.rotationPitch + (this.field_9410_p - (double)this.rotationPitch) / (double)this.field_9415_k);
                 --this.field_9415_k;
-                this.setPosition(var41, var42, var5);
+                this.setPosition(var46, var47, var5);
                 this.setRotation(this.rotationYaw, this.rotationPitch);
             } else {
                 this.setPosition(this.posX, this.posY, this.posZ);
@@ -173,104 +173,130 @@ public class EntityMinecart extends Entity implements IInventory {
             int var1 = MathHelper.floor_double(this.posX);
             int var2 = MathHelper.floor_double(this.posY);
             int var3 = MathHelper.floor_double(this.posZ);
-            if (this.worldObj.getBlockId(var1, var2 - 1, var3) == Block.minecartTrack.blockID) {
+            if (BlockRail.func_27040_h(this.worldObj, var1, var2 - 1, var3)) {
                 --var2;
             }
 
             double var4 = 0.4D;
             boolean var6 = false;
             var7 = 0.0078125D;
-            if (this.worldObj.getBlockId(var1, var2, var3) == Block.minecartTrack.blockID) {
-                Vec3D var9 = this.func_514_g(this.posX, this.posY, this.posZ);
-                int var10 = this.worldObj.getBlockMetadata(var1, var2, var3);
+            int var9 = this.worldObj.getBlockId(var1, var2, var3);
+            if (BlockRail.func_27041_c(var9)) {
+                Vec3D var10 = this.func_514_g(this.posX, this.posY, this.posZ);
+                int var11 = this.worldObj.getBlockMetadata(var1, var2, var3);
                 this.posY = (double)var2;
-                if (var10 >= 2 && var10 <= 5) {
+                boolean var12 = false;
+                boolean var13 = false;
+                if (var9 == Block.railPowered.blockID) {
+                    var12 = (var11 & 8) != 0;
+                    var13 = !var12;
+                }
+
+                if (((BlockRail)Block.blocksList[var9]).func_27042_h()) {
+                    var11 &= 7;
+                }
+
+                if (var11 >= 2 && var11 <= 5) {
                     this.posY = (double)(var2 + 1);
                 }
 
-                if (var10 == 2) {
+                if (var11 == 2) {
                     this.motionX -= var7;
                 }
 
-                if (var10 == 3) {
+                if (var11 == 3) {
                     this.motionX += var7;
                 }
 
-                if (var10 == 4) {
+                if (var11 == 4) {
                     this.motionZ += var7;
                 }
 
-                if (var10 == 5) {
+                if (var11 == 5) {
                     this.motionZ -= var7;
                 }
 
-                int[][] var11 = field_855_j[var10];
-                double var12 = (double)(var11[1][0] - var11[0][0]);
-                double var14 = (double)(var11[1][2] - var11[0][2]);
-                double var16 = Math.sqrt(var12 * var12 + var14 * var14);
-                double var18 = this.motionX * var12 + this.motionZ * var14;
-                if (var18 < 0.0D) {
-                    var12 = -var12;
-                    var14 = -var14;
+                int[][] var14 = field_855_j[var11];
+                double var15 = (double)(var14[1][0] - var14[0][0]);
+                double var17 = (double)(var14[1][2] - var14[0][2]);
+                double var19 = Math.sqrt(var15 * var15 + var17 * var17);
+                double var21 = this.motionX * var15 + this.motionZ * var17;
+                if (var21 < 0.0D) {
+                    var15 = -var15;
+                    var17 = -var17;
                 }
 
-                double var20 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-                this.motionX = var20 * var12 / var16;
-                this.motionZ = var20 * var14 / var16;
-                double var22 = 0.0D;
-                double var24 = (double)var1 + 0.5D + (double)var11[0][0] * 0.5D;
-                double var26 = (double)var3 + 0.5D + (double)var11[0][2] * 0.5D;
-                double var28 = (double)var1 + 0.5D + (double)var11[1][0] * 0.5D;
-                double var30 = (double)var3 + 0.5D + (double)var11[1][2] * 0.5D;
-                var12 = var28 - var24;
-                var14 = var30 - var26;
-                double var32;
-                double var34;
-                double var36;
-                if (var12 == 0.0D) {
+                double var23 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+                this.motionX = var23 * var15 / var19;
+                this.motionZ = var23 * var17 / var19;
+                double var25;
+                if (var13) {
+                    var25 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+                    if (var25 < 0.03D) {
+                        this.motionX *= 0.0D;
+                        this.motionY *= 0.0D;
+                        this.motionZ *= 0.0D;
+                    } else {
+                        this.motionX *= 0.5D;
+                        this.motionY *= 0.0D;
+                        this.motionZ *= 0.5D;
+                    }
+                }
+
+                var25 = 0.0D;
+                double var27 = (double)var1 + 0.5D + (double)var14[0][0] * 0.5D;
+                double var29 = (double)var3 + 0.5D + (double)var14[0][2] * 0.5D;
+                double var31 = (double)var1 + 0.5D + (double)var14[1][0] * 0.5D;
+                double var33 = (double)var3 + 0.5D + (double)var14[1][2] * 0.5D;
+                var15 = var31 - var27;
+                var17 = var33 - var29;
+                double var35;
+                double var37;
+                double var39;
+                if (var15 == 0.0D) {
                     this.posX = (double)var1 + 0.5D;
-                    var22 = this.posZ - (double)var3;
-                } else if (var14 == 0.0D) {
+                    var25 = this.posZ - (double)var3;
+                } else if (var17 == 0.0D) {
                     this.posZ = (double)var3 + 0.5D;
-                    var22 = this.posX - (double)var1;
+                    var25 = this.posX - (double)var1;
                 } else {
-                    var32 = this.posX - var24;
-                    var34 = this.posZ - var26;
-                    var36 = (var32 * var12 + var34 * var14) * 2.0D;
-                    var22 = var36;
+                    var35 = this.posX - var27;
+                    var37 = this.posZ - var29;
+                    var39 = (var35 * var15 + var37 * var17) * 2.0D;
+                    var25 = var39;
                 }
 
-                this.posX = var24 + var12 * var22;
-                this.posZ = var26 + var14 * var22;
+                this.posX = var27 + var15 * var25;
+                this.posZ = var29 + var17 * var25;
                 this.setPosition(this.posX, this.posY + (double)this.yOffset, this.posZ);
-                var32 = this.motionX;
-                var34 = this.motionZ;
+                var35 = this.motionX;
+                var37 = this.motionZ;
                 if (this.riddenByEntity != null) {
-                    var32 *= 0.75D;
-                    var34 *= 0.75D;
+                    var35 *= 0.75D;
+                    var37 *= 0.75D;
                 }
 
-                if (var32 < -var4) {
-                    var32 = -var4;
+                if (var35 < -var4) {
+                    var35 = -var4;
                 }
 
-                if (var32 > var4) {
-                    var32 = var4;
+                if (var35 > var4) {
+                    var35 = var4;
                 }
 
-                if (var34 < -var4) {
-                    var34 = -var4;
+                if (var37 < -var4) {
+                    var37 = -var4;
                 }
 
-                if (var34 > var4) {
-                    var34 = var4;
+                if (var37 > var4) {
+                    var37 = var4;
                 }
 
-                this.moveEntity(var32, 0.0D, var34);
-                if (var11[0][1] != 0 && MathHelper.floor_double(this.posX) - var1 == var11[0][0] && MathHelper.floor_double(this.posZ) - var3 == var11[0][2]) {
-                    this.setPosition(this.posX, this.posY + (double)var11[0][1], this.posZ);
-                } else if (var11[1][1] != 0 && MathHelper.floor_double(this.posX) - var1 == var11[1][0] && MathHelper.floor_double(this.posZ) - var3 == var11[1][2]) {
-                    this.setPosition(this.posX, this.posY + (double)var11[1][1], this.posZ);
+                this.moveEntity(var35, 0.0D, var37);
+                if (var14[0][1] != 0 && MathHelper.floor_double(this.posX) - var1 == var14[0][0] && MathHelper.floor_double(this.posZ) - var3 == var14[0][2]) {
+                    this.setPosition(this.posX, this.posY + (double)var14[0][1], this.posZ);
+                } else if (var14[1][1] != 0 && MathHelper.floor_double(this.posX) - var1 == var14[1][0] && MathHelper.floor_double(this.posZ) - var3 == var14[1][2]) {
+                    this.setPosition(this.posX, this.posY + (double)var14[1][1], this.posZ);
                 }
 
                 if (this.riddenByEntity != null) {
@@ -279,17 +305,17 @@ public class EntityMinecart extends Entity implements IInventory {
                     this.motionZ *= 0.996999979019165D;
                 } else {
                     if (this.minecartType == 2) {
-                        var36 = (double)MathHelper.sqrt_double(this.pushX * this.pushX + this.pushZ * this.pushZ);
-                        if (var36 > 0.01D) {
+                        var39 = (double)MathHelper.sqrt_double(this.pushX * this.pushX + this.pushZ * this.pushZ);
+                        if (var39 > 0.01D) {
                             var6 = true;
-                            this.pushX /= var36;
-                            this.pushZ /= var36;
-                            double var38 = 0.04D;
+                            this.pushX /= var39;
+                            this.pushZ /= var39;
+                            double var41 = 0.04D;
                             this.motionX *= 0.800000011920929D;
                             this.motionY *= 0.0D;
                             this.motionZ *= 0.800000011920929D;
-                            this.motionX += this.pushX * var38;
-                            this.motionZ += this.pushZ * var38;
+                            this.motionX += this.pushX * var41;
+                            this.motionZ += this.pushZ * var41;
                         } else {
                             this.motionX *= 0.8999999761581421D;
                             this.motionY *= 0.0D;
@@ -302,37 +328,59 @@ public class EntityMinecart extends Entity implements IInventory {
                     this.motionZ *= 0.9599999785423279D;
                 }
 
-                Vec3D var46 = this.func_514_g(this.posX, this.posY, this.posZ);
-                if (var46 != null && var9 != null) {
-                    double var37 = (var9.yCoord - var46.yCoord) * 0.05D;
-                    var20 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-                    if (var20 > 0.0D) {
-                        this.motionX = this.motionX / var20 * (var20 + var37);
-                        this.motionZ = this.motionZ / var20 * (var20 + var37);
+                Vec3D var52 = this.func_514_g(this.posX, this.posY, this.posZ);
+                if (var52 != null && var10 != null) {
+                    double var40 = (var10.yCoord - var52.yCoord) * 0.05D;
+                    var23 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+                    if (var23 > 0.0D) {
+                        this.motionX = this.motionX / var23 * (var23 + var40);
+                        this.motionZ = this.motionZ / var23 * (var23 + var40);
                     }
 
-                    this.setPosition(this.posX, var46.yCoord, this.posZ);
+                    this.setPosition(this.posX, var52.yCoord, this.posZ);
                 }
 
-                int var47 = MathHelper.floor_double(this.posX);
-                int var48 = MathHelper.floor_double(this.posZ);
-                if (var47 != var1 || var48 != var3) {
-                    var20 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-                    this.motionX = var20 * (double)(var47 - var1);
-                    this.motionZ = var20 * (double)(var48 - var3);
+                int var53 = MathHelper.floor_double(this.posX);
+                int var54 = MathHelper.floor_double(this.posZ);
+                if (var53 != var1 || var54 != var3) {
+                    var23 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+                    this.motionX = var23 * (double)(var53 - var1);
+                    this.motionZ = var23 * (double)(var54 - var3);
                 }
 
+                double var42;
                 if (this.minecartType == 2) {
-                    double var39 = (double)MathHelper.sqrt_double(this.pushX * this.pushX + this.pushZ * this.pushZ);
-                    if (var39 > 0.01D && this.motionX * this.motionX + this.motionZ * this.motionZ > 0.001D) {
-                        this.pushX /= var39;
-                        this.pushZ /= var39;
+                    var42 = (double)MathHelper.sqrt_double(this.pushX * this.pushX + this.pushZ * this.pushZ);
+                    if (var42 > 0.01D && this.motionX * this.motionX + this.motionZ * this.motionZ > 0.001D) {
+                        this.pushX /= var42;
+                        this.pushZ /= var42;
                         if (this.pushX * this.motionX + this.pushZ * this.motionZ < 0.0D) {
                             this.pushX = 0.0D;
                             this.pushZ = 0.0D;
                         } else {
                             this.pushX = this.motionX;
                             this.pushZ = this.motionZ;
+                        }
+                    }
+                }
+
+                if (var12) {
+                    var42 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+                    if (var42 > 0.01D) {
+                        double var44 = 0.04D;
+                        this.motionX += this.motionX / var42 * var44;
+                        this.motionZ += this.motionZ / var42 * var44;
+                    } else if (var11 == 1) {
+                        if (this.worldObj.isBlockOpaqueCube(var1 - 1, var2, var3)) {
+                            this.motionX = 0.02D;
+                        } else if (this.worldObj.isBlockOpaqueCube(var1 + 1, var2, var3)) {
+                            this.motionX = -0.02D;
+                        }
+                    } else if (var11 == 0) {
+                        if (this.worldObj.isBlockOpaqueCube(var1, var2, var3 - 1)) {
+                            this.motionZ = 0.02D;
+                        } else if (this.worldObj.isBlockOpaqueCube(var1, var2, var3 + 1)) {
+                            this.motionZ = -0.02D;
                         }
                     }
                 }
@@ -368,35 +416,35 @@ public class EntityMinecart extends Entity implements IInventory {
             }
 
             this.rotationPitch = 0.0F;
-            double var43 = this.prevPosX - this.posX;
-            double var44 = this.prevPosZ - this.posZ;
-            if (var43 * var43 + var44 * var44 > 0.001D) {
-                this.rotationYaw = (float)(Math.atan2(var44, var43) * 180.0D / 3.141592653589793D);
+            double var48 = this.prevPosX - this.posX;
+            double var49 = this.prevPosZ - this.posZ;
+            if (var48 * var48 + var49 * var49 > 0.001D) {
+                this.rotationYaw = (float)(Math.atan2(var49, var48) * 180.0D / 3.141592653589793D);
                 if (this.field_856_i) {
                     this.rotationYaw += 180.0F;
                 }
             }
 
-            double var13;
-            for(var13 = (double)(this.rotationYaw - this.prevRotationYaw); var13 >= 180.0D; var13 -= 360.0D) {
+            double var50;
+            for(var50 = (double)(this.rotationYaw - this.prevRotationYaw); var50 >= 180.0D; var50 -= 360.0D) {
             }
 
-            while(var13 < -180.0D) {
-                var13 += 360.0D;
+            while(var50 < -180.0D) {
+                var50 += 360.0D;
             }
 
-            if (var13 < -170.0D || var13 >= 170.0D) {
+            if (var50 < -170.0D || var50 >= 170.0D) {
                 this.rotationYaw += 180.0F;
                 this.field_856_i = !this.field_856_i;
             }
 
             this.setRotation(this.rotationYaw, this.rotationPitch);
-            List var15 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D));
-            if (var15 != null && var15.size() > 0) {
-                for(int var45 = 0; var45 < var15.size(); ++var45) {
-                    Entity var17 = (Entity)var15.get(var45);
-                    if (var17 != this.riddenByEntity && var17.canBePushed() && var17 instanceof EntityMinecart) {
-                        var17.applyEntityCollision(this);
+            List var16 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D));
+            if (var16 != null && var16.size() > 0) {
+                for(int var51 = 0; var51 < var16.size(); ++var51) {
+                    Entity var18 = (Entity)var16.get(var51);
+                    if (var18 != this.riddenByEntity && var18.canBePushed() && var18 instanceof EntityMinecart) {
+                        var18.applyEntityCollision(this);
                     }
                 }
             }
@@ -421,34 +469,39 @@ public class EntityMinecart extends Entity implements IInventory {
         int var9 = MathHelper.floor_double(var1);
         int var10 = MathHelper.floor_double(var3);
         int var11 = MathHelper.floor_double(var5);
-        if (this.worldObj.getBlockId(var9, var10 - 1, var11) == Block.minecartTrack.blockID) {
+        if (BlockRail.func_27040_h(this.worldObj, var9, var10 - 1, var11)) {
             --var10;
         }
 
-        if (this.worldObj.getBlockId(var9, var10, var11) == Block.minecartTrack.blockID) {
-            int var12 = this.worldObj.getBlockMetadata(var9, var10, var11);
+        int var12 = this.worldObj.getBlockId(var9, var10, var11);
+        if (!BlockRail.func_27041_c(var12)) {
+            return null;
+        } else {
+            int var13 = this.worldObj.getBlockMetadata(var9, var10, var11);
+            if (((BlockRail)Block.blocksList[var12]).func_27042_h()) {
+                var13 &= 7;
+            }
+
             var3 = (double)var10;
-            if (var12 >= 2 && var12 <= 5) {
+            if (var13 >= 2 && var13 <= 5) {
                 var3 = (double)(var10 + 1);
             }
 
-            int[][] var13 = field_855_j[var12];
-            double var14 = (double)(var13[1][0] - var13[0][0]);
-            double var16 = (double)(var13[1][2] - var13[0][2]);
-            double var18 = Math.sqrt(var14 * var14 + var16 * var16);
-            var14 /= var18;
-            var16 /= var18;
-            var1 += var14 * var7;
-            var5 += var16 * var7;
-            if (var13[0][1] != 0 && MathHelper.floor_double(var1) - var9 == var13[0][0] && MathHelper.floor_double(var5) - var11 == var13[0][2]) {
-                var3 += (double)var13[0][1];
-            } else if (var13[1][1] != 0 && MathHelper.floor_double(var1) - var9 == var13[1][0] && MathHelper.floor_double(var5) - var11 == var13[1][2]) {
-                var3 += (double)var13[1][1];
+            int[][] var14 = field_855_j[var13];
+            double var15 = (double)(var14[1][0] - var14[0][0]);
+            double var17 = (double)(var14[1][2] - var14[0][2]);
+            double var19 = Math.sqrt(var15 * var15 + var17 * var17);
+            var15 /= var19;
+            var17 /= var19;
+            var1 += var15 * var7;
+            var5 += var17 * var7;
+            if (var14[0][1] != 0 && MathHelper.floor_double(var1) - var9 == var14[0][0] && MathHelper.floor_double(var5) - var11 == var14[0][2]) {
+                var3 += (double)var14[0][1];
+            } else if (var14[1][1] != 0 && MathHelper.floor_double(var1) - var9 == var14[1][0] && MathHelper.floor_double(var5) - var11 == var14[1][2]) {
+                var3 += (double)var14[1][1];
             }
 
             return this.func_514_g(var1, var3, var5);
-        } else {
-            return null;
         }
     }
 
@@ -456,49 +509,54 @@ public class EntityMinecart extends Entity implements IInventory {
         int var7 = MathHelper.floor_double(var1);
         int var8 = MathHelper.floor_double(var3);
         int var9 = MathHelper.floor_double(var5);
-        if (this.worldObj.getBlockId(var7, var8 - 1, var9) == Block.minecartTrack.blockID) {
+        if (BlockRail.func_27040_h(this.worldObj, var7, var8 - 1, var9)) {
             --var8;
         }
 
-        if (this.worldObj.getBlockId(var7, var8, var9) == Block.minecartTrack.blockID) {
-            int var10 = this.worldObj.getBlockMetadata(var7, var8, var9);
+        int var10 = this.worldObj.getBlockId(var7, var8, var9);
+        if (BlockRail.func_27041_c(var10)) {
+            int var11 = this.worldObj.getBlockMetadata(var7, var8, var9);
             var3 = (double)var8;
-            if (var10 >= 2 && var10 <= 5) {
+            if (((BlockRail)Block.blocksList[var10]).func_27042_h()) {
+                var11 &= 7;
+            }
+
+            if (var11 >= 2 && var11 <= 5) {
                 var3 = (double)(var8 + 1);
             }
 
-            int[][] var11 = field_855_j[var10];
-            double var12 = 0.0D;
-            double var14 = (double)var7 + 0.5D + (double)var11[0][0] * 0.5D;
-            double var16 = (double)var8 + 0.5D + (double)var11[0][1] * 0.5D;
-            double var18 = (double)var9 + 0.5D + (double)var11[0][2] * 0.5D;
-            double var20 = (double)var7 + 0.5D + (double)var11[1][0] * 0.5D;
-            double var22 = (double)var8 + 0.5D + (double)var11[1][1] * 0.5D;
-            double var24 = (double)var9 + 0.5D + (double)var11[1][2] * 0.5D;
-            double var26 = var20 - var14;
-            double var28 = (var22 - var16) * 2.0D;
-            double var30 = var24 - var18;
-            if (var26 == 0.0D) {
+            int[][] var12 = field_855_j[var11];
+            double var13 = 0.0D;
+            double var15 = (double)var7 + 0.5D + (double)var12[0][0] * 0.5D;
+            double var17 = (double)var8 + 0.5D + (double)var12[0][1] * 0.5D;
+            double var19 = (double)var9 + 0.5D + (double)var12[0][2] * 0.5D;
+            double var21 = (double)var7 + 0.5D + (double)var12[1][0] * 0.5D;
+            double var23 = (double)var8 + 0.5D + (double)var12[1][1] * 0.5D;
+            double var25 = (double)var9 + 0.5D + (double)var12[1][2] * 0.5D;
+            double var27 = var21 - var15;
+            double var29 = (var23 - var17) * 2.0D;
+            double var31 = var25 - var19;
+            if (var27 == 0.0D) {
                 var1 = (double)var7 + 0.5D;
-                var12 = var5 - (double)var9;
-            } else if (var30 == 0.0D) {
+                var13 = var5 - (double)var9;
+            } else if (var31 == 0.0D) {
                 var5 = (double)var9 + 0.5D;
-                var12 = var1 - (double)var7;
+                var13 = var1 - (double)var7;
             } else {
-                double var32 = var1 - var14;
-                double var34 = var5 - var18;
-                double var36 = (var32 * var26 + var34 * var30) * 2.0D;
-                var12 = var36;
+                double var33 = var1 - var15;
+                double var35 = var5 - var19;
+                double var37 = (var33 * var27 + var35 * var31) * 2.0D;
+                var13 = var37;
             }
 
-            var1 = var14 + var26 * var12;
-            var3 = var16 + var28 * var12;
-            var5 = var18 + var30 * var12;
-            if (var28 < 0.0D) {
+            var1 = var15 + var27 * var13;
+            var3 = var17 + var29 * var13;
+            var5 = var19 + var31 * var13;
+            if (var29 < 0.0D) {
                 ++var3;
             }
 
-            if (var28 > 0.0D) {
+            if (var29 > 0.0D) {
                 var3 += 0.5D;
             }
 

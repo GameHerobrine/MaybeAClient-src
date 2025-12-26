@@ -41,6 +41,13 @@ public class ChunkCoordinates implements Comparable {
         }
     }
 
+    public double func_27439_a(int var1, int var2, int var3) {
+        int var4 = this.x - var1;
+        int var5 = this.y - var2;
+        int var6 = this.z - var3;
+        return Math.sqrt((double)(var4 * var4 + var5 * var5 + var6 * var6));
+    }
+
     // $FF: synthetic method
     // $FF: bridge method
     public int compareTo(Object var1) {

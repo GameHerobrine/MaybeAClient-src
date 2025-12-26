@@ -18,13 +18,7 @@ public class ReachHack extends Hack{
 	}
 	
 	@Override
-	public String getNameForArrayList() {
-		String s = "[";
-		s += ChatColor.LIGHTCYAN;
-		s += this.radius.value;
-		s += ChatColor.WHITE;
-		s += "]";
-		
-		return this.name + s;
+	public String getPrefix() {
+		return ""+this.radius.value;
 	}
 }

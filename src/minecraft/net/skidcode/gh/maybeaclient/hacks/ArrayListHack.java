@@ -14,25 +14,29 @@ import net.skidcode.gh.maybeaclient.events.impl.EventRenderIngameNoDebug;
 import net.skidcode.gh.maybeaclient.gui.click.ArrayListTab;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingEnum;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingMode;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumAlign;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumExpand;
+import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumStaticPos;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
 
 public class ArrayListHack extends Hack{
 	
 	public SettingMode sortMode = new SettingMode(this, "Sorting", "Descending", "Ascending", "None");
-	public SettingMode alignment = new SettingMode(this, "Alignment", "Left", "Right");
-	public SettingMode expand = new SettingMode(this, "Expand", "Top", "Bottom");
-	public SettingMode staticPositon;
+	public SettingEnum<EnumAlign> alignment = new SettingEnum<>(this, "Alignment", EnumAlign.LEFT);
+	public SettingEnum<EnumStaticPos> staticPositon;
+	public SettingEnum<EnumExpand> expand = new SettingEnum<>(this, "Expand", EnumExpand.TOP);
 	public static ArrayListHack instance;
 	
 	public ArrayListHack() {
 		super("ArrayList", "Shows list of enabled modules", Keyboard.KEY_NONE, Category.UI);
 		instance = this;
 		this.addSetting(this.sortMode);
-		this.addSetting(this.staticPositon = new SettingMode(this, "Static Position", "Bottom Right", "Top Left", "Top Right", "Bottom Left", "Disabled") {
+		this.addSetting(this.staticPositon = new SettingEnum<EnumStaticPos>(this, "Static Position", EnumStaticPos.BOTTOM_RIGHT) {
 			public void setValue(String value) {
 				super.setValue(value);
-				if(this.currentMode.equalsIgnoreCase("Disabled")) {
+				if(this.getValue() == EnumStaticPos.DISABLED) {
 					ArrayListHack.instance.alignment.show();
 					ArrayListHack.instance.expand.show();
 				}else {

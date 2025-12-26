@@ -64,7 +64,7 @@ public class EntitySquid extends EntityWaterMob {
         return false;
     }
 
-    public boolean handleWaterMovement() {
+    public boolean func_27013_ag() {
         return this.worldObj.handleMaterialAcceleration(this.boundingBox.expand(0.0D, -0.6000000238418579D, 0.0D), Material.water, this);
     }
 
@@ -82,7 +82,7 @@ public class EntitySquid extends EntityWaterMob {
             }
         }
 
-        if (this.handleWaterMovement()) {
+        if (this.func_27013_ag()) {
             float var1;
             if (this.field_21085_g < 3.1415927F) {
                 var1 = this.field_21085_g / 3.1415927F;

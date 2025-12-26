@@ -25,16 +25,16 @@ public class GuiCreateWorld extends GuiScreen {
         this.controlList.clear();
         this.controlList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + 12, var1.translateKey("selectWorld.create")));
         this.controlList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + 12, var1.translateKey("gui.cancel")));
-        this.textboxWorldName = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 60, 200, 20, var1.translateKey("selectWorld.newWorld"));
+        this.textboxWorldName = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, 60, 200, 20, var1.translateKey("selectWorld.newWorld"));
         this.textboxWorldName.isFocused = true;
         this.textboxWorldName.setMaxStringLength(32);
-        this.textboxSeed = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 116, 200, 20, "");
+        this.textboxSeed = new GuiTextField(this, this.fontRenderer, this.width / 2 - 100, 116, 200, 20, "");
         this.func_22129_j();
     }
 
     private void func_22129_j() {
         this.folderName = this.textboxWorldName.getText().trim();
-        char[] var1 = FontAllowedCharacters.field_22286_b;
+        char[] var1 = ChatAllowedCharacters.field_22286_b;
         int var2 = var1.length;
 
         for(int var3 = 0; var3 < var2; ++var3) {
@@ -94,8 +94,12 @@ public class GuiCreateWorld extends GuiScreen {
     }
 
     protected void keyTyped(char var1, int var2) {
-        this.textboxWorldName.textboxKeyTyped(var1, var2);
-        this.textboxSeed.textboxKeyTyped(var1, var2);
+        if (this.textboxWorldName.isFocused) {
+            this.textboxWorldName.textboxKeyTyped(var1, var2);
+        } else {
+            this.textboxSeed.textboxKeyTyped(var1, var2);
+        }
+
         if (var1 == '\r') {
             this.actionPerformed((GuiButton)this.controlList.get(0));
         }
@@ -121,5 +125,16 @@ public class GuiCreateWorld extends GuiScreen {
         this.textboxWorldName.drawTextBox();
         this.textboxSeed.drawTextBox();
         super.drawScreen(var1, var2, var3);
+    }
+
+    public void func_27108_j() {
+        if (this.textboxWorldName.isFocused) {
+            this.textboxWorldName.func_27106_a(false);
+            this.textboxSeed.func_27106_a(true);
+        } else {
+            this.textboxWorldName.func_27106_a(true);
+            this.textboxSeed.func_27106_a(false);
+        }
+
     }
 }
