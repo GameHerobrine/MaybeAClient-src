@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.1";
+	public static final String clientVersion = "4.0.2";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -717,9 +717,9 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.1
-	 * Fixed water rendering
-	 * Fixed compass and clock textures when using high resolution texturepacks
+	 * 4.0.2
+	 * Fixed ChestContent not allowing to open the chest
+	 * Added PlaceOnlyBelow option for Schematica
 	 */
 	
 	static {
@@ -789,10 +789,10 @@ public class Client {
 		registerHack(new NoRenderHack());
 		//1.8
 		registerHack(new AutoScreenshotCopyHack());
-		registerHack(new ThirdPersonTweaksHack()); //TODO
+		registerHack(new ThirdPersonTweaksHack());
 		registerHack(new FastPortalHack());
 		registerHack(new AutoFishHack());
-		registerHack(new ChestCheckerHack());
+		registerHack(new ChestContentHack());
 		registerHack(new NewChunksHack());
 		//1.9
 		registerHack(new HideChatHack());

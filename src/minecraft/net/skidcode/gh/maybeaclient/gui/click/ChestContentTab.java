@@ -9,7 +9,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.RenderHelper;
 import net.minecraft.src.RenderManager;
 import net.skidcode.gh.maybeaclient.Client;
-import net.skidcode.gh.maybeaclient.hacks.ChestCheckerHack;
+import net.skidcode.gh.maybeaclient.hacks.ChestContentHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.ClientNameHack;
 import net.skidcode.gh.maybeaclient.hacks.InventoryViewHack;
@@ -25,7 +25,7 @@ public class ChestContentTab extends Tab{
 	}
 	
 	public void renderIngame() {
-		if(ChestCheckerHack.instance.status) {
+		if(ChestContentHack.instance.status) {
 			super.renderIngame();
 		}
 	}
@@ -39,8 +39,8 @@ public class ChestContentTab extends Tab{
 			int y = Client.mc.objectMouseOver.blockY;
 			int z = Client.mc.objectMouseOver.blockZ;
 			int id = Client.mc.theWorld.getBlockId(x, y, z);
-			if(id == Block.chest.blockID && ChestCheckerHack.instance.status) {
-				contents = ChestCheckerHack.instance.getChestContents(x, y, z);
+			if(id == Block.chest.blockID && ChestContentHack.instance.status) {
+				contents = ChestContentHack.instance.getChestContents(x, y, z);
 			}
 		}
 		

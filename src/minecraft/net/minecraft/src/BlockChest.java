@@ -2,6 +2,8 @@ package net.minecraft.src;
 
 import java.util.Random;
 
+import net.skidcode.gh.maybeaclient.hacks.ChestContentHack;
+
 public class BlockChest extends BlockContainer {
     private Random random = new Random();
 
@@ -212,6 +214,8 @@ public class BlockChest extends BlockContainer {
             }
 
             if (var1.multiplayerWorld) {
+            	ChestContentHack.instance.locked = 1;
+            	ChestContentHack.realOpened = true;
                 return true;
             } else {
                 var5.displayGUIChest((IInventory)var6);

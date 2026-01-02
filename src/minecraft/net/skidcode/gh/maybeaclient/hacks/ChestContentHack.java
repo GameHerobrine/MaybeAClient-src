@@ -21,11 +21,11 @@ import net.skidcode.gh.maybeaclient.events.impl.EventPacketReceive;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingFloat;
 
-public class ChestCheckerHack extends Hack implements EventListener{
-	public static ChestCheckerHack instance;
+public class ChestContentHack extends Hack implements EventListener{
+	public static ChestContentHack instance;
 	public static boolean realOpened = false;
 	public SettingFloat refreshData = new SettingFloat(this, "RefreshDataS", 1, 0.5f, 10, 0.5f);
-	public ChestCheckerHack() {
+	public ChestContentHack() {
 		super("ChestContent", "Shows content of chest in specific tab", Keyboard.KEY_NONE, Category.UI);
 		instance = this;
 		
@@ -48,12 +48,12 @@ public class ChestCheckerHack extends Hack implements EventListener{
 				if(pk.inventoryType == 0) { //chest
 					event.cancelled = true;
 					mc.getSendQueue().addToSendQueue(new Packet101CloseWindow(pk.windowId));
-					
 				}
 			}
 		}
 	}
 	
+	@Override
 	public void onDisable() {
 		items = null;
 		fakeOpenY = -1;
@@ -104,6 +104,7 @@ public class ChestCheckerHack extends Hack implements EventListener{
 		this.fakeOpenZ = z;
 		this.requestedY = -1;
 		this.items = data;
+		this.waitingGui = false;
 		this.lastData = System.currentTimeMillis();
 	}
 	

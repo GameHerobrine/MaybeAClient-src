@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.skidcode.gh.maybeaclient.hacks.AutoMouseClickHack;
-import net.skidcode.gh.maybeaclient.hacks.ChestCheckerHack;
+import net.skidcode.gh.maybeaclient.hacks.ChestContentHack;
 import net.skidcode.gh.maybeaclient.hacks.InventoryWalkHack;
 import net.skidcode.gh.maybeaclient.hacks.TooltipsHack;
 
@@ -23,7 +23,7 @@ public abstract class GuiContainer extends GuiScreen {
 
     public void initGui() {
         super.initGui();
-        ChestCheckerHack.instance.locked=1;
+        ChestContentHack.instance.locked=1;
         this.mc.thePlayer.craftingInventory = this.inventorySlots;
         this.controlList.add(new GuiButton(1337, 0, this.height - 20 - 1, 120, 20, "Disable AutoMouseClick") {
         	
@@ -228,8 +228,8 @@ public abstract class GuiContainer extends GuiScreen {
     }
 
     public void onGuiClosed() {
-    	ChestCheckerHack.instance.locked=0;
-    	ChestCheckerHack.realOpened = false;
+    	ChestContentHack.instance.locked=0;
+    	ChestContentHack.realOpened = false;
         if (this.mc.thePlayer != null) {
             this.mc.playerController.func_20086_a(this.inventorySlots.windowId, this.mc.thePlayer);
         }

@@ -15,6 +15,7 @@ import lunatrius.schematica.Settings;
 import net.minecraft.src.Block;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.MathHelper;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
@@ -42,6 +43,8 @@ public class SchematicaHack extends Hack implements EventListener{
 	public SettingButton openStats = new SettingButton(this, "Stats");
 	
 	public SettingBoolean autoPlacer;
+	public SettingBoolean placeOnlyBelow = new SettingBoolean(this, "PlaceOnlyBelow", false);
+	
 	public SettingInteger placeDelay = new SettingInteger(this, "Delay", 5, 0, 10);
 	public SettingInteger placeRadius = new SettingInteger(this, "Radius", 2, 1, 6);
 	public final lunatrius.schematica.Render render = new lunatrius.schematica.Render(this);
@@ -79,11 +82,12 @@ public class SchematicaHack extends Hack implements EventListener{
 		this.addSetting(this.autoPlacer = new SettingBoolean(this, "AutoBlockPlace", false) {
 			public void setValue(boolean d) {
 				super.setValue(d);
-				SchematicaHack.instance.placeDelay.hidden = SchematicaHack.instance.placeRadius.hidden = !d;
+				SchematicaHack.instance.placeOnlyBelow.hidden = SchematicaHack.instance.placeDelay.hidden = SchematicaHack.instance.placeRadius.hidden = !d;
 			}
 		});
 		this.addSetting(this.placeDelay);
 		this.addSetting(this.placeRadius);
+		this.addSetting(this.placeOnlyBelow);
 		
 		this.addSetting(this.enableAlpha);
 		this.addSetting(this.alpha);
@@ -163,11 +167,16 @@ public class SchematicaHack extends Hack implements EventListener{
 					for(int z = minZ; z < maxZ; ++z) {
 						for(int y = minY; y < maxY; ++y) {
 							if(y > 127) continue;
+							System.out.println(y+" "+mc.thePlayer.boundingBox.minY);
 							int rX = 0, rY = 0, rZ = 0;
 							try {
 								rX = x + inst.offset.x;
 								rY = y + inst.offset.y;
 								rZ = z + inst.offset.z;
+
+								if(SchematicaHack.instance.placeOnlyBelow.getValue() && rY >= MathHelper.floor_double(mc.thePlayer.boundingBox.minY)) {
+									continue;
+								}
 								if(rX <= maxXr && rX >= minXr && rY <= maxYr && rY >= minYr && rZ <= maxZr && rZ >= minZr) {
 									int id = schem.getBlockId(x, y, z); //schem.blocks[x][y][z];
 									int worldID = mc.theWorld.getBlockId(rX, rY, rZ);
