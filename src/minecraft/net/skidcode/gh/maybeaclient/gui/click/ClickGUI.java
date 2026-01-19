@@ -15,7 +15,7 @@ import net.skidcode.gh.maybeaclient.utils.GUIUtils;
 import net.skidcode.gh.maybeaclient.utils.InputHandler;
 
 public class ClickGUI extends GuiScreen{
-	
+
 	public GuiScreen parent;
 	public static boolean initialized = false;
 	public static ArrayList<Tab> tabs = new ArrayList<>();
@@ -41,7 +41,7 @@ public class ClickGUI extends GuiScreen{
 	
 	@Override
 	public void handleMouseInput() {
-		
+
 	}
 	public static InputHandler inputHandler = null;
 	public static boolean hasInputHandler = false;

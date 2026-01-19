@@ -123,7 +123,7 @@ public class ForceFieldHack extends Hack implements EventListener{
 					}
 					if(e.ff_delay > 0) continue;
 					
-					if(this.swing.getValue()) {
+					if(this.swing.getValue() && !mc.thePlayer.isSwinging) {
 						mc.thePlayer.swingItem();
 					}
 					PlayerUtils.hitEntity(e);

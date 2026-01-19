@@ -19,6 +19,7 @@ import net.skidcode.gh.maybeaclient.utils.ChatColor;
 public class ClientInfoHack extends Hack{
 	
 	public SettingBoolean coords;
+    public SettingBoolean rotation = new SettingBoolean(this, "Show raw yaw/pitch", false);
 	public SettingBoolean facing = new SettingBoolean(this, "Show facing", true);
 	public SettingBoolean fps = new SettingBoolean(this, "Show fps", false);
 	public SettingBoolean username = new SettingBoolean(this, "Show username", false);
@@ -59,6 +60,7 @@ public class ClientInfoHack extends Hack{
 		};
 		
 		this.addSetting(coords);
+        this.addSetting(rotation);
 		this.addSetting(this.showNetherCoords);
 		this.addSetting(facing);
 		this.addSetting(fps);

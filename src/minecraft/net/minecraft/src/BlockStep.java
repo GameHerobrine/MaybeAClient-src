@@ -5,8 +5,7 @@ import java.util.Random;
 import net.skidcode.gh.maybeaclient.hacks.XRayHack;
 
 public class BlockStep extends Block {
-    public static final String[] field_22037_a = new String[]{"stone", "sand", "wood", "cobble"};
-    private boolean blockType;
+	private boolean blockType;
 
     public BlockStep(int var1, boolean var2) {
         super(var1, 6, Material.rock);
@@ -94,4 +93,20 @@ public class BlockStep extends Block {
             return var1.getBlockId(var2, var3, var4) != this.blockID;
         }
     }
+
+    //XXX crash slab fix
+	public static String getTypeName(int damage) {
+		switch(damage) {
+			case 0:
+				return "stone";
+			case 1:
+				return "sand";
+			case 2:
+				return "wood";
+			case 3:
+				return "cobble";
+			default:
+				return "cliff";
+		}
+	}
 }

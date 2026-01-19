@@ -37,7 +37,7 @@ public class FlyHack extends Hack implements EventListener{
 	}
 	
 	public static void handleFly(double speedMultiplier) {
-		
+		mc.thePlayer.movementInput.sneak = false;
 		mc.thePlayer.onGround = false;
 		mc.thePlayer.motionX = 0.0D;
 		mc.thePlayer.motionY = 0.0D;
@@ -80,7 +80,7 @@ public class FlyHack extends Hack implements EventListener{
 			mc.thePlayer.motionZ = Math.sin(Math.toRadians(d1));
 		}
 		if(up) mc.thePlayer.motionY++;
-		else if(down) mc.thePlayer.motionY--;
+		if(down) mc.thePlayer.motionY--;
 		
 		mc.thePlayer.motionX *= speedMultiplier;
 		mc.thePlayer.motionY *= speedMultiplier;

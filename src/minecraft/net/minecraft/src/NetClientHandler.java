@@ -28,6 +28,7 @@ public class NetClientHandler extends NetHandler {
     public NetClientHandler(Minecraft var1, String var2, int var3) throws UnknownHostException, IOException {
         this.mc = var1;
         Socket var4 = new Socket(InetAddress.getByName(var2), var3);
+        var4.setTcpNoDelay(true);
         this.ip = var2;
         this.port = var3;
         this.netManager = new NetworkManager(var4, "Client", this);

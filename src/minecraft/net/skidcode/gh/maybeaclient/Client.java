@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.2";
+	public static final String clientVersion = "4.0.3";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -836,6 +836,9 @@ public class Client {
 		registerHack(new FireExtinguisherHack());
 		//3.1.2
 		registerHack(new WeatherLockHack());
+		//hijmod
+		registerHack(new TNTBomber());
+
 		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {
 			public Hack init() {
 				this.addSetting(new net.skidcode.gh.maybeaclient.hacks.settings.SettingChooser(this, "ColorSettingVithVeryVeryVeryVeryLongName", new String[] {"Ae", "Clef"}, new boolean[] {false, false}));

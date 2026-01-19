@@ -80,19 +80,21 @@ public class CommandModule extends Command{
 						try {
 							bind = Integer.parseInt(keybindRaw);
 						}catch(NumberFormatException e) {
-							mouse_check:
-							if(keybindRaw.startsWith("MOUSE_")) {
-								try {
-									bind = Client.getKeycodeForMouseButton(Integer.parseInt(keybindRaw.substring(6)));
-									break i_love_freecliff;
-								}catch(NumberFormatException ee) {}
-							}
-							if(!keybindRaw.startsWith("KEY_")) {
-								Client.addMessage("Invalid keyname format.");
-								break;
-							}
-							
-							bind = Keyboard.getKeyIndex(keybindRaw.substring(4));
+                            bind = Keyboard.getKeyIndex(keybindRaw.substring(4));
+
+                            if (bind == 0) {
+                                mouse_check:
+                                if(keybindRaw.startsWith("MOUSE_")) {
+                                    try {
+                                        bind = Client.getKeycodeForMouseButton(Integer.parseInt(keybindRaw.substring(6)));
+                                        break i_love_freecliff;
+                                    }catch(NumberFormatException ee) {}
+                                }
+                                if(!keybindRaw.startsWith("KEY_")) {
+                                    Client.addMessage("Invalid keyname format.");
+                                    break;
+                                }
+                            }
 						}
 						h.bind(bind);
 					}
