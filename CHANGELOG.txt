@@ -1,0 +1,9 @@
+- Added TNTBomber
+- Added raw rotation values to PlayerInfo tab
+- Added mob jitter fix for MP
+- Added tcp no delay
+- Fixed slime rendering
+- Fixed nonfull blocks being rendered in xray even when not selected (fluids todo)
+- Fixed .module bind
+- Removed swing animation on every tick in kill aura
+- Removed sneaking while flying

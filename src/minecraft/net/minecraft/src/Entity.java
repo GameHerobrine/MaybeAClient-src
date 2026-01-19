@@ -315,6 +315,7 @@ public abstract class Entity {
     }
 
     public void moveEntity(double var1, double var3, double var5) {
+        if (Client.mc.isMultiplayerWorld() && this instanceof EntityLiving && !(this instanceof EntityPlayerSP)) return;
     	if (this.noClip || (FreecamHack.instance.status && FreecamHack.instance.noclip.value && this == Client.mc.thePlayer) || (NoClipHack.instance.status && this == Client.mc.thePlayer)) {
             this.boundingBox.offset(var1, var3, var5);
             this.posX = (this.boundingBox.minX + this.boundingBox.maxX) / 2.0D;

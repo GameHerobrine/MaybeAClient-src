@@ -19,7 +19,7 @@ public class ClientInfoTab extends ElementTab{
 	public static ClientInfoTab instance;
 	
 	
-	public TextElement coordX, coordY, coordZ;
+	public TextElement coordX, coordY, coordZ, yaw, pitch;
 	public TextElement facing, fps, username, walkingSpeed;
 	public VerticalContainer vc = new VerticalContainer();
 	
@@ -32,6 +32,8 @@ public class ClientInfoTab extends ElementTab{
 		vc.addElement(this.coordX = new TextElement(""));
 		vc.addElement(this.coordY = new TextElement(""));
 		vc.addElement(this.coordZ = new TextElement(""));
+        vc.addElement(this.yaw = new TextElement(""));
+        vc.addElement(this.pitch = new TextElement(""));
 		vc.addElement(this.facing = new TextElement(""));
 		vc.addElement(this.fps = new TextElement(""));
 		vc.addElement(this.username = new TextElement(""));
@@ -50,11 +52,14 @@ public class ClientInfoTab extends ElementTab{
 	public void preRender() {
 		//this.width = Client.mc.fontRenderer.getStringWidth(this.name) + ClickGUIHack.theme().titleXadd;
 		this.coordX.shown = this.coordY.shown = this.coordZ.shown = ClientInfoHack.instance.coords.value;
+        this.yaw.shown = this.pitch.shown = ClientInfoHack.instance.rotation.value;
 		this.facing.shown = ClientInfoHack.instance.facing.value;
 		this.fps.shown = ClientInfoHack.instance.fps.value;
 		this.username.shown = ClientInfoHack.instance.username.value;
 		this.walkingSpeed.shown = ClientInfoHack.instance.walkingSpeed.value;
-		
+
+        this.yaw.text = String.format("Yaw: %.1f", Client.mc.thePlayer.rotationYaw);
+        this.pitch.text = String.format("Pitch: %.1f", Client.mc.thePlayer.rotationPitch);
 		this.facing.text = String.format("Facing: %s", PlayerUtils.getDirection());
 		this.fps.text = String.format("FPS: %s", Client.mc.fps);
 		this.username.text = String.format("Username: %s", Client.mc.session.username);

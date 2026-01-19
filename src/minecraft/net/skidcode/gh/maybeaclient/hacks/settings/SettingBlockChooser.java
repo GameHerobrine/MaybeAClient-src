@@ -14,6 +14,7 @@ import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 
 public class SettingBlockChooser extends Setting{
+    public static boolean rendering = false;
 	public boolean blocks[];
 	public int ids[];
 	//public int width, height;
@@ -199,7 +200,8 @@ public class SettingBlockChooser extends Setting{
 			x += 5;
 			xEnd -= 5;
 		}
-		
+
+        rendering = true;
 		y += ySpace;
 		GL11.glPushMatrix();
 		int id = 1;
@@ -221,6 +223,7 @@ public class SettingBlockChooser extends Setting{
 		}
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glPopMatrix();
+        rendering = false;
 	}
 	
 	@Override

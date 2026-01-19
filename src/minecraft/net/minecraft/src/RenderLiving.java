@@ -344,9 +344,17 @@ public class RenderLiving extends Render {
 			GL11.glEnable(GL11.GL_LINE_SMOOTH);
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glColor3f((float)r, (float)g, (float)b);
-			RenderUtils.drawOutlinedBB(
-				AxisAlignedBB.getBoundingBox(var2 - entity.width / 2, var4, var6 - entity.width / 2, var2 + entity.width / 2, var4 + entity.height, var6 + entity.width / 2)
-			);
+            if (entity instanceof EntitySlime) {
+                EntitySlime entitySlime = (EntitySlime) entity;
+                float size = entitySlime.getSlimeSize() * 0.6F;
+                RenderUtils.drawOutlinedBB(
+                        AxisAlignedBB.getBoundingBox(var2 - size / 2, var4, var6 - size / 2, var2 + size / 2, var4 + size, var6 + size / 2)
+                );
+            } else {
+                RenderUtils.drawOutlinedBB(
+                        AxisAlignedBB.getBoundingBox(var2 - entity.width / 2, var4, var6 - entity.width / 2, var2 + entity.width / 2, var4 + entity.height, var6 + entity.width / 2)
+                );
+            }
 			GL11.glColor4f(0.0F, 230F, 255F, 0.3F);
 			GL11.glDepthMask(true);
 			GL11.glEnable(GL11.GL_LIGHTING);

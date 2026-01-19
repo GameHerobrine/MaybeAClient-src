@@ -1,5 +1,8 @@
 package net.minecraft.src;
 
+import net.skidcode.gh.maybeaclient.hacks.XRayHack;
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingBlockChooser;
+
 import java.util.Random;
 
 public class BlockFlower extends Block {
@@ -52,7 +55,17 @@ public class BlockFlower extends Block {
         return false;
     }
 
+    @Override
     public int getRenderType() {
-        return 1;
+        if (SettingBlockChooser.rendering) return 1;
+        return XRayHack.INSTANCE.status && XRayHack.INSTANCE.blockChooser.blocks[this.blockID] ? 0 : 1;
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
+        if(XRayHack.INSTANCE.status && !XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
+            return !XRayHack.INSTANCE.blockChooser.blocks[this.blockID];
+        }
+        return true;
     }
 }
