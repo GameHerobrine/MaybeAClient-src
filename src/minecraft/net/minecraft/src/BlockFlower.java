@@ -57,7 +57,7 @@ public class BlockFlower extends Block {
 
     @Override
     public int getRenderType() {
-    	return 1;
+        return 1;
     }
 
     @Override
