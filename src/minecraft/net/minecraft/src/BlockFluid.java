@@ -251,7 +251,7 @@ public abstract class BlockFluid extends Block {
 
     public int getRenderBlockPass() {
     	if(XRayHack.INSTANCE.status && XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
-    		return 0;
+    		return XRayHack.INSTANCE.blockChooser.blocks[this.blockID] ? 0 : 1;
     	}
     	
         return this.blockMaterial == Material.water ? 1 : 0;

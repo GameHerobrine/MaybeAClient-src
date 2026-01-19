@@ -2,6 +2,8 @@ package net.minecraft.src;
 
 import java.util.Random;
 
+import net.skidcode.gh.maybeaclient.hacks.XRayHack;
+
 public class BlockIce extends BlockBreakable {
     public BlockIce(int var1, int var2) {
         super(var1, var2, Material.ice, false);
@@ -10,6 +12,9 @@ public class BlockIce extends BlockBreakable {
     }
 
     public int getRenderBlockPass() {
+    	if(XRayHack.INSTANCE.status && XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
+    		return XRayHack.INSTANCE.blockChooser.blocks[this.blockID] ? 0 : 1;
+    	}
         return 1;
     }
 

@@ -55,8 +55,8 @@ public class XRayHack extends Hack{
 				}
 			}
 		};
-		this.addSetting(this.opacity);
 		this.addSetting(this.mode);
+		this.addSetting(this.opacity);
 		this.addSetting(this.blockChooser);
 	}
 	
@@ -82,7 +82,11 @@ public class XRayHack extends Hack{
 			Block.blockDiamond.blockID,
 			Block.blockSteel.blockID,
 			Block.blockGold.blockID,
-			Block.blockLapis.blockID
+			Block.blockLapis.blockID,
+			Block.lavaMoving.blockID,
+			Block.lavaStill.blockID,
+			Block.waterStill.blockID,
+			Block.waterMoving.blockID
 	) {
 		@Override
 		public void blockChanged(int id) {

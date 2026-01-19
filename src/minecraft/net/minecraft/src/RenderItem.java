@@ -13,6 +13,7 @@ public class RenderItem extends Render {
     private RenderBlocks renderBlocks = new RenderBlocks();
     private Random random = new Random();
     public boolean field_27004_a = true;
+	public float alphaCol = 1.0f;
 
     public RenderItem() {
         this.shadowSize = 0.15F;
@@ -427,10 +428,15 @@ public class RenderItem extends Render {
             float var10 = (float)(var8 >> 8 & 255) / 255.0F;
             var11 = (float)(var8 & 255) / 255.0F;
             if (this.field_27004_a) {
-                GL11.glColor4f(var9, var10, var11, 1.0F);
+            	if(alphaCol != 1) {
+            		GL11.glEnable(GL11.GL_BLEND);
+            	}
+                GL11.glColor4f(var9, var10, var11, alphaCol);
             }
-
             this.renderTexturedQuad(var6, var7, var5 % 16 * 16, var5 / 16 * 16, 16, 16);
+            if(this.field_27004_a && alphaCol != 1) {
+        		GL11.glDisable(GL11.GL_BLEND);
+        	}
             GL11.glEnable(2896 /*GL_LIGHTING*/);
         }
 

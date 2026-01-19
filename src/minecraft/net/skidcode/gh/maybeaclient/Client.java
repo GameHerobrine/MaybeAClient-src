@@ -834,9 +834,9 @@ public class Client {
 		//3.0.0
 		registerHack(new NoFriendlyFireHack());
 		registerHack(new FireExtinguisherHack());
-		//3.1.2
+		//3.0.2
 		registerHack(new WeatherLockHack());
-		//hijmod
+		//4.0.3 (freehij)
 		registerHack(new TNTBomber());
 
 		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {

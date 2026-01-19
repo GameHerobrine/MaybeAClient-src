@@ -96,8 +96,12 @@ public class RenderBlocks {
         int var5 = var1.getRenderType();
         var1.setBlockBoundsBasedOnState(this.blockAccess, var2, var3, var4);
         
-        if(XRayHack.INSTANCE.status && XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
-        	this.renderAllFaces = XRayHack.INSTANCE.blockChooser.blocks[var1.blockID];
+        if(XRayHack.INSTANCE.status) {
+        	if(XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
+        		this.renderAllFaces = XRayHack.INSTANCE.blockChooser.blocks[var1.blockID];
+        	}else {
+        		if(!XRayHack.INSTANCE.blockChooser.blocks[var1.blockID]) return false;
+        	}
         }
         
         if (var5 == 0) {
@@ -1315,9 +1319,6 @@ public class RenderBlocks {
     }
 
     public boolean renderBlockReed(Block var1, int var2, int var3, int var4) {
-    	 if(XRayHack.INSTANCE.status && !XRayHack.INSTANCE.mode.currentMode.equalsIgnoreCase("Opacity")) {
-             if(!XRayHack.INSTANCE.blockChooser.blocks[var1.blockID]) return false;
-         }
         Tessellator var5 = Tessellator.instance;
         float var6 = var1.getBlockBrightness(this.blockAccess, var2, var3, var4);
         int var7 = var1.colorMultiplier(this.blockAccess, var2, var3, var4);

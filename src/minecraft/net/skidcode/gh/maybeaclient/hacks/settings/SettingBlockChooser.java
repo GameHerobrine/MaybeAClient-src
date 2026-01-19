@@ -17,7 +17,6 @@ public class SettingBlockChooser extends Setting{
     public static boolean rendering = false;
 	public boolean blocks[];
 	public int ids[];
-	//public int width, height;
 	
 	public boolean minimized = false;
 	public int blockCount = 0;
@@ -38,9 +37,6 @@ public class SettingBlockChooser extends Setting{
 		this.ids = ids;
 		
 		int id = 1;
-		int drawn = 0;
-		int hei = 0;
-		int wid = 0;
 		while(id < 256) if(Block.blocksList[id++] != null) ++blockCount;
 	}
 	
@@ -118,6 +114,7 @@ public class SettingBlockChooser extends Setting{
 			}
 			++id;
 		}
+		GL11.glColor4f(1f, 1f, 1f, 1f);
 		GL11.glPopMatrix();
 	}
 	public boolean minPressd = false;
@@ -212,7 +209,15 @@ public class SettingBlockChooser extends Setting{
 			if(b != null) {
 				GL11.glDisable(GL11.GL_LIGHTING);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
+				if(this.blocks[id]) {
+		            GL11.glEnable(GL11.GL_BLEND);
+		            GuiIngame.itemRenderer.alphaCol = 0.5f;
+				}
 				GuiIngame.itemRenderer.renderItemIntoGUI(Client.mc.fontRenderer, Client.mc.renderEngine, new ItemStack(b), x + drawn*18, y + yOff);
+				if(this.blocks[id]) {
+		            GuiIngame.itemRenderer.alphaCol = 1f;
+			         GL11.glDisable(GL11.GL_BLEND);
+				}
 				++drawn;
 			}
 			if(drawn >= getMaxColoumns(x, xEnd)) {
