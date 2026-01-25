@@ -4,15 +4,14 @@ import net.minecraft.src.*;
 import net.skidcode.gh.maybeaclient.events.Event;
 import net.skidcode.gh.maybeaclient.events.EventListener;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
-import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePost;
 import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePre;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.utils.Direction;
 import net.skidcode.gh.maybeaclient.utils.PlayerUtils;
 import org.lwjgl.input.Keyboard;
 
-public class TNTBomber extends Hack implements EventListener {
-    public TNTBomber() {
+public class TNTBomberHack extends Hack implements EventListener {
+    public TNTBomberHack() {
         super("TNTBomber", "Auto places and ignites tnt", Keyboard.KEY_NONE, Category.MOVEMENT);
         EventRegistry.registerListener(EventPlayerUpdatePre.class, this);
     }

@@ -49,6 +49,9 @@ public class FreecamHack extends Hack implements EventListener{
 		if(this.resetPositonOnDisable.getValue()) {
 			mc.thePlayer.setPosition(this.posX, this.posY, this.posZ);
 		}
+		mc.thePlayer.motionX = 0.F;
+		mc.thePlayer.motionY = 0.F;
+		mc.thePlayer.motionZ = 0.F;
 	}
 	@Override
 	public void handleEvent(Event event) {

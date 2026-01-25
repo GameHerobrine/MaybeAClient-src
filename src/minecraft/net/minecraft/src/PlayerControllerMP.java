@@ -10,6 +10,7 @@ import net.skidcode.gh.maybeaclient.hacks.PacketMineHack;
 import net.skidcode.gh.maybeaclient.hacks.ReachHack;
 import net.skidcode.gh.maybeaclient.hacks.SpeedMineHack;
 import net.skidcode.gh.maybeaclient.hacks.TunnelESPHack;
+import org.lwjgl.input.Keyboard;
 
 public class PlayerControllerMP extends PlayerController {
     private int currentBlockX = -1;
@@ -218,6 +219,14 @@ public class PlayerControllerMP extends PlayerController {
         short var6 = var5.craftingInventory.func_20111_a(var5.inventory);
         ItemStack var7 = super.func_27174_a(var1, var2, var3, var4, var5);
         this.netClientHandler.addToSendQueue(new Packet102WindowClick(var1, var2, var3, var4, var7, var6));
+
+        if (var2 == 0 && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) &&
+                (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiCrafting)) {
+            for (int i = 0; i < 65; i++) {
+                this.netClientHandler.addToSendQueue(new Packet102WindowClick(var1, var2, var3, var4, var7, var6));
+            }
+        }
+
         return var7;
     }
 
