@@ -717,9 +717,14 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.2
-	 * Fixed ChestContent not allowing to open the chest
-	 * Added PlaceOnlyBelow option for Schematica
+	 * 4.0.4
+	 * Added FastCraft (freehij & gameherobrine)
+	 * Added AutoShear (freehij)
+	 * Added ImageViewer (freehij)
+	 * Added OnGround to Fly (freehij)
+	 * Added Biome to PlayerInfo (freehij)
+	 * Fixed FreeCam not resetting speed values (freehij)
+	 * Backported step sounds fix from r1.2.5 (freehij)
 	 */
 	
 	static {
@@ -841,6 +846,7 @@ public class Client {
 		//4.0.4 (freehij)
 		registerHack(new AutoShearHack());
 		registerHack(new ImageViewerHack());
+		registerHack(new FastCraftHack());
 
 		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {
 			public Hack init() {
