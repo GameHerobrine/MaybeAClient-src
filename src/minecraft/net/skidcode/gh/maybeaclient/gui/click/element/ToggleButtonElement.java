@@ -43,6 +43,9 @@ public class ToggleButtonElement extends Element{
 				txtColor = ClickGUIHack.instance.secColor.rgb();
 			}
 		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			txtColor = this.listener.getValue() ? Theme.UWARE_ENABLED_COLOR : Theme.UWARE_DISABLED_COLOR;
+		}
 		Client.mc.fontRenderer.drawString(s, startX + 2, startY + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		mouseHovering = false;
 	}
@@ -50,6 +53,10 @@ public class ToggleButtonElement extends Element{
 	@Override
 	public void renderBottom() {
 		boolean v = this.listener.getValue();
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(startX, startY, endX, endY, 0x26/255f, 0x26/255f, 0x26/255f, 0xaa/255f);
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS || ClickGUIHack.theme() == Theme.IRIDIUM) {
 			return;
 		}

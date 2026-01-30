@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.4";
+	public static final String clientVersion = "4.0.5";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -717,16 +717,10 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.4
-	 * Added FastCraft (freehij & gameherobrine)
-	 * Added AutoShear (freehij)
-	 * Added ImageViewer (freehij)
-	 * Added OnGround to Fly (freehij)
-	 * Added Biome to PlayerInfo (freehij)
-	 * Added sort modules option for ClickGui(default: A-Z) (gameherobrine)
-	 * Added ScrollUsingScrollwheel option for ClickGui(enabled by default) (gameherobrine)
-	 * Fixed FreeCam not resetting speed values (freehij)
-	 * Backported step sounds fix from r1.2.5 (freehij)
+	 * 4.0.5
+	 * Fixed portals causing stackoverflow in singleplayer (gameherobrine)
+	 * Added Uware theme (TODO: make it look more like uware(dont forget about subsettings of each block in blockesp), make it work with all tabs)
+	 * Leaked enchantile TODO
 	 */
 	
 	static {

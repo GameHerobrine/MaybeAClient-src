@@ -1,12 +1,16 @@
 package net.skidcode.gh.maybeaclient.hacks.settings;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Tessellator;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
 import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.GUIUtils;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public class SettingBoolean extends Setting{
 	
@@ -41,7 +45,18 @@ public class SettingBoolean extends Setting{
 	}
 	
 	@Override
-	public void renderText(int x, int y) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			
+
+
+			int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
+			int ys = y+3;
+			int xe = xEnd - 2;
+			int ye = yEnd - 2;
+			int col = this.value ? Theme.UWARE_ENABLED_COLOR : Theme.UWARE_DISABLED_COLOR;
+			Client.mc.fontRenderer.drawString("X", xs+1, ys, col);
+		}
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
 			int txtColor;
 			if(this.value) txtColor = Theme.IRIDIUM_ENABLED_COLOR;
@@ -55,6 +70,26 @@ public class SettingBoolean extends Setting{
 	
 	@Override
 	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			//float r, g, b, a = 128f/255f;
+			//g = b = r = 21/255f;
+			//if(this.value) {
+			//	r = ClickGUIHack.r();
+			//	g = ClickGUIHack.g();
+			//	b = ClickGUIHack.b();
+			//	a = 255/255f;
+			//}
+			int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
+			int ys = yStart+3;
+			float xe = xEnd - 1f - 0.3f;
+			int ye = yEnd - 2;
+			RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+			Tab.renderRoundedFrameBackGround(xs, ys, xe, ye, 2);
+			
+			//Tab.renderFrameBackGround(, , , , r, g, b, a);
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) return;
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			float r, g, b, a = 128f/255f;

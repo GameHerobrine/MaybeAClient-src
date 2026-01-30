@@ -112,7 +112,9 @@ public class SettingMode extends Setting{
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) return;
 		if(ClickGUIHack.theme() == Theme.NODUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
-		}else {
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+		} else{
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 	}

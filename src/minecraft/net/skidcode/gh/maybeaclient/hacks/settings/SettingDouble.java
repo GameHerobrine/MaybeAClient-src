@@ -7,6 +7,7 @@ import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public class SettingDouble extends Setting{
 	
@@ -106,6 +107,10 @@ public class SettingDouble extends Setting{
 			xMin += 5;
 			xMax -= 5;
 		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			xMin += 2;
+			xMax -= 2;
+		}
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;
 		double step = (this.maxGUI - this.minGUI)/sizeX;
@@ -123,9 +128,15 @@ public class SettingDouble extends Setting{
 		selected = true;
 	}
 	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
+		
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xStart += 5;
 			xEnd -= 5;
+		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			xStart += 2;
+			xEnd -= 2;
 		}
 		int diff1 = xEnd - xStart;
 		double diff2 = (this.maxGUI - this.minGUI)/diff1;
@@ -135,7 +146,15 @@ public class SettingDouble extends Setting{
 		if(val < this.minGUI) val = this.minGUI;
 		
 		int diff3 = (int) Math.round(val/diff2 - this.minGUI/diff2);
-		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			int sliderYbegin = yEnd - Theme.UWARE_SLIDER_HEIGHT;
+			int sliderYend = yEnd;
+			RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 1);
+			RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, 1);
+			return;
+		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			int sliderYbegin = yEnd - Theme.HEPH_SLIDER_HEIGHT;
 			int sliderYend = yEnd;
 			Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
@@ -152,6 +171,10 @@ public class SettingDouble extends Setting{
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xMin += 5;
 			xMax -= 5;
+		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			xMin += 2;
+			xMax -= 2;
 		}
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;

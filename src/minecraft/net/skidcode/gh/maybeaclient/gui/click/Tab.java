@@ -24,6 +24,7 @@ import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumAlign;
 import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumExpand;
 import net.skidcode.gh.maybeaclient.hacks.settings.enums.EnumStaticPos;
 import net.skidcode.gh.maybeaclient.utils.GUIUtils;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public abstract class Tab extends Element implements SettingsProvider{
 	abstract class Pin{
@@ -300,7 +301,7 @@ public abstract class Tab extends Element implements SettingsProvider{
 				this.dragging = true;
 				return true;
 			}else if(click == 1) {
-				if(!minimizePressed && ClickGUIHack.theme() == Theme.CLIFF) {
+				if(!minimizePressed && (ClickGUIHack.theme() == Theme.CLIFF || ClickGUIHack.theme() == Theme.UWARE)) {
 					this.actMinimize();
 					minimizePressed = true;
 				}
@@ -444,6 +445,15 @@ public abstract class Tab extends Element implements SettingsProvider{
 			renderFrameBackGround(xEnd-0.5, yStart, xEnd, yEnd, 0, 0, 0, 1f);
 			renderFrameBackGround(xStart, yStart, xEnd, yStart+0.5, 0, 0, 0, 1f);
 			renderFrameBackGround(xStart, yEnd-0.5, xEnd, yEnd, 0, 0, 0, 1f);
+		}else if(ClickGUIHack.theme() == Theme.UWARE){
+			GL11.glColor4f(0, 0, 0, 1f);
+			GL11.glLineWidth(1f);
+			tess.startDrawing(GL11.GL_LINE_LOOP);
+			tess.addVertex(xStart, yStart, 0);
+			tess.addVertex(xStart, yEnd, 0);
+			tess.addVertex(xEnd, yEnd, 0);
+			tess.addVertex(xEnd, yStart, 0);
+			tess.draw();
 		}else {
 			GL11.glColor4f(0, 0, 0, 0.9f);
 			GL11.glLineWidth(2.5f);
@@ -475,6 +485,22 @@ public abstract class Tab extends Element implements SettingsProvider{
 	public static void renderFrameBackGround(int xStart, int yStart, int xEnd, int yEnd) {
 		renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0.5f);
 	}
+	
+	public static void renderRoundedFrameBackGround(double xStart, double yStart, double xEnd, double yEnd, double n) {
+		Tessellator.instance.startDrawing(GL11.GL_POLYGON);
+		Tessellator.instance.addVertex(xStart, yStart, 0);
+		Tessellator.instance.addVertex(xStart-n, yStart, 0);
+		Tessellator.instance.addVertex(xStart-n, yEnd-n, 0);
+		Tessellator.instance.addVertex(xStart, yEnd, 0);
+		Tessellator.instance.addVertex(xEnd-n, yEnd, 0);
+		Tessellator.instance.addVertex(xEnd, yEnd-n, 0);
+		Tessellator.instance.addVertex(xEnd, yStart, 0);
+		Tessellator.instance.addVertex(xEnd-n, yStart-n, 0);
+		Tessellator.instance.addVertex(xStart, yStart-n, 0);
+		Tessellator.instance.addVertex(xStart-n, yStart, 0);
+		Tessellator.instance.draw();
+	}
+	
 	public static void renderFrameBackGround(double xStart, double yStart, double xEnd, double yEnd, float r, float g, float b, float a) {
 		Tessellator tess = Tessellator.instance;
 		GL11.glColor4f(r, g, b, a);
@@ -534,6 +560,19 @@ public abstract class Tab extends Element implements SettingsProvider{
 			renderFrameOutlines(xStart, yStart, xEnd, yEnd);
 		}else if(ClickGUIHack.theme() == Theme.IRIDIUM) {
 			renderFrameOutlines(xStart, yStart, xEnd, yEnd);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			//renderFrameOutlines(xStart, yStart, xEnd, yEnd);
+			Tessellator tess = Tessellator.instance;
+			GL11.glColor4f(0, 0, 0, 1f);
+			GL11.glLineWidth(1f);
+			tess.startDrawing(GL11.GL_LINE_LOOP);
+			tess.addVertex(xStart, yStart, 0);
+			tess.addVertex(xStart, yEnd-2, 0);
+			tess.addVertex(xStart+2, yEnd, 0);
+			tess.addVertex(xEnd-2, yEnd, 0);
+			tess.addVertex(xEnd, yEnd-2, 0);
+			tess.addVertex(xEnd, yStart, 0);
+			tess.draw();
 		}
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -548,7 +587,55 @@ public abstract class Tab extends Element implements SettingsProvider{
 		int xStart = this.startX;
 		int yStart = this.startY;
 		if(!ClickGUIHack.renderHeader(this)) return;
-		
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			int xEnd = this.endX+2;
+			int yEnd = yStart+ClickGUIHack.theme().yspacing;
+			GL11.glEnable(GL11.GL_BLEND);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			
+			RenderUtils.glColor(Theme.UWARE_THEME_COLOR);
+			
+			//GL11.glColor4f(0, 0, 0, 1);
+			Tessellator.instance.startDrawing(GL11.GL_POLYGON);
+			Tessellator.instance.addVertex(xStart, yStart, 0);
+			Tessellator.instance.addVertex(xStart-2, yStart, 0);
+			Tessellator.instance.addVertex(xStart-2, yEnd-2, 0);
+			Tessellator.instance.addVertex(xStart, yEnd, 0);
+			Tessellator.instance.addVertex(xEnd-2, yEnd, 0);
+			Tessellator.instance.addVertex(xEnd, yEnd-2, 0);
+			Tessellator.instance.addVertex(xEnd, yStart, 0);
+			Tessellator.instance.addVertex(xEnd-2, yStart-2, 0);
+			Tessellator.instance.addVertex(xStart, yStart-2, 0);
+			Tessellator.instance.addVertex(xStart-2, yStart, 0);
+			Tessellator.instance.draw();
+			
+			GL11.glColor4f(0, 0, 0, 1);
+			GL11.glLineWidth(1);
+			Tessellator.instance.startDrawing(GL11.GL_LINES);
+			Tessellator.instance.addVertex(xStart, yStart-2, 0);
+			Tessellator.instance.addVertex(xEnd-2, yStart-2, 0);
+			Tessellator.instance.addVertex(xEnd, yStart, 0);
+			Tessellator.instance.addVertex(xEnd, yEnd-2, 0);
+			Tessellator.instance.addVertex(xEnd-2, yEnd, 0);
+			Tessellator.instance.addVertex(xStart, yEnd, 0);
+			Tessellator.instance.addVertex(xStart-2, yEnd-2, 0);
+			Tessellator.instance.addVertex(xStart-2, yStart, 0);
+			Tessellator.instance.draw();
+			GL11.glLineWidth(2);
+			Tessellator.instance.startDrawing(GL11.GL_LINES);
+			Tessellator.instance.addVertex(xEnd-2, yStart-2, 0);
+			Tessellator.instance.addVertex(xEnd, yStart, 0);
+			Tessellator.instance.addVertex(xEnd, yEnd-2, 0);
+			Tessellator.instance.addVertex(xEnd-2, yEnd, 0);
+			Tessellator.instance.addVertex(xStart, yEnd, 0);
+			Tessellator.instance.addVertex(xStart-2, yEnd-2, 0);
+			Tessellator.instance.addVertex(xStart-2, yStart, 0);
+			Tessellator.instance.addVertex(xStart, yStart-2, 0);
+			Tessellator.instance.draw();
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_BLEND);
+		}
 		if(ClickGUIHack.theme() == Theme.CLIFF) {
 			renderFrameFull(this, xStart, yStart, this.endX, yStart + ClickGUIHack.theme().yspacing);
 		}else if(ClickGUIHack.theme() == Theme.NODUS) {
@@ -611,6 +698,16 @@ public abstract class Tab extends Element implements SettingsProvider{
 		}else if(ClickGUIHack.theme() == Theme.IRIDIUM) {
 			String name = this.getTabName();
 			Client.mc.fontRenderer.drawStringWithShadow(name, xpos, ypos, 0xffffff);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.getTabName(), xpos, ypos, Theme.UWARE_ENABLED_COLOR);
+			if(this.canMinimize) {
+				String s = this.minimized.getValue() ? "+" : "-";
+				int w = this.tabMinimize.getMaxX() - this.tabMinimize.getMinX();
+				w -= Client.mc.fontRenderer.getStringWidth(s);
+				if(w < 0) w = 0;
+				Client.mc.fontRenderer.drawStringWithShadow(s, this.tabMinimize.getMinX() + w/2 + 2, ypos, this.minimized.getValue() ? Theme.UWARE_DISABLED_COLOR : Theme.UWARE_ENABLED_COLOR);
+			}
+			
 		}
 	}
 	

@@ -81,6 +81,8 @@ public class SettingBlockChooser extends Setting{
 		
 		if(ClickGUIHack.theme() == Theme.NODUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
 		}else if(ClickGUIHack.theme() != Theme.HEPHAESTUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
@@ -103,6 +105,7 @@ public class SettingBlockChooser extends Setting{
 					int xb = xStart + drawn*18;
 					int yb = yStart + yOff;
 					if(ClickGUIHack.theme() == Theme.NODUS) Tab.renderFrameBackGround(xb, yb, xb+16, yb+16, 0, 0, 0, 0x80/255f);
+					else if(ClickGUIHack.theme() == Theme.UWARE) Tab.renderFrameBackGround(xb, yb, xb+16, yb+16, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
 					else Tab.renderFrameBackGround(xb, yb, xb+16, yb+16, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 					
 				}

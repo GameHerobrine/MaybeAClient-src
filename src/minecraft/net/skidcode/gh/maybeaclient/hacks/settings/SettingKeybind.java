@@ -95,13 +95,17 @@ public class SettingKeybind extends Setting implements InputHandler{
 		
 	}
 	
+	@Override
 	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		Theme theme = ClickGUIHack.theme();
 		if(theme == Theme.IRIDIUM) return;
+		
 		if(theme == Theme.NODUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0x80/255f);
 		}else if(theme == Theme.HEPHAESTUS){
 			
+		}else if(theme == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
 		}else{
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
@@ -137,6 +141,11 @@ public class SettingKeybind extends Setting implements InputHandler{
 				Client.mc.fontRenderer.drawStringWithShadow(this.name + ": ", x+Theme.HEPH_OPT_XADD, y+ClickGUIHack.theme().yaddtocenterText, 0xffffff);
 				Client.mc.fontRenderer.drawStringWithShadow(s, xEnd-Theme.HEPH_OPT_XADD-Client.mc.fontRenderer.getStringWidth(s), y+ClickGUIHack.theme().yaddtocenterText, 0xffffff);
 			}
+		}else if(theme == Theme.UWARE){
+			String s = this.name + ": "+ (listening ? ChatColor.LIGHTGRAY+"Listening..." : this.valueToString());
+			int xstart = x + ((xEnd-x) - Client.mc.fontRenderer.getStringWidth(s))/2;
+			txtColor = Theme.UWARE_ENABLED_COLOR;
+			Client.mc.fontRenderer.drawString(s, xstart + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		}else {
 			Client.mc.fontRenderer.drawString(this.name + ": "+ (listening ? ChatColor.LIGHTGRAY+"Listening..." : this.valueToString()), x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		}

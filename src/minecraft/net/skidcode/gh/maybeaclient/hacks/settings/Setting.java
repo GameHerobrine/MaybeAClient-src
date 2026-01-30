@@ -134,7 +134,11 @@ public abstract class Setting{
 		
 	}
 	public int getSettingWidth() {
-		return Client.mc.fontRenderer.getStringWidth(this.name) + 10 + (ClickGUIHack.theme() == Theme.HEPHAESTUS ? Theme.HEPH_OPT_XADD*2 : 0);
+		int off = 0;
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) off = Theme.HEPH_OPT_XADD*2;
+		else if(ClickGUIHack.theme() == Theme.UWARE) off = Theme.UWARE_OPT_XADD*2;
+		
+		return Client.mc.fontRenderer.getStringWidth(this.name) + 10 + off;
 	}
 	
 	public int getSettingHeight() {

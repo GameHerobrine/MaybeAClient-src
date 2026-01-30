@@ -135,6 +135,14 @@ public class RenderUtils {
 		GL11.glPopMatrix();
 	}
 	
+	public static void glColor(int col) {
+		float a = ((col & 0xff000000) >>> 24) / 255f;
+		float r = ((col & 0x00ff0000) >>> 16) / 255f;
+		float g = ((col & 0x0000ff00) >>> 8) / 255f;
+		float b = ((col & 0x000000ff)) / 255f;
+		GL11.glColor4f(r, g, b, a);
+	}
+	
 	public static void drawString(String s, double d, double d1, double d2)
     {
         double f = Math.sqrt(

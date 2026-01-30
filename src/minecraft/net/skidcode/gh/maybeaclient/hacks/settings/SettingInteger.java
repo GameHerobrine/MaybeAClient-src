@@ -8,6 +8,7 @@ import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public class SettingInteger extends Setting{
 	public int minGUI, maxGUI;
@@ -98,6 +99,10 @@ public class SettingInteger extends Setting{
 			xMin += 5;
 			xMax -= 5;
 		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			xMin += 2;
+			xMax -= 2;
+		}
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;
 		double step = (double)(this.maxGUI - this.minGUI)/sizeX;
@@ -118,6 +123,11 @@ public class SettingInteger extends Setting{
 			xStart += 5;
 			xEnd -= 5;
 		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			xStart += 2;
+			xEnd -= 2;
+		}
 		double diff1 = xEnd - xStart;
 		double diff2 = (this.maxGUI - this.minGUI)/diff1;
 		
@@ -126,12 +136,21 @@ public class SettingInteger extends Setting{
 		if(val < this.minGUI) val = this.minGUI;
 		
 		int diff3 = (int) Math.round(val/diff2 - this.minGUI/diff2);
-		
-		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			int sliderYbegin = yEnd - Theme.UWARE_SLIDER_HEIGHT;
+			int sliderYend = yEnd;
+			RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 1);
+			RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, 1);
+			return;
+		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			int sliderYbegin = yEnd - Theme.HEPH_SLIDER_HEIGHT;
 			int sliderYend = yEnd;
 			Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
 			Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
 		}else if(ClickGUIHack.theme() == Theme.NODUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yEnd, 0, 0, 0, 0x80/255f);
 		}else {
@@ -143,6 +162,10 @@ public class SettingInteger extends Setting{
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xMin += 5;
 			xMax -= 5;
+		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			xMin += 2;
+			xMax -= 2;
 		}
 		double sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;

@@ -35,7 +35,6 @@ public class ExpandToggleButtonElement extends ToggleButtonElement{
 			Client.mc.fontRenderer.drawStringWithShadow(s, startX + 1, startY + ClickGUIHack.theme().yaddtocenterText, txtColor);
 			mouseHovering = false;
 			return;
-			
 		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			
@@ -49,6 +48,15 @@ public class ExpandToggleButtonElement extends ToggleButtonElement{
 			mouseHovering = false;
 			return;
 		}
+
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			txtColor = this.listener.getValue() ? Theme.UWARE_ENABLED_COLOR : Theme.UWARE_DISABLED_COLOR;
+			Client.mc.fontRenderer.drawStringWithShadow(s, startX + 2, startY + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			String z = this.expanded ? "-" : "+";
+			Client.mc.fontRenderer.drawString(z, endX - 2 - Client.mc.fontRenderer.getStringWidth(z), startY + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			mouseHovering = false;
+			return;
+		}
 		
 		if(ClickGUIHack.theme() == Theme.NODUS) {
 			txtColor = ClickGUIHack.instance.themeColor.rgb();
@@ -56,13 +64,14 @@ public class ExpandToggleButtonElement extends ToggleButtonElement{
 				txtColor = ClickGUIHack.instance.secColor.rgb();
 			}
 		}
+		
 		Client.mc.fontRenderer.drawString(s, startX + 2, startY + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		mouseHovering = false;
 	}
 	
 	@Override
 	public int getWidth() {
-		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+		if(ClickGUIHack.theme() == Theme.HEPHAESTUS || ClickGUIHack.theme() == Theme.UWARE) {
 			String s = this.listener.getDisplayString(this.listener.getValue());
 			String z = this.expanded ? "-" : "+";
 			

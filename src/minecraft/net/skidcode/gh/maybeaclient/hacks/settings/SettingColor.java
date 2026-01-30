@@ -16,6 +16,7 @@ import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.GUIUtils;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public class SettingColor extends Setting{
 	
@@ -213,6 +214,11 @@ public class SettingColor extends Setting{
 			xMin += 5 + 2;
 			xMax -= 5;
 		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			xMin += 2 + 2;
+			xMax -= 2;
+		}
+		
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int sizeX = xMax - xMin;
 		int mouseOff = mouseX - xMin;
@@ -253,6 +259,10 @@ public class SettingColor extends Setting{
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			xMin += 5 + 2;
 			xMax -= 5;
+		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			xMin += 2 + 2;
+			xMax -= 2;
 		}
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int mos = (mouseY - yMin) / ySpace;
@@ -304,11 +314,12 @@ public class SettingColor extends Setting{
 	}
 	
 	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
-		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+		Theme theme = ClickGUIHack.theme();
+		if(theme == Theme.HEPHAESTUS) {
 			xStart += 5 + 2;
 			xEnd -= 5;
 		}
-		Theme theme = ClickGUIHack.theme();
+		
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int ySpace2 = ySpace - ClickGUIHack.theme().settingYreduce;
 		float bgcolr = ClickGUIHack.r();
@@ -319,8 +330,12 @@ public class SettingColor extends Setting{
 			bgcolr = bgcolg = bgcolb = 0;
 			bgcola = 0x80/255f;
 		}
+		if(theme == Theme.UWARE) {
+			bgcolr = bgcolg = bgcolb = 0x16/255f;
+			bgcola = 0xaa/255f;
+		}
 		
-		if(!this.minimized && theme != Theme.HEPHAESTUS && theme != Theme.IRIDIUM) Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+		if(!this.minimized && theme != Theme.HEPHAESTUS && theme != Theme.IRIDIUM || (this.minimized && theme == Theme.UWARE)) Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 		
 		int xmi = xEnd - ySpace2;
 		int xma = xEnd;
@@ -337,12 +352,12 @@ public class SettingColor extends Setting{
 		
 		yStart += ySpace;
 		
-		int diff1 = xEnd - xStart;
+		int diff1 = theme == Theme.UWARE ? (xEnd-2) - (xStart+2+2) : xEnd - xStart;
 		float step = 255f/diff1;
 		
 		if(theme != Theme.HEPHAESTUS && theme != Theme.IRIDIUM) Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 		yStart += ySpace;
-		
+
 		rendersliders:
 		if(this.guiMode == SettingColor.sliders) {
 			int value = this.red;
@@ -354,6 +369,14 @@ public class SettingColor extends Setting{
 				int sliderYend = yStart + ySpace2;
 				Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
 				Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+			}else if(ClickGUIHack.theme() == Theme.UWARE){
+				Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+				int sliderYbegin = (yStart + ySpace2) - Theme.UWARE_SLIDER_HEIGHT;
+				int sliderYend = yStart + ySpace2;
+				RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
+				RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xStart+2+2+diff3, sliderYend, 1);
 			}else {
 				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 			}
@@ -368,6 +391,14 @@ public class SettingColor extends Setting{
 				int sliderYend = yStart + ySpace2;
 				Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
 				Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+			}else if(ClickGUIHack.theme() == Theme.UWARE){
+				Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+				int sliderYbegin = (yStart + ySpace2) - Theme.UWARE_SLIDER_HEIGHT;
+				int sliderYend = yStart + ySpace2;
+				RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
+				RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xStart+2+2+diff3, sliderYend, 1);
 			}else {
 				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 			}
@@ -382,6 +413,14 @@ public class SettingColor extends Setting{
 				int sliderYend = yStart + ySpace2;
 				Tab.renderFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 100/255f, 100/255f, 100/255f, 1);
 				Tab.renderFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, bgcolr, bgcolg, bgcolb, bgcola);
+			}else if(ClickGUIHack.theme() == Theme.UWARE){
+				Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
+				int sliderYbegin = (yStart + ySpace2) - Theme.UWARE_SLIDER_HEIGHT;
+				int sliderYend = yStart + ySpace2;
+				RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
+				RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xStart+2+2+diff3, sliderYend, 1);
 			}else {
 				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 			}

@@ -47,6 +47,7 @@ public class ClickGUIHack extends Hack{
 				boolean nodus = this.getValue() == Theme.NODUS;
 				boolean cliff = this.getValue() == Theme.CLIFF;
 				boolean hephaestus = this.getValue() == Theme.HEPHAESTUS;
+				boolean uware = this.getValue() == Theme.UWARE;
 				
 				ClickGUIHack.instance.secColor.hidden = !nodus && !hephaestus;
 				ClickGUIHack.instance.fillEnabled.hidden = !nodus;
@@ -69,6 +70,11 @@ public class ClickGUIHack extends Hack{
 					if(theme == Theme.IRIDIUM) {
 						ClickGUIHack.instance.themeColor.setValue(0xff, 0x33, 0x33);
 						ClickGUIHack.instance.secColor.setValue(0xfd, 0xfd, 0x96);
+					}
+					
+					if(uware) {
+						ClickGUIHack.instance.themeColor.setValue(0xff, 0xff, 0xff);
+						ClickGUIHack.instance.secColor.setValue(0xff, 0xff, 0xff);
 					}
 				}
 				ClickGUIHack.instance.showDescription.hidden = hephaestus;
@@ -143,7 +149,8 @@ public class ClickGUIHack extends Hack{
 		CLIFF("Cliff", 12, 3, 2, 2, 1, 2, 4, false, 2),
 		NODUS("Nodus", 14, 2, 3, 0, 0, 10+4+2, 4, false, 2),
 		HEPHAESTUS("Hephaestus", 14, 0, 3, 0, 0, 10+4+2+2, 4, true, 4),
-		IRIDIUM("Iridium", 10, 2, 1, 0, 0, 11, 4, false, 1);
+		IRIDIUM("Iridium", 10, 2, 1, 0, 0, 11, 4, false, 1),
+		UWARE("Uware", 14, 0, 2, 0, 0, 10+4+2, 4, true, 2);
 		
 		public static final int HEPH_DESC_YADD = 10;
 		public static final int HEPH_OPT_XADD = 7;
@@ -151,6 +158,16 @@ public class ClickGUIHack extends Hack{
 		public static final int HEPH_DISABLED_COLOR = 0x676767;
 		public static final int IRIDIUM_DISABLED_COLOR = 0x555555;
 		public static final int IRIDIUM_ENABLED_COLOR = 0xf7f7f7;
+
+		public static final int UWARE_OPT_XADD = 8;
+		public static final int UWARE_SLIDER_HEIGHT = 2;
+		public static final int UWARE_OPT_D_COLOR = 0xff0078ad;
+		public static final int UWARE_OPT_E_COLOR = 0xff009ce0;
+		public static final int UWARE_THEME_COLOR = 0xEC0588C2;
+		public static final int UWARE_DISABLED_COLOR = 0x8a8a8a;
+		public static final int UWARE_ENABLED_COLOR = 0xffffff;
+		
+		
 		public int yspacing;
 		public int titlebasediff;
 		public int yaddtocenterText;

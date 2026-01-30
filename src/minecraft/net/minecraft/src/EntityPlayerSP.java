@@ -48,7 +48,7 @@ public class EntityPlayerSP extends EntityPlayer {
         	this.moveForward = this.moveStrafing = 0;
         }
     }
-
+    
     public void onLivingUpdate() {
         if (!this.mc.statFileWriter.hasAchievementUnlocked(AchievementList.openInventory)) {
             this.mc.guiAchievement.queueAchievementInformation(AchievementList.openInventory);
@@ -73,7 +73,7 @@ public class EntityPlayerSP extends EntityPlayer {
             }
 
             this.timeInPortal += 0.0125F;
-            if (this.timeInPortal >= 1.0F) {
+            if (this.timeInPortal >= 1.0F && this.timeUntilPortal == 0) {
                 this.timeInPortal = 1.0F;
                 if (!this.worldObj.multiplayerWorld) {
                     this.timeUntilPortal = 10;
