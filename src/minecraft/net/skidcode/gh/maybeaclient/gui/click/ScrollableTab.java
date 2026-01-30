@@ -1,5 +1,7 @@
 package net.skidcode.gh.maybeaclient.gui.click;
 
+import java.util.ArrayList;
+
 import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.gui.click.element.ScrollBarElement;
 import net.skidcode.gh.maybeaclient.gui.click.element.VerticalContainer;

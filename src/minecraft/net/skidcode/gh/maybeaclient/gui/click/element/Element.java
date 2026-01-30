@@ -19,6 +19,11 @@ public abstract class Element{
 	public boolean mouseMovedSelected(int x, int y) {
 		return false;
 	}
+	
+	public boolean wheelMoved(int x, int y, int wheel) {
+		return false;
+	}
+	
 	public void onDeselect(int x, int y) {
 		
 	}

@@ -46,8 +46,15 @@ public class Category {
 		this.tab.minimized.setValue(b);
 	}
 
+	public ArrayList<ContentListener> contentListeners = new ArrayList<ContentListener>();
 	public void addContentListener(ContentListener listener) {
-		
-		
+		this.contentListeners.add(listener);
 	}
+	
+	public void notifyContentChange() {
+		for(ContentListener l : this.contentListeners) {
+			l.onContentChanged();
+		}
+	}
+	
 }

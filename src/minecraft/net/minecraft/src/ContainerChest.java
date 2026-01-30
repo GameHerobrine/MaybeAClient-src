@@ -40,9 +40,9 @@ public class ContainerChest extends Container {
             ItemStack var4 = var3.getStack();
             var2 = var4.copy();
             if (var1 < this.field_27282_b * 9) {
-                this.func_28125_a(var4, this.field_27282_b * 9, this.slots.size(), true);
+                this.mergeItemStack(var4, this.field_27282_b * 9, this.slots.size(), true);
             } else {
-                this.func_28125_a(var4, 0, this.field_27282_b * 9, false);
+                this.mergeItemStack(var4, 0, this.field_27282_b * 9, false);
             }
 
             if (var4.stackSize == 0) {

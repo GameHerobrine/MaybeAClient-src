@@ -68,13 +68,13 @@ public class ContainerWorkbench extends Container {
             ItemStack var4 = var3.getStack();
             var2 = var4.copy();
             if (var1 == 0) {
-                this.func_28125_a(var4, 10, 46, true);
+                this.mergeItemStack(var4, 10, 46, true);
             } else if (var1 >= 10 && var1 < 37) {
-                this.func_28125_a(var4, 37, 46, false);
+                this.mergeItemStack(var4, 37, 46, false);
             } else if (var1 >= 37 && var1 < 46) {
-                this.func_28125_a(var4, 10, 37, false);
+                this.mergeItemStack(var4, 10, 37, false);
             } else {
-                this.func_28125_a(var4, 10, 46, false);
+                this.mergeItemStack(var4, 10, 46, false);
             }
 
             if (var4.stackSize == 0) {

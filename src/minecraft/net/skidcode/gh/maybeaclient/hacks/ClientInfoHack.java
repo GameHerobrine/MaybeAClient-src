@@ -21,6 +21,7 @@ public class ClientInfoHack extends Hack{
 	public SettingBoolean coords;
     public SettingBoolean rotation = new SettingBoolean(this, "Show raw yaw/pitch", false);
 	public SettingBoolean facing = new SettingBoolean(this, "Show facing", true);
+	public SettingBoolean biome = new SettingBoolean(this, "Show biome", false);
 	public SettingBoolean fps = new SettingBoolean(this, "Show fps", false);
 	public SettingBoolean username = new SettingBoolean(this, "Show username", false);
 	public SettingBoolean showNetherCoords;
@@ -63,6 +64,7 @@ public class ClientInfoHack extends Hack{
         this.addSetting(rotation);
 		this.addSetting(this.showNetherCoords);
 		this.addSetting(facing);
+		this.addSetting(biome);
 		this.addSetting(fps);
 		this.addSetting(username);
 		this.addSetting(this.walkingSpeed);

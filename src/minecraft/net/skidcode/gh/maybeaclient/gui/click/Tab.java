@@ -743,6 +743,7 @@ public abstract class Tab extends Element implements SettingsProvider{
 		}
 	}
 
-	public void wheelMoved(int wheel, int x, int y) {
+	public boolean wheelMoved(int wheel, int x, int y) {
+		return false;
 	}
 }

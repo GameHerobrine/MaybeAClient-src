@@ -7,7 +7,7 @@ public class GuiTextField extends Gui {
     public final int width;
     public final int height;
     private String text;
-    private int maxStringLength;
+    public int maxStringLength;
     private int cursorCounter;
     public boolean isFocused = false;
     public boolean isEnabled = true;

@@ -92,9 +92,4 @@ public class ArrayListTab extends Tab{
 		Tab.renderFrameTop(this, this.startX, this.startY + this.getYOffset(), this.endX, this.endY);
 		
 	}
-	
-	@Override
-	public void wheelMoved(int wheel, int x, int y) {
-
-	}
 }

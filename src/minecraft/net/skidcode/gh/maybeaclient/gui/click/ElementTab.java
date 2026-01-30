@@ -62,6 +62,16 @@ public abstract class ElementTab extends Tab{
 	}
 	
 	@Override
+	public boolean wheelMoved(int wheel, int x, int y) {
+		super.wheelMoved(wheel, x, y);
+		for(Element e : this.elements) {
+			if(!e.isShown()) continue;
+			if(e.wheelMoved(x, y, wheel)) return true;
+		}
+		return false;
+	}
+	
+	@Override
 	public boolean onSelect(int click, int x, int y) {
 		boolean b = super.onSelect(click, x, y);
 		if(b) return b;

@@ -1,10 +1,13 @@
 package net.skidcode.gh.maybeaclient.hacks;
 
+import java.util.Comparator;
+
 import org.lwjgl.input.Keyboard;
 
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
+import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.category.Category;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
 import net.skidcode.gh.maybeaclient.hacks.settings.SettingColor;
@@ -22,6 +25,16 @@ public class ClickGUIHack extends Hack{
 	public SettingBoolean showDescription = new SettingBoolean(this, "Show Description", false);
 	public SettingEnum<Theme> theme;
 	public SettingEnum<ShowFrame> showFrameInHud = new SettingEnum<ShowFrame>(this, "HUDFrameStyle", ShowFrame.YES);
+	public SettingEnum<SortDirection> sortModules = new SettingEnum<SortDirection>(this, "Sort Modules", SortDirection.A_Z) {
+		@Override
+		public void setValue(String value) {
+			super.setValue(value);
+			for(Category c : Category.categories) {
+				c.notifyContentChange();
+			}
+		}
+	};
+	public SettingBoolean scrollUsingScrollWheel = new SettingBoolean(this, "Scroll using scroll wheel", true);
 	
 	public ClickGUIHack() {
 		super("ClickGUI", "Open ClickGUI", Keyboard.KEY_UP, Category.UI);
@@ -71,6 +84,8 @@ public class ClickGUIHack extends Hack{
 		this.addSetting(this.secColor);
 		this.addSetting(this.fillEnabled);
 		this.addSetting(this.showDescription);
+		this.addSetting(this.sortModules);
+		this.addSetting(this.scrollUsingScrollWheel);
 	}
 	
 	public static boolean renderHeader(Tab tab) {
@@ -163,7 +178,7 @@ public class ClickGUIHack extends Hack{
 			return this.name;
 		}
 	}
-	
+
 	public static enum ShowFrame{
 		YES("Full"),
 		NOHEADER("NoHeader"),
@@ -178,5 +193,19 @@ public class ClickGUIHack extends Hack{
 			return this.name;
 		}
 	}
-
+	public static enum SortDirection{
+		A_Z("A-Z"),
+		Z_A("Z-A"),
+		NONE("None");
+		
+		final String name;
+		
+		SortDirection(String s){
+			this.name = s;
+		}
+		
+		public String toString() {
+			return this.name;
+		}
+	}
 }

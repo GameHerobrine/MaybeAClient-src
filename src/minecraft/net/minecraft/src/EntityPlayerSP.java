@@ -5,11 +5,7 @@ import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.events.EventRegistry;
 import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePost;
 import net.skidcode.gh.maybeaclient.events.impl.EventPlayerUpdatePre;
-import net.skidcode.gh.maybeaclient.hacks.AutoTunnelHack;
-import net.skidcode.gh.maybeaclient.hacks.AutoWalkHack;
-import net.skidcode.gh.maybeaclient.hacks.CombatLogHack;
-import net.skidcode.gh.maybeaclient.hacks.FreecamHack;
-import net.skidcode.gh.maybeaclient.hacks.StrafeHack;
+import net.skidcode.gh.maybeaclient.hacks.*;
 
 public class EntityPlayerSP extends EntityPlayer {
     public MovementInput movementInput;
@@ -102,7 +98,8 @@ public class EntityPlayerSP extends EntityPlayer {
         }
 
         this.movementInput.updatePlayerMoveState(this);
-        if (this.movementInput.sneak && this.ySize < 0.2F) {
+        if (this.movementInput.sneak && this.ySize < 0.2F &&
+                !FlyHack.instance.status && !FreecamHack.instance.status) {
             this.ySize = 0.2F;
         }
 

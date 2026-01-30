@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.3";
+	public static final String clientVersion = "4.0.4";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -717,9 +717,16 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.2
-	 * Fixed ChestContent not allowing to open the chest
-	 * Added PlaceOnlyBelow option for Schematica
+	 * 4.0.4
+	 * Added FastCraft (freehij & gameherobrine)
+	 * Added AutoShear (freehij)
+	 * Added ImageViewer (freehij)
+	 * Added OnGround to Fly (freehij)
+	 * Added Biome to PlayerInfo (freehij)
+	 * Added sort modules option for ClickGui(default: A-Z) (gameherobrine)
+	 * Added ScrollUsingScrollwheel option for ClickGui(enabled by default) (gameherobrine)
+	 * Fixed FreeCam not resetting speed values (freehij)
+	 * Backported step sounds fix from r1.2.5 (freehij)
 	 */
 	
 	static {
@@ -837,7 +844,11 @@ public class Client {
 		//3.0.2
 		registerHack(new WeatherLockHack());
 		//4.0.3 (freehij)
-		registerHack(new TNTBomber());
+		registerHack(new TNTBomberHack());
+		//4.0.4 (freehij)
+		registerHack(new AutoShearHack());
+		registerHack(new ImageViewerHack());
+		registerHack(new FastCraftHack());
 
 		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {
 			public Hack init() {

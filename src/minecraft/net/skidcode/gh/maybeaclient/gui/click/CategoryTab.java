@@ -1,5 +1,9 @@
 package net.skidcode.gh.maybeaclient.gui.click;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
@@ -62,7 +66,25 @@ public class CategoryTab extends ScrollableTab implements ContentListener {
 	public void preRender() {
 		if(this.regenerateElements) {
 			this.clearElements();
-			for(Hack hack : this.category.hacks) {
+			ArrayList<Hack> hacks = new ArrayList<Hack>(this.category.hacks); //freehij will haet me <3
+			if(ClickGUIHack.instance.sortModules.getValue() == ClickGUIHack.SortDirection.A_Z) {
+				Collections.sort(hacks, new Comparator<Hack>() {
+					@Override
+					public int compare(Hack o1, Hack o2) {
+						return o1.name.compareTo(o2.name);
+					}
+				});
+			}
+			if(ClickGUIHack.instance.sortModules.getValue() == ClickGUIHack.SortDirection.Z_A) {
+				Collections.sort(hacks, new Comparator<Hack>() {
+					@Override
+					public int compare(Hack o1, Hack o2) {
+						return o2.name.compareTo(o1.name);
+					}
+				});
+			}
+			
+			for(Hack hack : hacks) {
 				this.addElement(hack.categorybutton);
 			}
 			

@@ -1,5 +1,6 @@
 package net.skidcode.gh.maybeaclient.hacks;
 
+import net.skidcode.gh.maybeaclient.hacks.settings.SettingBoolean;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.src.GuiContainer;
@@ -15,12 +16,14 @@ import net.skidcode.gh.maybeaclient.utils.ChatColor;
 public class FlyHack extends Hack implements EventListener{
 	
 	public SettingDouble speedMultiplier = new SettingDouble(this, "Speed Multiplier", 0.2, 0.1, 2.0, 0.05);
+	public SettingBoolean onGround = new SettingBoolean(this, "OnGround", false);
 	
 	public static FlyHack instance;
 	public FlyHack() {
 		super("Fly", "FlyHack ^-^", Keyboard.KEY_R, Category.MOVEMENT);
 		instance = this;
 		this.addSetting(speedMultiplier);
+		this.addSetting(onGround);
 		EventRegistry.registerListener(EventPlayerUpdatePost.class, this);
 	}
 	
@@ -36,9 +39,10 @@ public class FlyHack extends Hack implements EventListener{
 		return ""+this.speedMultiplier.value;
 	}
 	
-	public static void handleFly(double speedMultiplier) {
+	public static void handleFly(double speedMultiplier, boolean onGround) {
 		mc.thePlayer.movementInput.sneak = false;
-		mc.thePlayer.onGround = false;
+		mc.thePlayer.movementInput.jump = false;
+		mc.thePlayer.onGround = onGround;
 		mc.thePlayer.motionX = 0.0D;
 		mc.thePlayer.motionY = 0.0D;
 		mc.thePlayer.motionZ = 0.0D;
@@ -90,7 +94,7 @@ public class FlyHack extends Hack implements EventListener{
 	@Override
 	public void handleEvent(Event event) {
 		if(event instanceof EventPlayerUpdatePost) {
-			handleFly(this.speedMultiplier.value);
+			handleFly(this.speedMultiplier.value, this.onGround.value);
 		}
 	}
 }

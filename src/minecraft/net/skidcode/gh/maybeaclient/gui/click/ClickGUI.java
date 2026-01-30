@@ -158,6 +158,7 @@ public class ClickGUI extends GuiScreen{
 		tabs.add(new PlayerlistTab());
 		tabs.add(new LastSeenSpotsTab());
 		tabs.add(new SlimeRadarTab());
+		tabs.add(new ImageViewerTab());
 		
 		//tabs.add(TabManagerTab.instance);
 		

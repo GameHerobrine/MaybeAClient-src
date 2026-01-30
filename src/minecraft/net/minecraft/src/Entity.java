@@ -503,26 +503,19 @@ public abstract class Entity {
             int var26;
             int var38;
             int var39;
-            if (this.canTriggerWalking() && !var18 && this.ridingEntity == null) {
+            if(this.canTriggerWalking() && !var18 && this.ridingEntity == null) {
                 this.distanceWalkedModified = (float)((double)this.distanceWalkedModified + (double)MathHelper.sqrt_double(var37 * var37 + var23 * var23) * 0.6D);
                 var38 = MathHelper.floor_double(this.posX);
-                var26 = MathHelper.floor_double(this.posY - 0.20000000298023224D - (double)this.yOffset);
+                var26 = MathHelper.floor_double(this.posY - (double)0.2F - (double)this.yOffset);
                 var39 = MathHelper.floor_double(this.posZ);
                 var28 = this.worldObj.getBlockId(var38, var26, var39);
-                if (this.worldObj.getBlockId(var38, var26 - 1, var39) == Block.fence.blockID) {
+                if(var28 == 0 && this.worldObj.getBlockId(var38, var26 - 1, var39) == Block.fence.blockID) {
                     var28 = this.worldObj.getBlockId(var38, var26 - 1, var39);
                 }
 
-                if (this.distanceWalkedModified > (float)this.nextStepDistance && var28 > 0) {
-                    ++this.nextStepDistance;
-                    StepSound var29 = Block.blocksList[var28].stepSound;
-                    if (this.worldObj.getBlockId(var38, var26 + 1, var39) == Block.snow.blockID) {
-                        var29 = Block.snow.stepSound;
-                        this.worldObj.playSoundAtEntity(this, var29.func_1145_d(), var29.getVolume() * 0.15F, var29.getPitch());
-                    } else if (!Block.blocksList[var28].blockMaterial.getIsLiquid()) {
-                        this.worldObj.playSoundAtEntity(this, var29.func_1145_d(), var29.getVolume() * 0.15F, var29.getPitch());
-                    }
-
+                if(this.distanceWalkedModified > (float)this.nextStepDistance && var28 > 0) {
+                    this.nextStepDistance = (int)this.distanceWalkedModified + 1;
+                    this.playStepSound(var38, var26, var39, var28);
                     Block.blocksList[var28].onEntityWalking(this.worldObj, var38, var26, var39, this);
                 }
             }
@@ -566,6 +559,17 @@ public abstract class Entity {
             }
 
         }
+    }
+
+    protected void playStepSound(int var1, int var2, int var3, int var4) {
+        StepSound var5 = Block.blocksList[var4].stepSound;
+        if(this.worldObj.getBlockId(var1, var2 + 1, var3) == Block.snow.blockID) {
+            var5 = Block.snow.stepSound;
+            this.worldObj.playSoundAtEntity(this, var5.func_1145_d(), var5.getVolume() * 0.15F, var5.getPitch());
+        } else if(!Block.blocksList[var4].blockMaterial.getIsLiquid()) {
+            this.worldObj.playSoundAtEntity(this, var5.func_1145_d(), var5.getVolume() * 0.15F, var5.getPitch());
+        }
+
     }
 
     protected boolean canTriggerWalking() {

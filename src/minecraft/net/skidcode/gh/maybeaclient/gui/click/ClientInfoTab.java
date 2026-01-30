@@ -19,7 +19,7 @@ public class ClientInfoTab extends ElementTab{
 	public static ClientInfoTab instance;
 	
 	
-	public TextElement coordX, coordY, coordZ, yaw, pitch;
+	public TextElement coordX, coordY, coordZ, yaw, pitch, biome;
 	public TextElement facing, fps, username, walkingSpeed;
 	public VerticalContainer vc = new VerticalContainer();
 	
@@ -35,6 +35,7 @@ public class ClientInfoTab extends ElementTab{
         vc.addElement(this.yaw = new TextElement(""));
         vc.addElement(this.pitch = new TextElement(""));
 		vc.addElement(this.facing = new TextElement(""));
+		vc.addElement(this.biome = new TextElement(""));
 		vc.addElement(this.fps = new TextElement(""));
 		vc.addElement(this.username = new TextElement(""));
 		vc.addElement(this.walkingSpeed = new TextElement(""));
@@ -54,6 +55,7 @@ public class ClientInfoTab extends ElementTab{
 		this.coordX.shown = this.coordY.shown = this.coordZ.shown = ClientInfoHack.instance.coords.value;
         this.yaw.shown = this.pitch.shown = ClientInfoHack.instance.rotation.value;
 		this.facing.shown = ClientInfoHack.instance.facing.value;
+		this.biome.shown = ClientInfoHack.instance.biome.value;
 		this.fps.shown = ClientInfoHack.instance.fps.value;
 		this.username.shown = ClientInfoHack.instance.username.value;
 		this.walkingSpeed.shown = ClientInfoHack.instance.walkingSpeed.value;
@@ -61,6 +63,8 @@ public class ClientInfoTab extends ElementTab{
         this.yaw.text = String.format("Yaw: %.1f", Client.mc.thePlayer.rotationYaw);
         this.pitch.text = String.format("Pitch: %.1f", Client.mc.thePlayer.rotationPitch);
 		this.facing.text = String.format("Facing: %s", PlayerUtils.getDirection());
+		this.biome.text = "Biome: " + Client.mc.theWorld.getWorldChunkManager().getBiomeGenAt(
+				(int) Client.mc.thePlayer.posX, (int) Client.mc.thePlayer.posZ).biomeName;
 		this.fps.text = String.format("FPS: %s", Client.mc.fps);
 		this.username.text = String.format("Username: %s", Client.mc.session.username);
 		this.walkingSpeed.text = String.format("Speed: %.4f BPS", PlayerUtils.getSpeed(ClientInfoHack.instance.useHorizontal.value));	

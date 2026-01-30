@@ -54,6 +54,20 @@ public class ScrollBarElement extends Element{
 		return this.scrollable.onClick(mx, my, click);
 	}
 	
+	public boolean wheelMoved(int x, int y, int wheel) {
+		if(ClickGUIHack.instance.scrollUsingScrollWheel.getValue()) {
+			int dir = wheel > 0 ? 1 : (wheel == 0 ? 0 : -1); //-1 = down, 1 = up
+			float toRender = ((float)this.realHeight/100f)*(this.realHeight/(this.maxHeight/100f));
+			this.vScrollOffset = (int)this.vScrollOffset + dir*8;
+			int a = (int)(startY+toRender) - this.vScrollOffset;
+			if(a > endY) this.vScrollOffset -= endY - a;
+			if(this.vScrollOffset > 0) this.vScrollOffset = 0;
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public boolean hoveringOver = false;
 	@Override
 	public boolean hoveringOver(int x, int y) {
