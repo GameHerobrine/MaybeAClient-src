@@ -78,6 +78,11 @@ public class SettingMode extends Setting{
 			
 			return;
 		}
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(this.currentMode, xEnd - 2 + 1 - Client.mc.fontRenderer.getStringWidth(this.currentMode), y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.NODUS) {
 			txtColor = ClickGUIHack.instance.themeColor.rgb();
 			if(this.mouseHovering) {

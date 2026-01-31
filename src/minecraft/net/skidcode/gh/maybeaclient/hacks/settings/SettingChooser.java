@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import net.minecraft.src.NBTTagCompound;
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
 import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
@@ -11,6 +12,7 @@ import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
+import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public class SettingChooser extends Setting{
 	
@@ -126,6 +128,18 @@ public class SettingChooser extends Setting{
 		int yReduce = ClickGUIHack.theme().settingYreduce;
 		if(ClickGUIHack.theme() == Theme.UWARE) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
+			
+			if(this == NoRenderHack.instance.particles) {
+				//this module is evil and malicious and uses this setting as
+				//a way to display subsettings
+				//TODO should be changed someday~
+				int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
+				int ys = yStart+3;
+				float xe = xEnd - 1f;
+				int ye = yStart + ySpace-yReduce - 2;
+				RenderUtils.glColor(ClickGUIHack.themeColor());
+				Tab.renderRoundedFrameBackGround(xs, ys, xe, ye, 2);
+			}
 		}
 		if(this.minimized) return;
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) return;
@@ -133,7 +147,9 @@ public class SettingChooser extends Setting{
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
 		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS){
 			
-		}else if(ClickGUIHack.theme() != Theme.UWARE){
+		}else if(ClickGUIHack.theme() == Theme.UWARE){
+
+		}else{
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}
 		
@@ -141,7 +157,14 @@ public class SettingChooser extends Setting{
 		
 		for(int i = 0; i < this.choices.length; ++i) {
 			boolean bb = this.getValue(this.choices[i]);
-			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
+			if(ClickGUIHack.theme() == Theme.UWARE) {
+				int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
+				int ys = yStart+3;
+				float xe = xEnd - 1f;
+				int ye = yStart + ySpace - 2;
+				RenderUtils.glColor(ClickGUIHack.themeColor());
+				Tab.renderRoundedFrameBackGround(xs, ys, xe, ye, 2);
+			}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				float r, g, b, a = 128f/255f;
 				g = b = r = 21/255f;
 				if(bb) {
@@ -156,8 +179,6 @@ public class SettingChooser extends Setting{
 			}else if(bb) {
 				if(ClickGUIHack.theme() == Theme.NODUS) {
 					Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
-				}else if(ClickGUIHack.theme() == Theme.UWARE) {
-					Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
 				}else {
 					Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 				}
@@ -175,7 +196,6 @@ public class SettingChooser extends Setting{
 		if(md > 0) {
 			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				int d = diff % ySpace;
-				System.out.println(d);
 				if(mouseX < (xMax - Theme.HEPH_OPT_XADD - 7) || mouseX > (xMax - Theme.HEPH_OPT_XADD + 1) || d < 3 || d > (ySpace-3)) {
 					this.lastPressed = md;
 					return;
@@ -225,6 +245,22 @@ public class SettingChooser extends Setting{
 			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 			String s = this.minimized ? "+" : "-";
 			Client.mc.fontRenderer.drawStringWithShadow(s, xEnd - Theme.HEPH_OPT_XADD - Client.mc.fontRenderer.getStringWidth(s) + 1, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			if(this == NoRenderHack.instance.particles) {
+				//this module is evil and malicious and uses this setting as
+				//a way to display subsettings
+				//TODO should be changed someday~
+				Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			
+				int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
+				int ys = y+3;
+				int col = !this.minimized ? Theme.UWARE_ENABLED_COLOR : Theme.UWARE_DISABLED_COLOR;
+				Client.mc.fontRenderer.drawString("X", xs+1, ys, col);
+			}else {
+				Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+				String s = this.minimized ? "+" : "-";
+				Client.mc.fontRenderer.drawStringWithShadow(s, xEnd - 2 - Client.mc.fontRenderer.getStringWidth(s) + 1, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			}
 		}else {
 			Client.mc.fontRenderer.drawString(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		}
@@ -254,6 +290,12 @@ public class SettingChooser extends Setting{
 				//if(!this.getValue(this.choices[i])) color = Theme.HEPH_DISABLED_COLOR;
 				
 				Client.mc.fontRenderer.drawStringWithShadow(this.choices[i], rx + Theme.HEPH_OPT_XADD + 2, ry + i*ySpace + ClickGUIHack.theme().yaddtocenterText, color);
+			}else if(ClickGUIHack.theme() == Theme.UWARE){
+				int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
+				int ys = ry + i*ySpace+3;
+				int col = this.getValue(this.choices[i]) ? Theme.UWARE_ENABLED_COLOR : Theme.UWARE_DISABLED_COLOR;
+				Client.mc.fontRenderer.drawString("X", xs+1, ys, col);
+				Client.mc.fontRenderer.drawString(this.choices[i], rx + 2, ry + i*ySpace + ClickGUIHack.theme().yaddtocenterText, txtColor);
 			}else {
 				Client.mc.fontRenderer.drawString(this.choices[i], rx + 2, ry + i*ySpace + ClickGUIHack.theme().yaddtocenterText, txtColor);
 			}

@@ -52,7 +52,6 @@ public class ClickGUIHack extends Hack{
 				ClickGUIHack.instance.secColor.hidden = !nodus && !hephaestus;
 				ClickGUIHack.instance.fillEnabled.hidden = !nodus;
 				ClickGUIHack.instance.showDescription.hidden = hephaestus;
-				
 				if(ClickGUIHack.instance.resetColor.value) {
 					if(nodus) {
 						ClickGUIHack.instance.secColor.setValue(0x55, 0xff, 0x55);
@@ -169,7 +168,7 @@ public class ClickGUIHack extends Hack{
 		public static final int UWARE_HEAD_OPACITY = 0xCC;
 		public static final float UWARE_SLIDER_LEFT_A = (58.5f)/255f;
 		public static final float UWARE_SETTING_OVERLAY_A = 65/255f;
-		
+		public static final int UWARE_ROUNDNESS = 1;
 		public static final int UWARE_DISABLED_COLOR = 0x8a8a8a;
 		public static final int UWARE_ENABLED_COLOR = 0xffffff;
 		

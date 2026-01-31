@@ -553,7 +553,7 @@ public abstract class Tab extends Element implements SettingsProvider{
 			renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 127/255f);
 		}else if(ClickGUIHack.theme() == Theme.UWARE) {
 			GL11.glColor4f(0x26/255f, 0x26/255f, 0x26/255f, 0xaa/255f);
-			Tab.renderRoundedFrameBackGroundNoTop(xStart, yStart, xEnd, yEnd, 2);
+			Tab.renderRoundedFrameBackGroundNoTop(xStart, yStart, xEnd, yEnd, Theme.UWARE_ROUNDNESS);
 		}
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -575,18 +575,44 @@ public abstract class Tab extends Element implements SettingsProvider{
 		}else if(ClickGUIHack.theme() == Theme.IRIDIUM) {
 			renderFrameOutlines(xStart, yStart, xEnd, yEnd);
 		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			ScaledResolution scaledResolution = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
+			double scaledpx = 1d/scaledResolution.scaleFactor;
 			//renderFrameOutlines(xStart, yStart, xEnd, yEnd);
 			Tessellator tess = Tessellator.instance;
 			GL11.glColor4f(0, 0, 0, 1f);
 			GL11.glLineWidth(1f);
-			tess.startDrawing(GL11.GL_LINE_LOOP);
+			tess.startDrawing(GL11.GL_LINES);
+			//top line
 			tess.addVertex(xStart, yStart, 0);
-			tess.addVertex(xStart, yEnd-2, 0);
-			tess.addVertex(xStart+2, yEnd, 0);
-			tess.addVertex(xEnd-2, yEnd, 0);
-			tess.addVertex(xEnd, yEnd-2, 0);
 			tess.addVertex(xEnd, yStart, 0);
+			//r line
+			tess.addVertex(xEnd, yStart, 0);
+			tess.addVertex(xEnd, yEnd-Theme.UWARE_ROUNDNESS+scaledpx, 0);
+			//l line
+			tess.addVertex(xStart, yEnd-Theme.UWARE_ROUNDNESS , 0);
+			tess.addVertex(xStart, yStart, 0);
+			//bottom line
+			tess.addVertex(xStart+Theme.UWARE_ROUNDNESS, yEnd, 0);
+			tess.addVertex(xEnd-Theme.UWARE_ROUNDNESS, yEnd, 0);
 			tess.draw();
+			GL11.glLineWidth(2);
+			Tessellator.instance.startDrawing(GL11.GL_LINES);
+			//rb
+			Tessellator.instance.addVertex(xEnd-scaledpx, yEnd-Theme.UWARE_ROUNDNESS+scaledpx, 0);
+			Tessellator.instance.addVertex(xEnd-scaledpx-Theme.UWARE_ROUNDNESS, yEnd, 0);
+			//lb
+			Tessellator.instance.addVertex(xStart+Theme.UWARE_ROUNDNESS, yEnd+scaledpx, 0);
+			Tessellator.instance.addVertex(xStart, yEnd-Theme.UWARE_ROUNDNESS, 0);
+			Tessellator.instance.draw();
+			GL11.glLineWidth(1);
+			/*tess.startDrawing(GL11.GL_LINE_LOOP);
+			tess.addVertex(xStart, yStart, 0);
+			tess.addVertex(xStart, yEnd-Theme.UWARE_ROUNDNESS, 0);
+			tess.addVertex(xStart+Theme.UWARE_ROUNDNESS, yEnd, 0);
+			tess.addVertex(xEnd-Theme.UWARE_ROUNDNESS, yEnd, 0);
+			tess.addVertex(xEnd, yEnd-Theme.UWARE_ROUNDNESS, 0);
+			tess.addVertex(xEnd, yStart, 0);
+			tess.draw();*/
 		}
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -602,37 +628,47 @@ public abstract class Tab extends Element implements SettingsProvider{
 		int yStart = this.startY;
 		if(!ClickGUIHack.renderHeader(this)) return;
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			int xEnd = this.endX+2;
+			xStart -= Theme.UWARE_ROUNDNESS;
+			int xEnd = this.endX+Theme.UWARE_ROUNDNESS*2;
 			int yEnd = yStart+ClickGUIHack.theme().yspacing;
 			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			
+			ScaledResolution scaledResolution = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
+			double scaledpx = 1d/scaledResolution.scaleFactor;
 			RenderUtils.glColor(ClickGUIHack.themeColor(), Theme.UWARE_HEAD_OPACITY);
-			Tab.renderRoundedFrameBackGround(xStart, yStart, xEnd, yEnd + 0.3f, 2);
+			Tab.renderRoundedFrameBackGround(xStart+scaledpx, yStart, xEnd, yEnd + 0.3f, Theme.UWARE_ROUNDNESS);
 			
 			GL11.glColor4f(0, 0, 0, 1);
 			GL11.glLineWidth(1);
 			Tessellator.instance.startDrawing(GL11.GL_LINES);
-			Tessellator.instance.addVertex(xStart, yStart-2, 0);
-			Tessellator.instance.addVertex(xEnd-2, yStart-2, 0);
+			//top line
+			Tessellator.instance.addVertex(xStart+scaledpx, yStart-Theme.UWARE_ROUNDNESS, 0);
+			Tessellator.instance.addVertex(xEnd-Theme.UWARE_ROUNDNESS, yStart-Theme.UWARE_ROUNDNESS, 0);
+			//r line
 			Tessellator.instance.addVertex(xEnd, yStart, 0);
-			Tessellator.instance.addVertex(xEnd, yEnd-2, 0);
-			Tessellator.instance.addVertex(xEnd-2, yEnd, 0);
-			Tessellator.instance.addVertex(xStart, yEnd, 0);
-			Tessellator.instance.addVertex(xStart-2, yEnd-2, 0);
-			Tessellator.instance.addVertex(xStart-2, yStart, 0);
+			Tessellator.instance.addVertex(xEnd, yEnd-Theme.UWARE_ROUNDNESS+scaledpx, 0);
+			//bottom line
+			Tessellator.instance.addVertex(xEnd-Theme.UWARE_ROUNDNESS, yEnd, 0);
+			Tessellator.instance.addVertex(xStart+scaledpx, yEnd, 0);
+			//l line
+			Tessellator.instance.addVertex(xStart+scaledpx-Theme.UWARE_ROUNDNESS, yEnd-Theme.UWARE_ROUNDNESS , 0);
+			Tessellator.instance.addVertex(xStart+scaledpx-Theme.UWARE_ROUNDNESS, yStart, 0);
 			Tessellator.instance.draw();
 			GL11.glLineWidth(2);
 			Tessellator.instance.startDrawing(GL11.GL_LINES);
-			Tessellator.instance.addVertex(xEnd-2, yStart-2, 0);
-			Tessellator.instance.addVertex(xEnd, yStart, 0);
-			Tessellator.instance.addVertex(xEnd, yEnd-2, 0);
-			Tessellator.instance.addVertex(xEnd-2, yEnd, 0);
-			Tessellator.instance.addVertex(xStart, yEnd, 0);
-			Tessellator.instance.addVertex(xStart-2, yEnd-2, 0);
-			Tessellator.instance.addVertex(xStart-2, yStart, 0);
-			Tessellator.instance.addVertex(xStart, yStart-2, 0);
+			//tr
+			Tessellator.instance.addVertex(xEnd-scaledpx-Theme.UWARE_ROUNDNESS, yStart-Theme.UWARE_ROUNDNESS, 0);
+			Tessellator.instance.addVertex(xEnd-scaledpx, yStart, 0);
+			//rb
+			Tessellator.instance.addVertex(xEnd-scaledpx, yEnd-Theme.UWARE_ROUNDNESS+scaledpx, 0);
+			Tessellator.instance.addVertex(xEnd-scaledpx-Theme.UWARE_ROUNDNESS, yEnd, 0);
+			//lb
+			Tessellator.instance.addVertex(xStart+scaledpx, yEnd+scaledpx, 0);
+			Tessellator.instance.addVertex(xStart+scaledpx-Theme.UWARE_ROUNDNESS, yEnd-Theme.UWARE_ROUNDNESS, 0);
+			//lt
+			Tessellator.instance.addVertex(xStart+scaledpx-Theme.UWARE_ROUNDNESS, yStart, 0);
+			Tessellator.instance.addVertex(xStart+scaledpx, yStart-Theme.UWARE_ROUNDNESS, 0);
 			Tessellator.instance.draw();
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_BLEND);
@@ -709,7 +745,6 @@ public abstract class Tab extends Element implements SettingsProvider{
 				if(w < 0) w = 0;
 				Client.mc.fontRenderer.drawStringWithShadow(s, this.tabMinimize.getMinX() + w/2 + 2, ypos, this.minimized.getValue() ? Theme.UWARE_DISABLED_COLOR : Theme.UWARE_ENABLED_COLOR);
 			}
-			
 		}
 	}
 	

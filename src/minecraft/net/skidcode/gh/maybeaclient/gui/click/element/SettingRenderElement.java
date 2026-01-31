@@ -14,6 +14,7 @@ public class SettingRenderElement extends Element{
 	
 	@Override
 	public void recalculatePosition(Element parent, int x, int y) {
+		this.shown = !this.toRender.hidden;
 		this.startX = x;
 		this.startY = y;
 		this.parent = parent;

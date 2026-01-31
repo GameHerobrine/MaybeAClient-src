@@ -708,7 +708,7 @@ public class Client {
 	 * Custom font support
 	 * BlockNotifier (notify if some block is close to the player)
 	 * Better AutoTunnel, Diagonal AutoTunnel?
-	 * Bred, Uware, CatHack themes
+	 * Bred, CatHack themes
 	 * AutoMiner
 	 * Added tab manager(special tab in clickgui, .tab [...] in console) TODO console, heph & nodus theme, more options, rewrite saving
 	 * Added ability to create custom module categories and modify existent TODO
@@ -719,7 +719,10 @@ public class Client {
 	/**
 	 * 4.0.5
 	 * Fixed portals causing stackoverflow in singleplayer (gameherobrine)
-	 * Added Uware theme (TODO: make it look more like uware(dont forget about subsettings of each block in blockesp), make it work with all tabs)
+	 * Fixed hidden settings displaying in themes with vertical settings (gameherobrine)
+	 * Fixed color settings not displaying selected colors in Iridium theme (gameherobrine)
+	 * Fixed Client Name tab being invisible when HeaderStyle is not Full (gameherobrine)
+	 * Added Uware theme (TODO: make it look more like uware)
 	 * Leaked enchantile TODO
 	 */
 	
