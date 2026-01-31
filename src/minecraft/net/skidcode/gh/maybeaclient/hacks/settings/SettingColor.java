@@ -197,6 +197,13 @@ public class SettingColor extends Setting{
 				Client.mc.fontRenderer.drawStringWithShadow(""+this.red, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.red) - Theme.HEPH_OPT_XADD + 1, y + txtCenter + ySpace*2, txtColor);
 				Client.mc.fontRenderer.drawStringWithShadow(""+this.green, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.green) - Theme.HEPH_OPT_XADD + 1, y + txtCenter + ySpace*3, txtColor2);
 				Client.mc.fontRenderer.drawStringWithShadow(""+this.blue, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.blue) - Theme.HEPH_OPT_XADD + 1, y + txtCenter + ySpace*4, txtColor3);
+			}else if(ClickGUIHack.theme() == Theme.UWARE){
+				Client.mc.fontRenderer.drawStringWithShadow("Red", x + 2+2, y + txtCenter-1 + ySpace*2, txtColor);
+				Client.mc.fontRenderer.drawStringWithShadow("Green", x + 2+2, y + txtCenter-1 + ySpace*3, txtColor2);
+				Client.mc.fontRenderer.drawStringWithShadow("Blue", x + 2+2, y + txtCenter-1 + ySpace*4, txtColor3);
+				Client.mc.fontRenderer.drawStringWithShadow(""+this.red, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.red) - 2, y + txtCenter-1 + ySpace*2, txtColor);
+				Client.mc.fontRenderer.drawStringWithShadow(""+this.green, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.green) - 2, y + txtCenter-1 + ySpace*3, txtColor2);
+				Client.mc.fontRenderer.drawStringWithShadow(""+this.blue, xEnd - Client.mc.fontRenderer.getStringWidth(""+this.blue) - 2, y + txtCenter-1 + ySpace*4, txtColor3);
 			}else {
 				Client.mc.fontRenderer.drawString("Red - "+this.red, x + 2 + 4, y + txtCenter + ySpace*2, txtColor);
 				Client.mc.fontRenderer.drawString("Green - "+this.green, x + 2 + 4, y + txtCenter + ySpace*3, txtColor2);

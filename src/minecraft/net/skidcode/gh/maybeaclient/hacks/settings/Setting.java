@@ -100,13 +100,14 @@ public abstract class Setting{
 	}
 	public void renderText(int x, int y) {
 		int txtColor = 0xffffff;
+		int yo = ClickGUIHack.theme().yaddtocenterText;
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) {
-			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, Theme.IRIDIUM_ENABLED_COLOR);
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + yo, Theme.IRIDIUM_ENABLED_COLOR);
 			this.mouseHovering = false;
 			return;
 		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
-			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, 0xffffff);
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + yo, 0xffffff);
 			this.mouseHovering = false;
 			return;
 		}
@@ -116,8 +117,7 @@ public abstract class Setting{
 				txtColor = ClickGUIHack.instance.secColor.rgb();
 			}
 		}
-		
-		Client.mc.fontRenderer.drawString(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		Client.mc.fontRenderer.drawString(this.name, x + 2, y + yo, txtColor);
 		this.mouseHovering = false;
 	}
 	

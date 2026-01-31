@@ -74,9 +74,13 @@ public class SettingInteger extends Setting{
 				txtColor = ClickGUIHack.instance.secColor.rgb();
 			}
 		}
+		String value = ""+this.getValue();
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
-			Client.mc.fontRenderer.drawStringWithShadow(""+this.getValue(), xEnd - Theme.HEPH_OPT_XADD + 1 - Client.mc.fontRenderer.getStringWidth(""+this.getValue()), y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(""+this.getValue(), xEnd - Theme.HEPH_OPT_XADD + 1 - Client.mc.fontRenderer.getStringWidth(value), y + ClickGUIHack.theme().yaddtocenterText, txtColor);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText-1, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(value, xEnd - 2 - Client.mc.fontRenderer.getStringWidth(value), y + ClickGUIHack.theme().yaddtocenterText-1, txtColor);
 		}else {
 			Client.mc.fontRenderer.drawString(this.name + " - " + this.getValue(), x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		}
