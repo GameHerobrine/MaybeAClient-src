@@ -331,8 +331,8 @@ public class SettingColor extends Setting{
 			bgcola = 0x80/255f;
 		}
 		if(theme == Theme.UWARE) {
-			bgcolr = bgcolg = bgcolb = 0x16/255f;
-			bgcola = 0xaa/255f;
+			bgcolr = bgcolg = bgcolb = 0;
+			bgcola = Theme.UWARE_SETTING_OVERLAY_A;
 		}
 		
 		if(!this.minimized && theme != Theme.HEPHAESTUS && theme != Theme.IRIDIUM || (this.minimized && theme == Theme.UWARE)) Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
@@ -344,6 +344,13 @@ public class SettingColor extends Setting{
 		if(theme == Theme.HEPHAESTUS) {
 			Tab.renderFrameBackGround(xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, yStart+3, xEnd - Theme.HEPH_OPT_XADD - 3, yStart + ySpace2 - 3, this.red / 255f, this.green / 255f, this.blue / 255f, 1);
 			Tab.renderFrameOutlines((double)xEnd - Theme.HEPH_OPT_XADD - Theme.HEPH_OPT_XADD - 4, (double)yStart+3, (double)xEnd - Theme.HEPH_OPT_XADD - 3, (double)yStart + ySpace2 - 3);
+		}else if(theme == Theme.UWARE) {
+			xmi = xEnd - Theme.UWARE_OPT_XADD - 2;
+			xma = xEnd - 1;
+			ymi = yStart+3;
+			yma = (yStart + ySpace2) - 2;
+			GL11.glColor4f(this.red / 255f, this.green / 255f, this.blue / 255f, 1f);
+			Tab.renderRoundedFrameBackGround(xmi, ymi, (float)xma, yma, 2);
 		}else if(theme != Theme.IRIDIUM){
 			Tab.renderFrameBackGround(xmi, ymi, xma, yma, this.red / 255f, this.green / 255f, this.blue / 255f, 1f);
 		}
@@ -373,9 +380,12 @@ public class SettingColor extends Setting{
 				Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 				int sliderYbegin = (yStart + ySpace2) - Theme.UWARE_SLIDER_HEIGHT;
 				int sliderYend = yStart + ySpace2;
-				RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+				RenderUtils.glColor(ClickGUIHack.themeColor());
 				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
-				RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+				GL11.glColor4f(0, 0, 0, Theme.UWARE_SLIDER_LEFT_A);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
+				
+				RenderUtils.glColor(ClickGUIHack.themeColor());
 				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xStart+2+2+diff3, sliderYend, 1);
 			}else {
 				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
@@ -395,9 +405,12 @@ public class SettingColor extends Setting{
 				Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 				int sliderYbegin = (yStart + ySpace2) - Theme.UWARE_SLIDER_HEIGHT;
 				int sliderYend = yStart + ySpace2;
-				RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+				RenderUtils.glColor(ClickGUIHack.themeColor());
 				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
-				RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+				GL11.glColor4f(0, 0, 0, Theme.UWARE_SLIDER_LEFT_A);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
+				
+				RenderUtils.glColor(ClickGUIHack.themeColor());
 				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xStart+2+2+diff3, sliderYend, 1);
 			}else {
 				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
@@ -417,9 +430,11 @@ public class SettingColor extends Setting{
 				Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);
 				int sliderYbegin = (yStart + ySpace2) - Theme.UWARE_SLIDER_HEIGHT;
 				int sliderYend = yStart + ySpace2;
-				RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+				RenderUtils.glColor(ClickGUIHack.themeColor());
 				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
-				RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+				GL11.glColor4f(0, 0, 0, Theme.UWARE_SLIDER_LEFT_A);
+				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xEnd-2, sliderYend, 1);
+				RenderUtils.glColor(ClickGUIHack.themeColor());
 				Tab.renderRoundedFrameBackGround(xStart+2+2, sliderYbegin, xStart+2+2+diff3, sliderYend, 1);
 			}else {
 				Tab.renderFrameBackGround(xStart, yStart, xStart + diff3, yStart + ySpace2, bgcolr, bgcolg, bgcolb, bgcola);

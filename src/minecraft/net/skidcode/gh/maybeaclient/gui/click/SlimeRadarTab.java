@@ -150,6 +150,7 @@ public class SlimeRadarTab extends Tab {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_POLYGON_SMOOTH);
+		GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_FASTEST);
 		GUIUtils.scissorEnd();
 		GUIUtils.disableScissorTest();
 		Tab.renderFrameTop(this, xStart, yStart, xEnd, yEnd);

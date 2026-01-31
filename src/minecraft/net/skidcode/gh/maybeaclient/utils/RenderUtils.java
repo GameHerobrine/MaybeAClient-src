@@ -134,9 +134,12 @@ public class RenderUtils {
 		GL11.glPopAttrib();
 		GL11.glPopMatrix();
 	}
-	
+
 	public static void glColor(int col) {
-		float a = ((col & 0xff000000) >>> 24) / 255f;
+		glColor(col, 0xff);
+	}
+	public static void glColor(int col, int opacity) {
+		float a = opacity / 255f;
 		float r = ((col & 0x00ff0000) >>> 16) / 255f;
 		float g = ((col & 0x0000ff00) >>> 8) / 255f;
 		float b = ((col & 0x000000ff)) / 255f;

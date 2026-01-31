@@ -1,5 +1,7 @@
 package net.skidcode.gh.maybeaclient.hacks.settings;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagInt;
 import net.skidcode.gh.maybeaclient.Client;
@@ -124,7 +126,7 @@ public class SettingInteger extends Setting{
 			xEnd -= 5;
 		}
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
 			xStart += 2;
 			xEnd -= 2;
 		}
@@ -139,9 +141,11 @@ public class SettingInteger extends Setting{
 		if(ClickGUIHack.theme() == Theme.UWARE) {
 			int sliderYbegin = yEnd - Theme.UWARE_SLIDER_HEIGHT;
 			int sliderYend = yEnd;
-			RenderUtils.glColor(Theme.UWARE_OPT_D_COLOR);
+			RenderUtils.glColor(ClickGUIHack.themeColor());
 			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 1);
-			RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+			GL11.glColor4f(0, 0, 0, Theme.UWARE_SLIDER_LEFT_A);
+			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 1);
+			RenderUtils.glColor(ClickGUIHack.themeColor());
 			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xStart+diff3, sliderYend, 1);
 			return;
 		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {

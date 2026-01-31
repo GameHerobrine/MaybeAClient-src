@@ -74,6 +74,9 @@ public class SettingBlockChooser extends Setting{
 	
 	@Override
 	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
+		}
 		if(this.minimized) return;
 		
 		int ySpace = ClickGUIHack.theme().yspacing;
@@ -81,8 +84,6 @@ public class SettingBlockChooser extends Setting{
 		
 		if(ClickGUIHack.theme() == Theme.NODUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace, 0, 0, 0, 0x80/255f);
-		}else if(ClickGUIHack.theme() == Theme.UWARE) {
-			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
 		}else if(ClickGUIHack.theme() != Theme.HEPHAESTUS) {
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yStart + ySpace-yReduce, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}

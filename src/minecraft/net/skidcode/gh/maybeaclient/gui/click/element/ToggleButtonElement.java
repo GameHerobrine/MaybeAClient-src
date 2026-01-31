@@ -54,7 +54,7 @@ public class ToggleButtonElement extends Element{
 	public void renderBottom() {
 		boolean v = this.listener.getValue();
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			Tab.renderFrameBackGround(startX, startY, endX, endY, 0x26/255f, 0x26/255f, 0x26/255f, 0xaa/255f);
+			//Tab.renderFrameBackGround(startX, startY, endX, endY, 0x26/255f, 0x26/255f, 0x26/255f, 0xaa/255f);
 			return;
 		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS || ClickGUIHack.theme() == Theme.IRIDIUM) {

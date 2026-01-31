@@ -231,6 +231,7 @@ public class ClickGUI extends GuiScreen{
 			if(!t.shown) continue;
 			
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			GL11.glDisable(GL11.GL_LINE_SMOOTH);
 			t.renderBottom();
 		}
 		GL11.glEnable(GL11.GL_DEPTH_TEST);

@@ -152,7 +152,7 @@ public class SettingTextBox extends Setting implements InputHandler{
 		}else if(ClickGUIHack.theme() == Theme.HEPHAESTUS){
 			
 		}else if(ClickGUIHack.theme() == Theme.UWARE) {
-			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
 		}else{
 			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, ClickGUIHack.r(), ClickGUIHack.g(), ClickGUIHack.b(), 1f);
 		}

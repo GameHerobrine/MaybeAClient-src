@@ -73,7 +73,7 @@ public class ClickGUIHack extends Hack{
 					}
 					
 					if(uware) {
-						ClickGUIHack.instance.themeColor.setValue(0xff, 0xff, 0xff);
+						ClickGUIHack.instance.themeColor.setValue(0x00, 0x9C, 0xE0);
 						ClickGUIHack.instance.secColor.setValue(0xff, 0xff, 0xff);
 					}
 				}
@@ -103,12 +103,16 @@ public class ClickGUIHack extends Hack{
 		ShowFrame h = instance.showFrameInHud.getValue();
 		return (tab != null && (!tab.isHUD || tab.minimized.getValue())) ? ShowFrame.YES : h;
 	}
-	
-	public static int normTextColor() {
-		if(theme() == Theme.CLIFF || theme() == Theme.HEPHAESTUS || theme() == Theme.IRIDIUM) return 0xffffff;
+	public static int themeColor() {
 		return ClickGUIHack.instance.themeColor.rgb();
 	}
+	public static int normTextColor() {
+		if(theme() == Theme.UWARE) return Theme.UWARE_ENABLED_COLOR;
+		if(theme() == Theme.CLIFF || theme() == Theme.HEPHAESTUS || theme() == Theme.IRIDIUM) return 0xffffff;
+		return themeColor();
+	}
 	public static int highlightedTextColor() {
+		if(theme() == Theme.UWARE) return themeColor();
 		if(theme() == Theme.IRIDIUM) return 0x55ffff;
 		if(theme() == Theme.CLIFF) return 0x55FFFF;
 		return ClickGUIHack.instance.secColor.rgb();
@@ -150,7 +154,7 @@ public class ClickGUIHack extends Hack{
 		NODUS("Nodus", 14, 2, 3, 0, 0, 10+4+2, 4, false, 2),
 		HEPHAESTUS("Hephaestus", 14, 0, 3, 0, 0, 10+4+2+2, 4, true, 4),
 		IRIDIUM("Iridium", 10, 2, 1, 0, 0, 11, 4, false, 1),
-		UWARE("Uware", 14, 0, 2, 0, 0, 10+4+2, 4, true, 2);
+		UWARE("Uware", 14, 0, 3, 0, 0, 10+4+2, 4, true, 2);
 		
 		public static final int HEPH_DESC_YADD = 10;
 		public static final int HEPH_OPT_XADD = 7;
@@ -161,9 +165,11 @@ public class ClickGUIHack extends Hack{
 
 		public static final int UWARE_OPT_XADD = 8;
 		public static final int UWARE_SLIDER_HEIGHT = 2;
-		public static final int UWARE_OPT_D_COLOR = 0xff0078ad;
-		public static final int UWARE_OPT_E_COLOR = 0xff009ce0;
-		public static final int UWARE_THEME_COLOR = 0xEC0588C2;
+		//public static final int UWARE_THEME_COLOR = 0x009CE0;
+		public static final int UWARE_HEAD_OPACITY = 0xCC;
+		public static final float UWARE_SLIDER_LEFT_A = (58.5f)/255f;
+		public static final float UWARE_SETTING_OVERLAY_A = 65/255f;
+		
 		public static final int UWARE_DISABLED_COLOR = 0x8a8a8a;
 		public static final int UWARE_ENABLED_COLOR = 0xffffff;
 		

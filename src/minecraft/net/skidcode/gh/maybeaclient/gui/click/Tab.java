@@ -485,8 +485,19 @@ public abstract class Tab extends Element implements SettingsProvider{
 	public static void renderFrameBackGround(int xStart, int yStart, int xEnd, int yEnd) {
 		renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 0.5f);
 	}
-	
+	public static void renderRoundedFrameBackGroundNoTop(double xStart, double yStart, double xEnd, double yEnd, double n) {
+		Tessellator.instance.startDrawing(GL11.GL_POLYGON);
+		Tessellator.instance.addVertex(xStart, yStart, 0);
+		Tessellator.instance.addVertex(xStart, yEnd-n, 0);
+		Tessellator.instance.addVertex(xStart+n, yEnd, 0);
+		Tessellator.instance.addVertex(xEnd-n, yEnd, 0);
+		Tessellator.instance.addVertex(xEnd, yEnd-n, 0);
+		Tessellator.instance.addVertex(xEnd, yStart, 0);
+		Tessellator.instance.draw();
+	}
 	public static void renderRoundedFrameBackGround(double xStart, double yStart, double xEnd, double yEnd, double n) {
+		xEnd -= 0.3d;
+		yEnd -= 0.3d;
 		Tessellator.instance.startDrawing(GL11.GL_POLYGON);
 		Tessellator.instance.addVertex(xStart, yStart, 0);
 		Tessellator.instance.addVertex(xStart-n, yStart, 0);
@@ -540,6 +551,9 @@ public abstract class Tab extends Element implements SettingsProvider{
 			renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 100/255f);
 		}else if(ClickGUIHack.theme() == Theme.IRIDIUM) {
 			renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, 127/255f);
+		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			GL11.glColor4f(0x26/255f, 0x26/255f, 0x26/255f, 0xaa/255f);
+			Tab.renderRoundedFrameBackGroundNoTop(xStart, yStart, xEnd, yEnd, 2);
 		}
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -594,21 +608,8 @@ public abstract class Tab extends Element implements SettingsProvider{
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			
-			RenderUtils.glColor(Theme.UWARE_THEME_COLOR);
-			
-			//GL11.glColor4f(0, 0, 0, 1);
-			Tessellator.instance.startDrawing(GL11.GL_POLYGON);
-			Tessellator.instance.addVertex(xStart, yStart, 0);
-			Tessellator.instance.addVertex(xStart-2, yStart, 0);
-			Tessellator.instance.addVertex(xStart-2, yEnd-2, 0);
-			Tessellator.instance.addVertex(xStart, yEnd, 0);
-			Tessellator.instance.addVertex(xEnd-2, yEnd, 0);
-			Tessellator.instance.addVertex(xEnd, yEnd-2, 0);
-			Tessellator.instance.addVertex(xEnd, yStart, 0);
-			Tessellator.instance.addVertex(xEnd-2, yStart-2, 0);
-			Tessellator.instance.addVertex(xStart, yStart-2, 0);
-			Tessellator.instance.addVertex(xStart-2, yStart, 0);
-			Tessellator.instance.draw();
+			RenderUtils.glColor(ClickGUIHack.themeColor(), Theme.UWARE_HEAD_OPACITY);
+			Tab.renderRoundedFrameBackGround(xStart, yStart, xEnd, yEnd + 0.3f, 2);
 			
 			GL11.glColor4f(0, 0, 0, 1);
 			GL11.glLineWidth(1);
@@ -699,6 +700,7 @@ public abstract class Tab extends Element implements SettingsProvider{
 			String name = this.getTabName();
 			Client.mc.fontRenderer.drawStringWithShadow(name, xpos, ypos, 0xffffff);
 		}else if(ClickGUIHack.theme() == Theme.UWARE) {
+			ypos -= 1;
 			Client.mc.fontRenderer.drawStringWithShadow(this.getTabName(), xpos, ypos, Theme.UWARE_ENABLED_COLOR);
 			if(this.canMinimize) {
 				String s = this.minimized.getValue() ? "+" : "-";

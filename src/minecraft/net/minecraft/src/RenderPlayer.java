@@ -281,7 +281,6 @@ public class RenderPlayer extends RenderLiving {
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(2929 /* GL_DEPTH_TEST */);
 			GL11.glDepthMask(false);
-			GL11.glEnable(GL11.GL_LINE_SMOOTH);
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glColor3f((float)r, (float)g, (float)b);
 			RenderUtils.drawOutlinedBB(
@@ -290,6 +289,7 @@ public class RenderPlayer extends RenderLiving {
 			GL11.glColor4f(0.0F, 230F, 255F, 0.3F);
 			GL11.glDepthMask(true);
 			GL11.glEnable(GL11.GL_LIGHTING);
+			GL11.glDisable(GL11.GL_LINE_SMOOTH);
 			GL11.glEnable(3553 /* GL_TEXTURE_2D */);
 			GL11.glEnable(2929 /* GL_DEPTH_TEST */);
 		}

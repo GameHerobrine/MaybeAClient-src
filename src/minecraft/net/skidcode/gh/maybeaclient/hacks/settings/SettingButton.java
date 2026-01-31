@@ -1,5 +1,7 @@
 package net.skidcode.gh.maybeaclient.hacks.settings;
 
+import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.gui.click.Tab;
 import net.skidcode.gh.maybeaclient.gui.click.element.Element;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
 import net.skidcode.gh.maybeaclient.hacks.Hack;
@@ -12,12 +14,26 @@ public class SettingButton extends SettingBoolean{
 	}
 	
 	public void setValue(boolean d) {}
-
 	@Override
-	public void renderText(int x, int y) {
+	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			int xo = ((xEnd - x) - Client.mc.fontRenderer.getStringWidth(this.name))/2;
+			Client.mc.fontRenderer.drawString(this.name, x + xo, y + ClickGUIHack.theme().yaddtocenterText, Theme.UWARE_ENABLED_COLOR);
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) this.value = true;
-		super.renderText(x, y);
+		super.renderText(tab, x, y, xEnd, yEnd);
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) this.value = false;
+		
+	}
+	@Override
+	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
+		if(ClickGUIHack.theme() == Theme.UWARE) {
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
+			Tab.renderFrameBackGround(xStart+2, yStart, xEnd-2, yEnd, 2/255f, 10/255f, 10/255f, 60/255f);
+			return;
+		}
+		super.renderElement(tab, xStart, yStart, xEnd, yEnd);
 	}
 	
 	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {

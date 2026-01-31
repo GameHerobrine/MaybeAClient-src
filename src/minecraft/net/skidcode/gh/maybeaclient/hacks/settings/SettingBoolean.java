@@ -47,13 +47,8 @@ public class SettingBoolean extends Setting{
 	@Override
 	public void renderText(Element tab, int x, int y, int xEnd, int yEnd) {
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			
-
-
 			int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
 			int ys = y+3;
-			int xe = xEnd - 2;
-			int ye = yEnd - 2;
 			int col = this.value ? Theme.UWARE_ENABLED_COLOR : Theme.UWARE_DISABLED_COLOR;
 			Client.mc.fontRenderer.drawString("X", xs+1, ys, col);
 		}
@@ -71,7 +66,7 @@ public class SettingBoolean extends Setting{
 	@Override
 	public void renderElement(Element tab, int xStart, int yStart, int xEnd, int yEnd) {
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
 			//float r, g, b, a = 128f/255f;
 			//g = b = r = 21/255f;
 			//if(this.value) {
@@ -82,9 +77,9 @@ public class SettingBoolean extends Setting{
 			//}
 			int xs = xEnd - Theme.UWARE_OPT_XADD - 2;
 			int ys = yStart+3;
-			float xe = xEnd - 1f - 0.3f;
+			float xe = xEnd - 1f;
 			int ye = yEnd - 2;
-			RenderUtils.glColor(Theme.UWARE_OPT_E_COLOR);
+			RenderUtils.glColor(ClickGUIHack.themeColor());
 			Tab.renderRoundedFrameBackGround(xs, ys, xe, ye, 2);
 			
 			//Tab.renderFrameBackGround(, , , , r, g, b, a);

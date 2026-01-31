@@ -125,7 +125,7 @@ public class SettingChooser extends Setting{
 		int ySpace = ClickGUIHack.theme().yspacing;
 		int yReduce = ClickGUIHack.theme().settingYreduce;
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0x16/255f, 0x16/255f, 0x16/255f, 0xaa/255f);
+			Tab.renderFrameBackGround(xStart, yStart, xEnd, yEnd, 0, 0, 0, Theme.UWARE_SETTING_OVERLAY_A);
 		}
 		if(this.minimized) return;
 		if(ClickGUIHack.theme() == Theme.IRIDIUM) return;
