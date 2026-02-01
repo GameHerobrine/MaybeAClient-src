@@ -37,6 +37,9 @@ public class SettingButton extends SettingBoolean{
 	}
 	
 	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(ClickGUIHack.theme() == Theme.UWARE && !GUIUtils.isInsideRect(mouseX, mouseY, xMin+2, yMin, xMax-2, yMax)) {
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS && !GUIUtils.isInsideRect(mouseX, mouseY, xMax - Theme.HEPH_OPT_XADD - 7, yMin+3, xMax - Theme.HEPH_OPT_XADD + 1, yMax - 3)) {
 			return;
 		}

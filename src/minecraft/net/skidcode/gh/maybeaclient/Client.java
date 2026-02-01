@@ -722,7 +722,8 @@ public class Client {
 	 * Fixed hidden settings displaying in themes with vertical settings (gameherobrine)
 	 * Fixed color settings not displaying selected colors in Iridium theme (gameherobrine)
 	 * Fixed Client Name tab being invisible when HeaderStyle is not Full (gameherobrine)
-	 * Added Uware theme (TODO: make it look more like uware)
+	 * Fixed incorrect outline/fill color for items in entityesp (gameherobrine)
+	 * Added Uware theme(gameherobrine)
 	 * Leaked enchantile TODO
 	 */
 	

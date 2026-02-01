@@ -79,8 +79,8 @@ public class SettingInteger extends Setting{
 			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + Theme.HEPH_OPT_XADD, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 			Client.mc.fontRenderer.drawStringWithShadow(""+this.getValue(), xEnd - Theme.HEPH_OPT_XADD + 1 - Client.mc.fontRenderer.getStringWidth(value), y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		}else if(ClickGUIHack.theme() == Theme.UWARE) {
-			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText-1, txtColor);
-			Client.mc.fontRenderer.drawStringWithShadow(value, xEnd - 2 - Client.mc.fontRenderer.getStringWidth(value), y + ClickGUIHack.theme().yaddtocenterText-1, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(this.name, x + 2, y + ClickGUIHack.theme().yaddtocenterText-1-1, txtColor);
+			Client.mc.fontRenderer.drawStringWithShadow(value, xEnd - 2 - Client.mc.fontRenderer.getStringWidth(value), y + ClickGUIHack.theme().yaddtocenterText-1-1, txtColor);
 		}else {
 			Client.mc.fontRenderer.drawString(this.name + " - " + this.getValue(), x + 2, y + ClickGUIHack.theme().yaddtocenterText, txtColor);
 		}
@@ -143,8 +143,8 @@ public class SettingInteger extends Setting{
 		
 		int diff3 = (int) Math.round(val/diff2 - this.minGUI/diff2);
 		if(ClickGUIHack.theme() == Theme.UWARE) {
-			int sliderYbegin = yEnd - Theme.UWARE_SLIDER_HEIGHT;
-			int sliderYend = yEnd;
+			int sliderYbegin = yEnd - Theme.UWARE_SLIDER_HEIGHT-1;
+			int sliderYend = yEnd-1;
 			RenderUtils.glColor(ClickGUIHack.themeColor());
 			Tab.renderRoundedFrameBackGround(xStart, sliderYbegin, xEnd, sliderYend, 1);
 			GL11.glColor4f(0, 0, 0, Theme.UWARE_SLIDER_LEFT_A);

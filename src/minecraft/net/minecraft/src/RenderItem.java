@@ -126,9 +126,12 @@ public class RenderItem extends Render {
 					GL11.glDisable(GL11.GL_FOG);
 					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 					GL11.glColor4f((float)r/255, (float)g/255, (float)b/255, 1);
-					
+
+					boolean a = this.renderBlocks.field_31088_b;
+					this.renderBlocks.field_31088_b = false;
 					this.renderBlocks.renderBlockOnInventory(Block.blocksList[itemstack.itemID], itemstack.getItemDamage(), entity.getEntityBrightness(var9));
-						
+					this.renderBlocks.field_31088_b = a;
+					
 					GL11.glPopAttrib();
 					GL11.glPopMatrix();
 					GL11.glPopMatrix();
@@ -201,8 +204,12 @@ public class RenderItem extends Render {
     		        GL11.glDisable(GL11.GL_DEPTH_TEST);
 
 		        	GL11.glColor4f(r, g, b, 1);
+		        	boolean a = this.renderBlocks.field_31088_b;
+					this.renderBlocks.field_31088_b = false;
 		        	this.renderBlocks.renderBlockOnInventory(Block.blocksList[itemstack.itemID], itemstack.getItemDamage(), entity.getEntityBrightness(var9));
-    		        GL11.glEnable(GL11.GL_DEPTH_TEST);
+					this.renderBlocks.field_31088_b = a;
+					
+		        	GL11.glEnable(GL11.GL_DEPTH_TEST);
     		        GL11.glDepthMask(true);
     		        GL11.glDisable(GL11.GL_STENCIL_TEST);
     		        GL11.glDisable(GL11.GL_LINE_SMOOTH);

@@ -39,8 +39,23 @@ public class GUIUtils {
 		screen.setWorldAndResolution(mc, sc.getScaledWidth(), sc.getScaledHeight());
 		mc.entityRenderer.setupScaledResolution();
 	}
+	public static boolean isInsideRoundedRect(int mx, int my, int startX, int startY, int endX, int endY, int roundness) {
+		boolean yy = my >= startY && my <= endY-roundness;
+		boolean xx = mx >= startX && mx <= endX-roundness;
+		int xmin = startX - roundness;
+		int xmax = endX;
+		int ymin = startY - roundness;
+		int ymax = endY;
+
+		System.out.println(mx+" "+my+" "+startX+" "+startY+" "+endX+" "+endY);
+		if(mx >= xmin && mx <= xmax && yy) return true;
+		if(my >= ymin && my <= ymax && xx) return true;
+		//TODO check tiny corners too?
+		return false;
+	}
 	
 	public static boolean isInsideRect(int mx, int my, int startX, int startY, int endX, int endY) {
+		
 		return mx >= startX && mx <= endX && my >= startY && my <= endY;
 	}
 	

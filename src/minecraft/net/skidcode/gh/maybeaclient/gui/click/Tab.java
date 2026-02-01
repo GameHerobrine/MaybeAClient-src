@@ -743,7 +743,7 @@ public abstract class Tab extends Element implements SettingsProvider{
 				int w = this.tabMinimize.getMaxX() - this.tabMinimize.getMinX();
 				w -= Client.mc.fontRenderer.getStringWidth(s);
 				if(w < 0) w = 0;
-				Client.mc.fontRenderer.drawStringWithShadow(s, this.tabMinimize.getMinX() + w/2 + 2, ypos, this.minimized.getValue() ? Theme.UWARE_DISABLED_COLOR : Theme.UWARE_ENABLED_COLOR);
+				Client.mc.fontRenderer.drawStringWithShadow(s, this.tabMinimize.getMinX() + w/2 + 2, ypos, Theme.UWARE_ENABLED_COLOR);
 			}
 		}
 	}

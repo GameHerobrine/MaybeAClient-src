@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.src.EntitySlime;
 import net.minecraft.src.MathHelper;
+import net.minecraft.src.ScaledResolution;
 import net.minecraft.src.Tessellator;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack;
@@ -61,9 +62,11 @@ public class SlimeRadarTab extends Tab {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glBlendFunc(770, 771);
+		ScaledResolution scaledResolution = new ScaledResolution(Client.mc.gameSettings, Client.mc.displayWidth, Client.mc.displayHeight);
+		double scaledpx = 1d/scaledResolution.scaleFactor;
 		
 		GUIUtils.enableScissorTest();
-		GUIUtils.scissorStart(xStart, yStart, xEnd, yEnd);
+		GUIUtils.scissorStart(xStart, yStart, xEnd - (theme == Theme.UWARE ? scaledpx : 0), yEnd);
 		
 		int yCenter = yStart + (yEnd - yStart) / 2;
 		int xCenter = xStart + (xEnd - xStart) / 2;

@@ -116,6 +116,9 @@ public class SettingBoolean extends Setting{
 	}
 	
 	public void onPressedInside(Element tab, int xMin, int yMin, int xMax, int yMax, int mouseX, int mouseY, int mouseClick) {
+		if(ClickGUIHack.theme() == Theme.UWARE && !GUIUtils.isInsideRoundedRect(mouseX, mouseY, xMax - Theme.UWARE_OPT_XADD - 2, yMin+3, xMax - 1 - 1, yMax- 2, 2)) {
+			return;
+		}
 		if(ClickGUIHack.theme() == Theme.HEPHAESTUS && !GUIUtils.isInsideRect(mouseX, mouseY, xMax - Theme.HEPH_OPT_XADD - 7, yMin+3, xMax - Theme.HEPH_OPT_XADD + 1, yMax - 3)) {
 			return;
 		}

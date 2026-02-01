@@ -12,6 +12,7 @@ import net.skidcode.gh.maybeaclient.hacks.Hack;
 import net.skidcode.gh.maybeaclient.hacks.NoRenderHack;
 import net.skidcode.gh.maybeaclient.hacks.ClickGUIHack.Theme;
 import net.skidcode.gh.maybeaclient.utils.ChatColor;
+import net.skidcode.gh.maybeaclient.utils.GUIUtils;
 import net.skidcode.gh.maybeaclient.utils.RenderUtils;
 
 public class SettingChooser extends Setting{
@@ -194,6 +195,16 @@ public class SettingChooser extends Setting{
 		int diff = mouseY - yMin;
 		int md = diff / ySpace;
 		if(md > 0) {
+			if(ClickGUIHack.theme() == Theme.UWARE) {
+				//!GUIUtils.isInsideRoundedRect(mouseX, mouseY, xMax - Theme.UWARE_OPT_XADD - 2, yMin+3, xMax - 1 - 1, yMax- 2, 2)
+				int d = diff % ySpace;
+				int yy = md*ySpace;
+				int yyn = (md+1)*ySpace;
+				if(!GUIUtils.isInsideRoundedRect(mouseX, mouseY, xMax - Theme.UWARE_OPT_XADD - 2, yMin + yy+3, xMax - 1 - 1, yMin+yyn- 2, 2)) {
+					this.lastPressed = md;
+					return;
+				}
+			}
 			if(ClickGUIHack.theme() == Theme.HEPHAESTUS) {
 				int d = diff % ySpace;
 				if(mouseX < (xMax - Theme.HEPH_OPT_XADD - 7) || mouseX > (xMax - Theme.HEPH_OPT_XADD + 1) || d < 3 || d > (ySpace-3)) {
