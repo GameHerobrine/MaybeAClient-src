@@ -33,7 +33,7 @@ public class PlayerControllerSP extends PlayerController {
         int var6 = this.mc.theWorld.getBlockMetadata(x, y, z);
         boolean var7 = super.sendBlockRemoved(x, y, z, var4);
         ItemStack var8 = this.mc.thePlayer.getCurrentEquippedItem();
-        boolean var9 = this.mc.thePlayer.canHarvestBlock(Block.blocksList[id]);
+        boolean var9 = var7 ? this.mc.thePlayer.canHarvestBlock(Block.blocksList[id]) : false;
         if (var8 != null) {
             var8.onDestroyBlock(id, x, y, z, this.mc.thePlayer);
             if (var8.stackSize == 0) {

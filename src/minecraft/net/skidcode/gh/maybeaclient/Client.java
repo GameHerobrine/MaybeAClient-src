@@ -717,14 +717,9 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.5
-	 * Fixed portals causing stackoverflow in singleplayer (gameherobrine)
-	 * Fixed hidden settings displaying in themes with vertical settings (gameherobrine)
-	 * Fixed color settings not displaying selected colors in Iridium theme (gameherobrine)
-	 * Fixed Client Name tab being invisible when HeaderStyle is not Full (gameherobrine)
-	 * Fixed incorrect outline/fill color for items in entityesp (gameherobrine)
-	 * Added Uware theme(gameherobrine)
-	 * Leaked enchantile TODO
+	 * 4.0.6
+	 * Fixed huge schematicas causing huge lags when autoplace is enabled
+	 * Fixed instantmine crashing the game when breaking and placing zero-hardness blocks very fast
 	 */
 	
 	static {

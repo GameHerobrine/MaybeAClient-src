@@ -167,7 +167,6 @@ public class SchematicaHack extends Hack implements EventListener{
 					for(int z = minZ; z < maxZ; ++z) {
 						for(int y = minY; y < maxY; ++y) {
 							if(y > 127) continue;
-							System.out.println(y+" "+mc.thePlayer.boundingBox.minY);
 							int rX = 0, rY = 0, rZ = 0;
 							try {
 								rX = x + inst.offset.x;
