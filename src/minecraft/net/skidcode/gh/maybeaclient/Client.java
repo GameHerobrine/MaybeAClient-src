@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.5";
+	public static final String clientVersion = "4.0.6";
 	
 	public static final int saveVersion = 4;
 	/*
