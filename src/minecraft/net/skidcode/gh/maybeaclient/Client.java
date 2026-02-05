@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.6";
+	public static final String clientVersion = "4.0.7";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -717,9 +717,8 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.6
-	 * Fixed huge schematicas causing huge lags when autoplace is enabled
-	 * Fixed instantmine crashing the game when breaking and placing zero-hardness blocks very fast
+	 * 4.0.7
+	 * Fixed version name
 	 */
 	
 	static {
