@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.7";
+	public static final String clientVersion = "4.0.8";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -720,6 +720,7 @@ public class Client {
 	 * 4.0.8
 	 * Added AutoStore (gameherobrine)
 	 * Added NoWater for AntiSlowdown (disabled by default) (gameherobrine)
+	 * Added SmoothLight (yawningcheese)
 	 */
 	
 	static {
