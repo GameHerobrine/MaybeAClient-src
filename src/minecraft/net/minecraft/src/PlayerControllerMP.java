@@ -224,7 +224,7 @@ public class PlayerControllerMP extends PlayerController {
         if (FastCraftHack.instance.status && var2 == 0 && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) &&
                 (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiCrafting)) {
             for (int i = 0; i <= 64; i++) {
-            	 //malicious and evil freehij
+            	//malicious and evil freehij
             	//what if kind and virtuous anu peforms more than 64 clicks to craft some very epik item~
             	
                 this.netClientHandler.addToSendQueue(new Packet102WindowClick(var1, var2, var3, var4, var7, var6));

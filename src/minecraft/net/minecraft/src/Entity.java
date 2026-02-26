@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.skidcode.gh.maybeaclient.Client;
+import net.skidcode.gh.maybeaclient.hacks.AntiSlowdownHack;
 import net.skidcode.gh.maybeaclient.hacks.CameraLockHack;
 import net.skidcode.gh.maybeaclient.hacks.FreecamHack;
 import net.skidcode.gh.maybeaclient.hacks.NoClipHack;
@@ -611,6 +612,9 @@ public abstract class Entity {
     }
 
     public boolean isInWater() {
+    	if(AntiSlowdownHack.instance.status && AntiSlowdownHack.instance.noWater.getValue()) {
+    		return false;
+    	}
         return this.inWater;
     }
 

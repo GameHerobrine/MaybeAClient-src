@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
+import net.skidcode.gh.maybeaclient.hacks.AutoStoreHack;
 import net.skidcode.gh.maybeaclient.hacks.LockTimeHack;
 import net.skidcode.gh.maybeaclient.hacks.WeatherLockHack;
 
@@ -525,7 +526,14 @@ public class NetClientHandler extends NetHandler {
         } else if (var1.windowId == this.mc.thePlayer.craftingInventory.windowId) {
             this.mc.thePlayer.craftingInventory.putStackInSlot(var1.itemSlot, var1.myItemStack);
         }
-
+        
+        if(AutoStoreHack.instance.status) {
+        	if(AutoStoreHack.instance.awaiting) {
+        		AutoStoreHack.instance.handlePickup(var1);
+        		AutoStoreHack.instance.awaiting = false;
+        	}
+        }
+        
     }
 
     public void func_20089_a(Packet106Transaction var1) {

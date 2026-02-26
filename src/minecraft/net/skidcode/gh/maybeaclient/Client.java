@@ -717,8 +717,9 @@ public class Client {
 	*/
 	
 	/**
-	 * 4.0.7
-	 * Fixed version name
+	 * 4.0.8
+	 * Added AutoStore (gameherobrine)
+	 * Added NoWater for AntiSlowdown (disabled by default) (gameherobrine)
 	 */
 	
 	static {
@@ -841,6 +842,8 @@ public class Client {
 		registerHack(new AutoShearHack());
 		registerHack(new ImageViewerHack());
 		registerHack(new FastCraftHack());
+		//4.0.8 (gameherobrine)
+		registerHack(new AutoStoreHack());
 
 		/*registerHack(new Hack("Test", "test", org.lwjgl.input.Keyboard.KEY_NONE, net.skidcode.gh.maybeaclient.hacks.category.Category.RENDER) {
 			public Hack init() {

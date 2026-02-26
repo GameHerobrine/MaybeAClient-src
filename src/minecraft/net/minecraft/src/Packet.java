@@ -67,7 +67,7 @@ public abstract class Packet {
             if (var1 && !serverPacketIdList.contains(var6) || !var1 && !clientPacketIdList.contains(var6)) {
                 throw new IOException("Bad packet id " + var6);
             }
-
+            
             var3 = getNewPacket(var6);
             if (var3 == null) {
                 throw new IOException("Bad packet id " + var6);
