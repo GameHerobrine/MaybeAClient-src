@@ -233,7 +233,8 @@ public class Block {
 
     public float getBlockBrightness(IBlockAccess var1, int var2, int var3, int var4) {
     	if(XRayHack.INSTANCE.status) return 1.0f;
-    	if(FullBrightHack.INSTANCE.status) return Math.max(FullBrightHack.INSTANCE.brightness.getValue(), var1.getBrightness(var2, var3, var4, lightValue[this.blockID]));
+        if(FullBrightHack.INSTANCE.status && FullBrightHack.INSTANCE.smooth.value && !var1.isBlockOpaqueCube(var2, var3, var4)) return Math.max(FullBrightHack.INSTANCE.brightness.getValue(), var1.getBrightness(var2, var3, var4, lightValue[this.blockID]));
+    	if(FullBrightHack.INSTANCE.status && !FullBrightHack.INSTANCE.smooth.value) return Math.max(FullBrightHack.INSTANCE.brightness.getValue(), var1.getBrightness(var2, var3, var4, lightValue[this.blockID]));
         return var1.getBrightness(var2, var3, var4, lightValue[this.blockID]);
     }
 
