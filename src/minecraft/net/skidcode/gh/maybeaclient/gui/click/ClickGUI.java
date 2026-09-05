@@ -27,6 +27,7 @@ public class ClickGUI extends GuiScreen{
 	public ClickGUI(GuiScreen parent) {
 		this.parent = parent;
 		descHack = null;
+		Keyboard.enableRepeatEvents(true);
 	}
 	
 	@Override
@@ -285,6 +286,7 @@ public class ClickGUI extends GuiScreen{
 	}
 	@Override
 	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
 		if(prevGUIScale != newGUIScale) {
 			GUIUtils.setGUIScale(this, prevGUIScale);
 		}
