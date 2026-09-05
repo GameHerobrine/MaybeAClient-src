@@ -70,69 +70,62 @@ public class ImageViewerTab extends Tab{
 
     public static void loadTexture(File file) throws IOException {
         try {
-            Iterator<ImageReader> readers = ImageIO.getImageReadersBySuffix("gif");
-            boolean loadedAsGif = false;
-            if (file.getName().toLowerCase().endsWith(".gif") && readers.hasNext()) {
-                ImageReader reader = readers.next();
-                ImageInputStream stream = ImageIO.createImageInputStream(file);
-                reader.setInput(stream);
-                int frameCount = reader.getNumImages(true);
-                if (frameCount > 1) {
-                    List<Integer> ids = new ArrayList<>();
-                    List<Integer> delays = new ArrayList<>();
-                    for (int i = 0; i < frameCount; i++) {
-                        BufferedImage frame = reader.read(i);
-                        ids.add(uploadTexture(frame));
-                        int delay = 100;
-                        try {
-                            IIOMetadata metadata = reader.getImageMetadata(i);
-                            String formatName = metadata.getNativeMetadataFormatName();
-                            IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree(formatName);
-                            for (int j = 0; j < root.getLength(); j++) {
-                                IIOMetadataNode node = (IIOMetadataNode) root.item(j);
-                                if (node.getNodeName().equals("GraphicControlExtension")) {
-                                    String delayTime = node.getAttribute("delayTime");
-                                    if (delayTime != null && !delayTime.isEmpty()) {
-                                        delay = Integer.parseInt(delayTime) * 10;
-                                    }
+            ImageInputStream stream = ImageIO.createImageInputStream(file);
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(stream);
+            if (!readers.hasNext()) {
+                stream.close();
+                throw new IOException();
+            }
+            ImageReader reader = readers.next();
+            reader.setInput(stream);
+            boolean isGif = reader.getFormatName().equalsIgnoreCase("gif");
+            int frameCount = isGif ? reader.getNumImages(true) : 1;
+            if (isGif && frameCount > 1) {
+                List<Integer> ids = new ArrayList<>();
+                List<Integer> delays = new ArrayList<>();
+                for (int i = 0; i < frameCount; i++) {
+                    BufferedImage frame = reader.read(i);
+                    ids.add(uploadTexture(frame));
+                    int delay = 100;
+                    try {
+                        IIOMetadata metadata = reader.getImageMetadata(i);
+                        String formatName = metadata.getNativeMetadataFormatName();
+                        IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree(formatName);
+                        for (int j = 0; j < root.getLength(); j++) {
+                            IIOMetadataNode node = (IIOMetadataNode) root.item(j);
+                            if (node.getNodeName().equals("GraphicControlExtension")) {
+                                String delayTime = node.getAttribute("delayTime");
+                                if (delayTime != null && !delayTime.isEmpty()) {
+                                    delay = Integer.parseInt(delayTime) * 10;
                                 }
                             }
-                        } catch (Exception ignored) {
                         }
-                        if (delay <= 0) delay = 100;
-                        delays.add(delay);
+                    } catch (Exception ignored) {
                     }
-                    reader.dispose();
-                    stream.close();
-                    frameTextureIds = new int[ids.size()];
-                    frameDelaysMs = new int[ids.size()];
-                    for (int i = 0; i < ids.size(); i++) {
-                        frameTextureIds[i] = ids.get(i);
-                        frameDelaysMs[i] = delays.get(i);
-                    }
-                    currentFrame = 0;
-                    lastFrameTime = System.currentTimeMillis();
-                    isAnimated = true;
-                    textureId = frameTextureIds[0];
-                    loadedAsGif = true;
-                } else {
-                    BufferedImage frame = reader.read(0);
-                    reader.dispose();
-                    stream.close();
-                    frameTextureIds = null;
-                    frameDelaysMs = null;
-                    isAnimated = false;
-                    textureId = uploadTexture(frame);
-                    loadedAsGif = true;
+                    if (delay <= 0) delay = 100;
+                    delays.add(delay);
                 }
-            }
-            if (!loadedAsGif) {
-                BufferedImage image = ImageIO.read(file);
-                if (image == null) throw new IOException();
+                reader.dispose();
+                stream.close();
+                frameTextureIds = new int[ids.size()];
+                frameDelaysMs = new int[ids.size()];
+                for (int i = 0; i < ids.size(); i++) {
+                    frameTextureIds[i] = ids.get(i);
+                    frameDelaysMs[i] = delays.get(i);
+                }
+                currentFrame = 0;
+                lastFrameTime = System.currentTimeMillis();
+                isAnimated = true;
+                textureId = frameTextureIds[0];
+            } else {
+                BufferedImage frame = reader.read(0);
+                reader.dispose();
+                stream.close();
+                if (frame == null) throw new IOException();
                 frameTextureIds = null;
                 frameDelaysMs = null;
                 isAnimated = false;
-                textureId = uploadTexture(image);
+                textureId = uploadTexture(frame);
             }
         } catch (Exception e) {
             e.printStackTrace();
