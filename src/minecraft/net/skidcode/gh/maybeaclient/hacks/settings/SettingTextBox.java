@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.src.ChatAllowedCharacters;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.GuiScreen;
 import net.skidcode.gh.maybeaclient.Client;
 import net.skidcode.gh.maybeaclient.gui.click.ClickGUI;
 import net.skidcode.gh.maybeaclient.gui.click.Tab;
@@ -181,7 +182,7 @@ public class SettingTextBox extends Setting implements InputHandler{
 	public void onKeyPress(int keycode) {
 		boolean b = Keyboard.getEventKeyState();
 		if(!b) return;
-		if(keycode == Keyboard.KEY_ESCAPE) {
+		if(keycode == Keyboard.KEY_ESCAPE || keycode == Keyboard.KEY_RETURN) {
 			ClickGUI.setInputHandler(null);
 			return;
 		}
@@ -190,6 +191,11 @@ public class SettingTextBox extends Setting implements InputHandler{
 			return;
 		}
 		char c = Keyboard.getEventCharacter();
+
+		if (c == 22) {
+			this.setValue(this.value + GuiScreen.getClipboardString());
+			return;
+		}
 		
 		if(ChatAllowedCharacters.allowedCharacters.indexOf(c) >= 0) this.setValue(this.value + c);
 	}

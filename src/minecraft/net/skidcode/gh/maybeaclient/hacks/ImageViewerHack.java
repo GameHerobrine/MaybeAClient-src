@@ -16,8 +16,8 @@ import java.nio.file.InvalidPathException;
 public class ImageViewerHack extends Hack {
     public static ImageViewerHack instance;
     public SettingButton select = new SettingButton(this, "Select");
-    public SettingInteger width = new SettingInteger(this, "Width", 50, 5, 250, 5);
-    public SettingInteger height = new SettingInteger(this, "Height", 50, 5, 250, 5);
+    public SettingInteger width = new SettingInteger(this, "Width", 50, 5, 500, 5);
+    public SettingInteger height = new SettingInteger(this, "Height", 50, 5, 500, 5);
     static String errorMsg = "";
 
     public ImageViewerHack() {
@@ -32,6 +32,9 @@ public class ImageViewerHack extends Hack {
         if (b == select) {
             mc.displayGuiScreen(new SelectImageGUI());
             return;
+        }
+        if (b == this.resetToDefaults) {
+            ImageViewerTab.resetImage();
         }
         super.onPressed(b);
     }
@@ -63,6 +66,7 @@ public class ImageViewerHack extends Hack {
         public void initGui() {
             this.textInput = new CustomTextField(this, this.fontRenderer, this.width / 2 - 200,
                     this.height / 4 - 10 + 50 + 18, 400, 20);
+            this.textInput.isFocused = true;
             this.controlList.add(new GuiButton(0, this.width / 2 - 200, this.height / 4 + 96 + 12, 195, 20, "Cancel"));
             this.controlList.add(new GuiButton(1, this.width / 2 + 5, this.height / 4 + 96 + 12, 195, 20, "Apply"));
         }
@@ -74,7 +78,13 @@ public class ImageViewerHack extends Hack {
                     mc.displayGuiScreen(new ClickGUI(null));
                     break;
                 case 1:
-                    File file = new File(this.textInput.getText().replaceAll("[\"*?<>|]", ""));
+                    String input = this.textInput.getText().replaceAll("[\"*?<>|]", "");
+                    if (input.isEmpty()) {
+                        ImageViewerTab.resetImage();
+                        mc.displayGuiScreen(new ClickGUI(null));
+                        return;
+                    }
+                    File file = new File(input);
                     try {
                         file.toPath();
                     } catch (InvalidPathException e) {
@@ -125,6 +135,11 @@ public class ImageViewerHack extends Hack {
         @Override
         public void updateScreen() {
             this.textInput.updateCursorCounter();
+        }
+
+        @Override
+        public void onGuiClosed() {
+            errorMsg = "";
         }
     }
 }
