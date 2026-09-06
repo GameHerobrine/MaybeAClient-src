@@ -48,6 +48,7 @@ public class GuiChat extends GuiScreen {
     public int cursorPosition = 0;
     public int selectStart = -1;
     public int selectEnd = -1;
+    public int selectAnchor = -1;
     public void removeSelected() {
     	this.message = this.message.substring(0, this.selectStart)+this.message.substring(this.selectEnd, this.message.length());
 		this.cursorPosition = this.selectStart;
@@ -55,17 +56,37 @@ public class GuiChat extends GuiScreen {
     }
     protected void keyTyped(char var1, int code) {
     	if(Client.BETTER_CHAT_CONTROLS) {
+    		boolean shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+    		boolean ctrlHeld = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
     		if(code == Keyboard.KEY_LEFT) {
-    			if(this.selectStart != -1 && this.selectEnd != -1) {
-    				this.cursorPosition = 0;
+    			int target = ctrlHeld ? this.prevWordBoundary(this.cursorPosition) : Math.max(0, this.cursorPosition - 1);
+    			if(shiftHeld) {
+    				if(this.selectStart == -1 && this.selectEnd == -1) this.selectAnchor = this.cursorPosition;
+    				this.cursorPosition = target;
+    				this.selectStart = Math.min(this.selectAnchor, this.cursorPosition);
+    				this.selectEnd = Math.max(this.selectAnchor, this.cursorPosition);
+    				if(this.selectStart == this.selectEnd) this.selectStart = this.selectEnd = -1;
+    			}else if(this.selectStart != -1 && this.selectEnd != -1) {
+    				this.cursorPosition = this.selectStart;
     				this.selectStart = this.selectEnd = -1;
-    			}else if(this.cursorPosition > 0) --this.cursorPosition;
+    			}else {
+    				this.cursorPosition = target;
+    			}
     		}
     		if(code == Keyboard.KEY_RIGHT) {
-    			if(this.selectStart != -1 && this.selectEnd != -1) {
-    				this.cursorPosition = this.message.length();
+    			int target = ctrlHeld ? this.nextWordBoundary(this.cursorPosition) : Math.min(this.message.length(), this.cursorPosition + 1);
+    			if(shiftHeld) {
+    				if(this.selectStart == -1 && this.selectEnd == -1) this.selectAnchor = this.cursorPosition;
+    				this.cursorPosition = target;
+    				this.selectStart = Math.min(this.selectAnchor, this.cursorPosition);
+    				this.selectEnd = Math.max(this.selectAnchor, this.cursorPosition);
+    				if(this.selectStart == this.selectEnd) this.selectStart = this.selectEnd = -1;
+    			}else if(this.selectStart != -1 && this.selectEnd != -1) {
+    				this.cursorPosition = this.selectEnd;
     				this.selectStart = this.selectEnd = -1;
-    			}else if(this.cursorPosition < this.message.length()) ++this.cursorPosition;
+    			}else {
+    				this.cursorPosition = target;
+    			}
     		}
     		if(code == Keyboard.KEY_HOME) {
     			this.cursorPosition = 0;
@@ -184,6 +205,21 @@ public class GuiChat extends GuiScreen {
         	}
         }
     }
+    int prevWordBoundary(int pos) {
+    	if(pos <= 0) return 0;
+    	int i = pos;
+    	while(i > 0 && Character.isWhitespace(this.message.charAt(i-1))) --i;
+    	while(i > 0 && !Character.isWhitespace(this.message.charAt(i-1))) --i;
+    	return i;
+    }
+    int nextWordBoundary(int pos) {
+    	int len = this.message.length();
+    	if(pos >= len) return len;
+    	int i = pos;
+    	while(i < len && Character.isWhitespace(this.message.charAt(i))) ++i;
+    	while(i < len && !Character.isWhitespace(this.message.charAt(i))) ++i;
+    	return i;
+    }
     public void append(char c) {
     	if (field_20082_i.indexOf(c) >= 0 && this.message.length() < 100) {
         	if(this.selectStart != -1 && this.selectEnd != -1) {
@@ -197,13 +233,9 @@ public class GuiChat extends GuiScreen {
         this.drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
         if(Client.BETTER_CHAT_CONTROLS) {
         	StringBuilder sb = new StringBuilder(this.message);
-        	String insert = this.selectEnd == -1 && this.selectStart == -1 && this.updateCounter / 6 % 2 == 0 ? "|" : "";
-        	sb.insert(this.cursorPosition, insert);
-        	
-        	
+        	int yStart = this.height - 12;
+        	int yEnd = this.height - 4;
         	if(this.selectEnd != -1 && this.selectStart != -1) {
-        		int yStart = this.height - 12;
-        		int yEnd = this.height - 4;
         		int xStart = 4 + this.fontRenderer.getStringWidth("> "+this.message.substring(0, this.selectStart));
         		int xEnd = xStart + this.fontRenderer.getStringWidth(this.message.substring(this.selectStart, this.selectEnd));
         		this.drawRect(xStart, yStart, xEnd, yEnd, 0xffffffff);
@@ -212,7 +244,10 @@ public class GuiChat extends GuiScreen {
         	}
         	String rendMsg = sb.toString();
         	this.drawString(this.fontRenderer, "> " + rendMsg, 4, this.height - 12, 14737632);
-        	
+        	if(this.selectEnd == -1 && this.selectStart == -1 && this.updateCounter / 6 % 2 == 0) {
+        		int cursorX = 4 + this.fontRenderer.getStringWidth("> "+this.message.substring(0, this.cursorPosition));
+        		this.drawRect(cursorX, yStart, cursorX + 1, yEnd, 0xffffffff);
+        	}
         }else {
         	this.drawString(this.fontRenderer, "> " + this.message + (this.updateCounter / 6 % 2 == 0 ? "_" : ""), 4, this.height - 12, 14737632);
         }
@@ -224,10 +259,6 @@ public class GuiChat extends GuiScreen {
     		if(button == 0) {
     			this.mouseClicked = false;
     		}else {
-    			StringBuilder sb = new StringBuilder(this.message);
-            	String insert = this.selectEnd == -1 && this.selectStart == -1 && this.updateCounter / 6 % 2 == 0 ? "|" : "";
-            	sb.insert(this.cursorPosition, insert);
-            	String rendMsg = sb.toString();
     			int xmin = 2;
     			int begWid = this.fontRenderer.getStringWidth("> ");
             	if(x <= begWid+xmin) {
@@ -235,15 +266,11 @@ public class GuiChat extends GuiScreen {
                 	this.selectEnd = Math.max(0, this.cursorPosition);
             		return;
             	}
-            	char[] c = rendMsg.toCharArray();
+            	char[] c = this.message.toCharArray();
             	int xx = begWid;
             	int index = 0;
             	for(int i = 0; i < c.length; ++i) {
             		int w = this.fontRenderer.getCharWidth(c[i]);
-            		if(i == this.cursorPosition && (this.selectEnd == -1 && this.selectStart == -1 && this.updateCounter / 6 % 2 == 0)) {
-            			xx += w;
-            			continue;
-            		}
             		if(x > xx+w) {
             			++index;
             		}else {
@@ -261,10 +288,6 @@ public class GuiChat extends GuiScreen {
             if(Client.BETTER_CHAT_CONTROLS) {
             	
             	if(GUIUtils.isInsideRect(x, y, 2, this.height - 14, this.width - 2, this.height - 2)) {
-            		StringBuilder sb = new StringBuilder(this.message);
-                	String insert = this.selectEnd == -1 && this.selectStart == -1 && this.updateCounter / 6 % 2 == 0 ? "|" : "";
-                	sb.insert(this.cursorPosition, insert);
-                	String rendMsg = sb.toString();
                 	int xmin = 2;
                 	int xmax = this.width - 2;
                 	int begWid = this.fontRenderer.getStringWidth("> ");
@@ -274,15 +297,11 @@ public class GuiChat extends GuiScreen {
                 		this.selectEnd = this.selectStart = -1;
                 		return;
                 	}
-                	char[] c = rendMsg.toCharArray();
+                	char[] c = this.message.toCharArray();
                 	int xx = begWid;
                 	int index = 0;
                 	for(int i = 0; i < c.length; ++i) {
                 		int w = this.fontRenderer.getCharWidth(c[i]);
-                		if(i == this.cursorPosition && (this.selectEnd == -1 && this.selectStart == -1 && this.updateCounter / 6 % 2 == 0)) {
-                			xx += w;
-                			continue;
-                		}
                 		if(x > xx+w) {
                 			++index;
                 		}else {

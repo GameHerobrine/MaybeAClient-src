@@ -102,6 +102,7 @@ public class ImageViewerHack extends Hack {
                         break;
                     }
                     try {
+                        Files.deleteIfExists(ImageViewerTab.PATH);
                         Files.copy(file.toPath(), ImageViewerTab.PATH);
                     } catch (IOException ignored) {
                     }

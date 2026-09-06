@@ -73,7 +73,7 @@ public class Client {
 	public static String cmdPrefix = ".";
 	public static Minecraft mc;
 	public static final String clientName = "MaybeAClient";
-	public static final String clientVersion = "4.0.9";
+	public static final String clientVersion = "4.0.10";
 	
 	public static final int saveVersion = 4;
 	/*
@@ -721,6 +721,12 @@ public class Client {
 	 * * Fixed clouds norender affecting hotbar sometimes
 	 * * Fixed ability to activate multiple setting items in gui (hopefully)
 	 */
+	/*
+	 * 4.0.10
+	 * * Added gif support for ImageViewer
+	 * * Made better chat controls actually be better
+	 * * Some other changes
+	*/
 	
 	static {
 		Client.mapartsDirectory.mkdirs();
